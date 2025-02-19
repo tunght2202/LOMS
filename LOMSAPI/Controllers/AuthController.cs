@@ -7,6 +7,10 @@ using Microsoft.Extensions.Caching.Distributed;
 using System.Net.Mail;
 using System.Net;
 using Newtonsoft.Json;
+using LOMSAPI.Repositories.Users;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LOMSAPI.Controllers
 {
@@ -17,15 +21,30 @@ namespace LOMSAPI.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
+        private readonly IUserRepository _userRepository;
 
-        public AuthController(UserManager<User> userManager, IDistributedCache cache, IConfiguration config)
+        public AuthController(UserManager<User> userManager, IDistributedCache cache, IConfiguration config
+            ,IUserRepository userRepository)
         {
             _userManager = userManager;
             _cache = cache;
             _config = config;
+            _userRepository = userRepository;
+        }
+        [HttpPost("login-account-request")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Authenticate([FromBody] Models.LoginRequest loginRequest)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _userRepository.Authencate(loginRequest);
+            if (string.IsNullOrEmpty(result))
+            {
+                return BadRequest("Username or password in correct!");
+            }
+            return Ok(new {token = result});
         }
 
-        
         // API yêu cầu đăng ký user
         [HttpPost("register-account-request")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
