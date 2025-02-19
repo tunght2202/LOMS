@@ -1,6 +1,9 @@
 ﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -19,6 +22,7 @@ builder.Services.AddDbContext<LOMSDbContext>(options => {
     // Sử dụng MS SQL Server
     options.UseSqlServer(connectstring);
 });
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddIdentity<User, IdentityRole>()
         .AddEntityFrameworkStores<LOMSDbContext>()
         .AddDefaultTokenProviders();
@@ -46,6 +50,9 @@ builder.Services.Configure<IdentityOptions>(options => {
     options.SignIn.RequireConfirmedPhoneNumber = false;     // Xác thực số điện thoại
 
 });
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
