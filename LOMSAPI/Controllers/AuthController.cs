@@ -52,6 +52,7 @@ namespace LOMSAPI.Controllers
         }
 
         [HttpPost("register-account")]
+        [AllowAnonymous]
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyOtpModel model)
         {
             var result = await _userRepository.VerifyEmailAsync(model);
