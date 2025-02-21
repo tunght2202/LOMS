@@ -62,6 +62,7 @@ namespace LOMSAPI.Controllers
         }
 
         [HttpPost("reset-password-request")]
+        [AllowAnonymous]
         public async Task<IActionResult> ResetPasswordRequest([FromBody] ForgotPasswordModel model)
         {
             var result = await _userRepository.RequestPasswordResetAsync(model);
@@ -71,6 +72,7 @@ namespace LOMSAPI.Controllers
         }
 
         [HttpPost("reset-password")]
+        [AllowAnonymous]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
         {
             var result = await _userRepository.ResetPasswordAsync(model);
