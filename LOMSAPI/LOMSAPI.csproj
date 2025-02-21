@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\Base\**" />
+    <Compile Remove="Repositories\Implementations\**" />
+    <Compile Remove="Repositories\Interfaces\**" />
+    <Content Remove="Repositories\Base\**" />
+    <Content Remove="Repositories\Implementations\**" />
+    <Content Remove="Repositories\Interfaces\**" />
+    <EmbeddedResource Remove="Repositories\Base\**" />
+    <EmbeddedResource Remove="Repositories\Implementations\**" />
+    <EmbeddedResource Remove="Repositories\Interfaces\**" />
+    <None Remove="Repositories\Base\**" />
+    <None Remove="Repositories\Implementations\**" />
+    <None Remove="Repositories\Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
@@ -24,12 +39,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\Interfaces\" />
-    <Folder Include="Repositories\Implementations\" />
-    <Folder Include="Repositories\Base\" />
   </ItemGroup>
 
 </Project>
