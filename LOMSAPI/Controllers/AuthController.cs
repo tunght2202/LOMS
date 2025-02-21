@@ -48,10 +48,7 @@ namespace LOMSAPI.Controllers
 
         // API yêu cầu đăng ký user
         [HttpPost("register-account-request")]
-<<<<<<< HEAD
-=======
-       
->>>>>>> 1836d2f (add bearer jwt)
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             if (!ModelState.IsValid)
