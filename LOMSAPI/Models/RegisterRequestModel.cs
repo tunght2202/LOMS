@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-public class RegisterModel
+public class RegisterRequestModel
 {
     [Required]
     public string UserName { get; set; }

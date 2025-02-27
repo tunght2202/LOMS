@@ -42,24 +42,25 @@ namespace LOMSAPI.Controllers
 
         [HttpPost("register-account-request")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> RegisterRequest([FromBody] RegisterRequestModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var result = await _userRepository.RegisterAsync(model);
+            var result = await _userRepository.RegisterRequestAsync(model);
             if (!result) return BadRequest("Lỗi trong quá trình đăng ký.");
 
             return Ok(new { message = "Vui lòng kiểm tra email để nhập mã xác thực." });
         }
-
+        
+        
         [HttpPost("register-account")]
         [AllowAnonymous]
-        public async Task<IActionResult> VerifyEmail([FromBody] VerifyOtpModel model)
+        public async Task<IActionResult> RegisterAccount([FromBody] VerifyOtpModel model)
         {
-            var result = await _userRepository.VerifyEmailAsync(model);
+            var result = await _userRepository.RegisterAccountAsync(model);
             if (!result) return BadRequest("Mã OTP không hợp lệ hoặc đã hết hạn.");
 
-            return Ok(new { message = "Register successfully!" });
+            return Ok(new { message = "Đăng kí thành công!" });
         }
 
         [HttpPost("reset-password-request")]
@@ -71,7 +72,15 @@ namespace LOMSAPI.Controllers
 
             return Ok(new { message = "Mã OTP đã được gửi qua email." });
         }
+        [HttpPost("reset-password-verify-otp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpModel model)
+        {
+            var result = await _userRepository.VerifyOtpAsync(model);
+            if (!result) return BadRequest("Mã OTP không hợp lệ hoặc đã hết hạn.");
 
+            return Ok(new { message = "OTP hợp lệ. Bạn có thể đặt lại mật khẩu." });
+        }
         [HttpPost("reset-password")]
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
