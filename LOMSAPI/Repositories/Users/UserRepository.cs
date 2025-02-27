@@ -51,7 +51,7 @@ namespace LOMSAPI.Repositories.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> RegisterAsync(RegisterModel model)
+        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model)
         {
             var user = new User
             {
@@ -71,6 +71,10 @@ namespace LOMSAPI.Repositories.Users
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
+            await _cache.SetStringAsync("REGISTER_EMAIL", model.Email, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
 
             await _cache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(user), new DistributedCacheEntryOptions
             {
@@ -82,9 +86,10 @@ namespace LOMSAPI.Repositories.Users
             return true;
         }
 
-        public async Task<bool> VerifyEmailAsync(VerifyOtpModel model)
+        public async Task<bool> RegisterAccountAsync(VerifyOtpModel model)
         {
-            var otpCode = await _cache.GetStringAsync($"OTP_{model.Email}");
+            var userEmail = await _cache.GetStringAsync("REGISTER_EMAIL");
+            var otpCode = await _cache.GetStringAsync($"OTP_{userEmail}");
             if (otpCode == null || otpCode != model.OtpCode) return false;
 
             var userInfoString = await _cache.GetStringAsync("user_info");
@@ -94,7 +99,7 @@ namespace LOMSAPI.Repositories.Users
             var newUser = new User
             {
                 UserName = userInfo.UserName,
-                Email = model.Email,
+                Email = userEmail,
                 PhoneNumber = userInfo.PhoneNumber,
                 EmailConfirmed = true,
                 PasswordHash = userInfo.PasswordHash
@@ -104,7 +109,8 @@ namespace LOMSAPI.Repositories.Users
             if (!result.Succeeded) return false;
 
             await _cache.RemoveAsync("user_info");
-            await _cache.RemoveAsync($"OTP_{model.Email}");
+            await _cache.RemoveAsync($"OTP_{userEmail}");
+            await _cache.RemoveAsync("REGISTER_EMAIL");
 
             return true;
         }
@@ -119,24 +125,48 @@ namespace LOMSAPI.Repositories.Users
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
-
+            await _cache.SetStringAsync("RESET_EMAIL", user.Email, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
             await SendEmailAsync(user.Email, "Mã OTP đặt lại mật khẩu", $"Mã OTP: {otpCode}");
+
+            return true;
+        }
+        public async Task<bool> VerifyOtpAsync(VerifyOtpModel model)
+        {
+            var userEmail = await _cache.GetStringAsync("RESET_EMAIL");
+            var cachedOtp = await _cache.GetStringAsync($"OTP_RESET_{userEmail}");
+            if (cachedOtp == null || cachedOtp != model.OtpCode) return false;
+
+            
+            await _cache.SetStringAsync($"Verified_{userEmail}", "true", new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
 
             return true;
         }
 
         public async Task<bool> ResetPasswordAsync(ResetPasswordModel model)
         {
-            var otpCode = await _cache.GetStringAsync($"OTP_RESET_{model.Email}");
-            if (otpCode == null || otpCode != model.OtpCode) return false;
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var userEmail = await _cache.GetStringAsync("RESET_EMAIL");
+            var isVerified = await _cache.GetStringAsync($"Verified_{userEmail}");
+            if (string.IsNullOrEmpty(isVerified) || isVerified != "true") return false;
+            var user = await _userManager.FindByEmailAsync($"{userEmail}");
             if (user == null) return false;
 
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
             var result = await _userManager.ResetPasswordAsync(user, resetToken, model.NewPassword);
 
-            return result.Succeeded;
+            if (!result.Succeeded) return false;
+
+            // Xóa trạng thái OTP sau khi đặt lại mật khẩu thành công
+            await _cache.RemoveAsync("RESET_EMAIL");
+            await _cache.RemoveAsync($"Verified_{userEmail}");
+            await _cache.RemoveAsync($"OTP_RESET_{userEmail}");
+
+            return true;
         }
 
         private async Task SendEmailAsync(string toEmail, string subject, string body)
@@ -159,5 +189,7 @@ namespace LOMSAPI.Repositories.Users
             mailMessage.To.Add(toEmail);
             await smtpClient.SendMailAsync(mailMessage);
         }
+
+        
     }
 }
