@@ -10,6 +10,7 @@ using LOMSAPI.Repositories.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using LOMSAPI.Repositories.Comments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,7 +59,9 @@ builder.Services.AddTransient<UserManager<User>, UserManager<User>>();
 builder.Services.AddTransient<SignInManager<User>, SignInManager<User>>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICommentRepository,CommentRepository>();
 
 builder.Services.AddSwaggerGen(c =>
 {
