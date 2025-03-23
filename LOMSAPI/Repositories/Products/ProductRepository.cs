@@ -91,6 +91,43 @@ namespace LOMSAPI.Repositories.Products
 
             return await _context.SaveChangesAsync();
         }
+
+        public async Task<int> UpdatePriceProduct(int productId, int price)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == productId);
+
+            if (product == null) 
+            {
+                throw new Exception($"Can't find a product with id = {productId}");
+            }
+
+            product.Price = price;
+            return await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> UpdateStockProduct(int productId, int reduceProduct)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == productId);
+
+            if (product == null)
+            {
+                throw new Exception($"Can't find a product with id = {productId}");
+            }
+            var stock = product.Stock;
+
+            if (stock < reduceProduct) 
+            {
+                throw new Exception("stock not enough !");
+            }
+
+            if(reduceProduct < 0)
+            {
+                throw new Exception("reduce product can't is  negative number");
+            }
+
+            product.Stock = product.Stock - reduceProduct;
+            return await _context.SaveChangesAsync();
+        }
         //public async Task DeleteProduct(int id)
         //{
         //    var product = await _context.Products.FindAsync(id);
