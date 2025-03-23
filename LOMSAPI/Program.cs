@@ -6,10 +6,12 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System;
-using LOMSAPI.Repositories.Users;
+using LOMSAPI.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using LOMSAPI.Repositories.Products;
+using LOMSAPI.Repositories.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,8 +58,8 @@ builder.Services.Configure<IdentityOptions>(options => {
 });
 builder.Services.AddTransient<UserManager<User>, UserManager<User>>();
 builder.Services.AddTransient<SignInManager<User>, SignInManager<User>>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
-
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddSwaggerGen(c =>
