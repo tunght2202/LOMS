@@ -7,7 +7,7 @@ namespace LOMSAPI.Data.Entities
     public class Customer
     {
         [Key]
-        public int CustomerID { get; set; }
+        public string CustomerID { get; set; }
 
         [Required, MaxLength(255)]
         public string FullName { get; set; }
