@@ -62,6 +62,11 @@ namespace LOMSAPI.Data.Entities
                 .WithMany(ls => ls.Orders)
                 .HasForeignKey(o => o.LivestreamID)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Product>()
+                .HasOne(p => p.LiveStream)
+                .WithMany(ls => ls.Products)
+                .HasForeignKey(p => p.LiveStreamID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<OrderDetail>()
                 .HasOne(od => od.Order)
