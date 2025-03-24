@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LOMSAPI.Data.Entities
@@ -16,8 +17,11 @@ namespace LOMSAPI.Data.Entities
 
         public decimal Price { get; set; }
         public int Stock { get; set; }
+        public bool Status { get; set; }
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
+        public LiveStream LiveStream { get; set; }
+        public string LivestreamID { get; set; }
     }
 
 }

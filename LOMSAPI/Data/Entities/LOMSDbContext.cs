@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Reflection.Emit;
@@ -85,6 +86,12 @@ namespace LOMSAPI.Data.Entities
             .HasOne(o => o.Shipping)
             .WithOne(s => s.Order)
             .HasForeignKey<Shipping>(s => s.OrderID);
+
+            builder.Entity<Product>()
+                .HasOne(pm => pm.LiveStream)
+                .WithMany(o => o.Products)
+                .HasForeignKey(pm => pm.LivestreamID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

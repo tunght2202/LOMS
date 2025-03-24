@@ -14,7 +14,7 @@ namespace LOMSAPI.Data.Entities
         public Customer Customer { get; set; }
 
         [ForeignKey("LiveStream")]
-        public int LivestreamID { get; set; }
+        public string LivestreamID { get; set; }
         public LiveStream LiveStream { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public string Status { get; set; } // Pending, Confirmed, Shipped, Delivered

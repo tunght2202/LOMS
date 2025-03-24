@@ -10,7 +10,7 @@ namespace LOMSAPI.Repositories.Comments
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
 
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBOZCtyhios9b8BSoytLgFoJjGWdeXAKE8hXLZBgB6qCoqACWsHyWfqbDpxrgfUzZBDNVdI0hgfHLwc8Fwa4RqZCsZA60nrsZAaFRfqqCHaZClF5prag16xmBhYSNyShTMsA1fb4zP1AkUnffwMqSli5BLvNsIn28gLDUYKm5544dwvhDD0njJIfaBAOFvSyP9fZAewv9LsR8bHm3OruEZD";
+        private const string ACCESS_TOKEN = "EAAIYLfie53cBOZBIvkppFHMBLPrkRoScI2ZB4jWgBEcckrFq8ZA1qTaPsqwSYlbYZCFXBdnI0DZBZA1eAyBvs4abxfQvt0MdjMxYvTGmgBvFBdOK8ytZB2JOORDv8z0uY3Ay58JRz9upfNAlLtPEP86wLZAPUYcVHuqsB74S999W85ZABY5XtiBfuZBPA6VHXzGpu3lIDp21sr14jqBO4SEiP5JGQZD";
         public CommentRepository(LOMSDbContext context, HttpClient httpClient)
         {
             _context = context;
@@ -48,25 +48,25 @@ namespace LOMSAPI.Repositories.Comments
 
         private List<Comment> ParseComments(string jsonResponse)
         {
-            using JsonDocument doc = JsonDocument.Parse(jsonResponse);
-            JsonElement root = doc.RootElement;
+            //using JsonDocument doc = JsonDocument.Parse(jsonResponse);
+            //JsonElement root = doc.RootElement;
 
             List<Comment> comments = new List<Comment>();
 
-            if (root.TryGetProperty("data", out JsonElement dataElement))
-            {
-                foreach (JsonElement item in dataElement.EnumerateArray())
-                {
-                    var comment = new Comment
-                    {
-                        CommentID = item.GetProperty("id").GetInt32(),
-                        Content = item.GetProperty("message").GetString(),
-                        CommentTime = item.GetProperty("created_time").GetDateTime(),
-                        CustomerID = item.GetProperty("from").GetProperty("id").GetInt32()
-                    };
-                    comments.Add(comment);
-                }
-            }
+            //if (root.TryGetProperty("data", out JsonElement dataElement))
+            //{
+            //    foreach (JsonElement item in dataElement.EnumerateArray())
+            //    {
+            //        var comment = new Comment
+            //        {
+            //            CommentID = item.GetProperty("id").GetString(),
+            //            Content = item.GetProperty("message").GetString(),
+            //            CommentTime = item.GetProperty("created_time").GetDateTime(),
+            //            CustomerID = int.Parse(item.GetProperty("from").GetProperty("id").GetString())
+            //        };
+            //        comments.Add(comment);
+            //    }
+            //}
 
             return comments;
         }

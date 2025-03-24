@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LOMSAPI.Data.Entities
@@ -22,7 +23,7 @@ namespace LOMSAPI.Data.Entities
 
         public int SuccessfulDeliveries { get; set; } = 0;
         public int FailedDeliveries { get; set; } = 0;
-
+        public bool Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 

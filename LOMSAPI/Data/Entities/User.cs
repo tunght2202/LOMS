@@ -1,3 +1,4 @@
+﻿
 using Microsoft.AspNetCore.Identity;
 
 namespace LOMSAPI.Data.Entities
@@ -6,5 +7,6 @@ namespace LOMSAPI.Data.Entities
     {
         public DateTime CreatedAt { get; set; }
         public virtual ICollection<LiveStream> LiveStreams { get; set; }
+        
     }
 }
