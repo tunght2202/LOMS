@@ -18,17 +18,29 @@ namespace LOMSAPI.Controllers
         }
 
         // Lấy danh sách sản phẩm
-        [HttpGet]
+        [HttpGet("GetProducts")]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return Ok(await _productRepository.GetAllProducts());
         }
 
         // Lấy sản phẩm theo ID
-        [HttpGet("{id}")]
+        [HttpGet("GetProductId/{id}")]
         public async Task<ActionResult<ProductModel>> GetProduct(int id)
         {
             var product = await _productRepository.GetProductById(id);
+            if (product == null)
+            {
+                return NotFound("Sản phẩm không tồn tại.");
+            }
+            return Ok(product);
+        }
+        
+        // Lấy sản phẩm theo LiveStream ID
+        [HttpGet("GetProductByLiveStreamId/{liveStreamId}")]
+        public async Task<ActionResult<ProductModel>> GetProductByLiveStreamId(string liveStreamId)
+        {
+            var product = await _productRepository.GetAllProductsByLiveStream(liveStreamId);
             if (product == null)
             {
                 return NotFound("Sản phẩm không tồn tại.");
@@ -84,7 +96,21 @@ namespace LOMSAPI.Controllers
 
                 return CreatedAtAction(nameof(GetProduct), new { id = product.ProductID }, product);
             }
-            return BadRequest("Update Price  Producr Fail");
+            return BadRequest("Update Price  Product Fail");
+        }
+
+        // Xóa sản phẩm theo status
+        [HttpDelete("DeleteProductById/{id}")]
+        public async Task<ActionResult> DeleteProdutById(int id)
+        {
+            var result = await _productRepository.DeleteProduct(id);
+            if(result == 1)
+            {
+                var product = await _productRepository.GetProductById(id);
+
+                return CreatedAtAction(nameof(GetProduct), new { id = product.ProductID }, product);
+            }
+            return BadRequest("Delete product Fail");
         }
 
     }
