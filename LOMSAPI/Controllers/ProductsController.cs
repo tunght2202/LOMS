@@ -48,6 +48,18 @@ namespace LOMSAPI.Controllers
             return Ok(product);
         }
 
+        // Lấy sản phẩm theo User ID
+        [HttpGet("GetAllProductsByUser/{userId}")]
+        public async Task<ActionResult<ProductModel>> GetAllProductsByUser(string userId)
+        {
+            var product = await _productRepository.GetAllProductsByUser(userId);
+            if (product == null)
+            {
+                return NotFound("Sản phẩm không tồn tại.");
+            }
+            return Ok(product);
+        }
+
         // Thêm sản phẩm mới
         [HttpPost]
         public async Task<ActionResult> AddProduct([FromBody] ProductModel product)
@@ -55,19 +67,19 @@ namespace LOMSAPI.Controllers
             var result = await _productRepository.AddProduct(product);
             if (result == 1)
             {
-                return CreatedAtAction(nameof(GetProduct), new { id = product.ProductID }, product);
+                return Ok();
             }
             return BadRequest("Create Producr Fail");
         }
 
         // Cập nhật sản phẩm
         [HttpPut("updateProduct/{id}")]
-        public async Task<ActionResult> UpdateProduct(int id,[FromForm] ProductModel product)
+        public async Task<ActionResult> UpdateProduct(int id,[FromForm] UpdateProductModel product)
         {
             var result = await _productRepository.UpdateProduct(id,product);
             if (result == 1)
             {
-                return CreatedAtAction(nameof(GetProduct), new { id = product.ProductID }, product);
+                return Ok();
             }
             return BadRequest("Update Producr Fail");
         }
@@ -78,8 +90,7 @@ namespace LOMSAPI.Controllers
             var result = await _productRepository.UpdateStockProduct(id, reduceStockProduct);
             if (result == 1)
             {
-                var product = await _productRepository.GetProductById(id);
-                return CreatedAtAction(nameof(GetProduct), new { id = product.ProductID }, product);
+                return Ok();
             }
             return BadRequest("Update Producr Fail");
         }
@@ -91,10 +102,7 @@ namespace LOMSAPI.Controllers
             var result = await _productRepository.UpdatePriceProduct(id, newPrice);
             if (result == 1)
             {
-
-                var product = await _productRepository.GetProductById(id);
-
-                return CreatedAtAction(nameof(GetProduct), new { id = product.ProductID }, product);
+                return Ok();
             }
             return BadRequest("Update Price  Product Fail");
         }
@@ -106,9 +114,7 @@ namespace LOMSAPI.Controllers
             var result = await _productRepository.DeleteProduct(id);
             if(result == 1)
             {
-                var product = await _productRepository.GetProductById(id);
-
-                return CreatedAtAction(nameof(GetProduct), new { id = product.ProductID }, product);
+                return Ok();
             }
             return BadRequest("Delete product Fail");
         }
