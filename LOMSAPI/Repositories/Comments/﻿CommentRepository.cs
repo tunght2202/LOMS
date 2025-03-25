@@ -19,6 +19,7 @@ namespace LOMSAPI.Repositories.Comments
 
         public async Task<List<Comment>> GetAllComments(string LiveStreamURL)
         {
+            //Dùng hàm này đến khi nào Bảng LiveStream có dữ liệu
             string liveStreamId = ExtractLiveStreamId(LiveStreamURL);
             if (string.IsNullOrEmpty(liveStreamId))
                 throw new ArgumentException("Không thể lấy LiveStream ID từ URL");

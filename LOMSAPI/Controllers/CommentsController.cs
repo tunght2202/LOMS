@@ -8,7 +8,7 @@ namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [AllowAnonymous]
     public class CommentController : ControllerBase
     {
         private readonly ICommentRepository _commentRepository;
