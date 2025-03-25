@@ -60,5 +60,41 @@ namespace LOMSUI.Services
                 return false;
             }
         }
+<<<<<<< Updated upstream
+=======
+
+        public class FacebookLiveService
+        {
+            private const string AccessToken = "EAAIYLfie53cBOxdeb1mZBTbQ7MlRf1X64vFfdmnHLnnoIjMAwQvgkqTGvLxwbbZB8WSaGmflSalq8angfExMilsdsK6QwdvyxOLCGSxIIHSrtnNmU1BZAQNI8PfFKJ2SQJxGJMH695QVj9NtNtgKMWaZCUbTJ0ZB8DKZBlxfzvpiuIZAqMUDizeCxn1oAYQfyQtln5fAphmxwhEnpZB8yQZDZD";
+            private const string PageId = "266349363239226";
+            private const string BaseUrl = "https://graph.facebook.com/v22.0";
+
+            private readonly HttpClient _httpClient = new HttpClient();
+
+            public async Task<List<LiveVideo>> GetLiveStreamsAsync()
+            {
+                string url = $"{BaseUrl}/{PageId}/live_videos?fields=id,title,permalink_url,creation_time,status&access_token={AccessToken}";
+
+                try
+                {
+                    HttpResponseMessage response = await _httpClient.GetAsync(url);
+                    string json = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[DEBUG] API Response: {json}");
+
+                    if (!response.IsSuccessStatusCode) return new List<LiveVideo>();
+
+                    var result = JsonConvert.DeserializeObject<FacebookLiveResponse>(json);
+                    return result?.Data ?? new List<LiveVideo>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] Fetching live streams failed: {ex.Message}");
+                    return new List<LiveVideo>();
+                }
+            }
+
+
+        }
+>>>>>>> Stashed changes
     }
 }
