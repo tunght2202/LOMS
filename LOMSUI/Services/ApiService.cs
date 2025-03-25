@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Android.Util;
 using LOMSUI.Models;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
@@ -12,6 +14,7 @@ namespace LOMSUI.Services
     {
         private readonly HttpClient _httpClient;
         private const string BASE_URL = "https://10.0.2.2:7112/api/Auth";
+        private const string BASE_URLL = "https://10.0.2.2:7112/api";
 
         public ApiService(HttpClient httpClient = null)
         {
@@ -60,6 +63,23 @@ namespace LOMSUI.Services
                 return false;
             }
         }
+        public async Task<List<CommentModel>> GetComments(string liveStreamURL)
+        {
+            try
+            {
+                string fullUrl = $"{BASE_URLL}/Comment/get-all-comment?liveStreamURL={liveStreamURL}";
+                var response = await _httpClient.GetAsync(fullUrl);
+                var json = await response.Content.ReadAsStringAsync();
+                var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
+
+                return comments ?? new List<CommentModel>();
+            }
+            catch (Exception)
+            {
+                return new List<CommentModel>();
+            }
+        }
+
 
         public class FacebookLiveService
         {

@@ -7,7 +7,7 @@ namespace LOMSUI
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.activity_comments);
+            SetContentView(Resource.Layout.activity_login);
         }
     }
 }

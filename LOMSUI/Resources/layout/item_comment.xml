@@ -2,75 +2,45 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="8dp"
-    android:background="@android:color/darker_gray">
+    android:layout_margin="10dp"
+    android:background="#a6a6a6">
 
-    <!-- Ảnh đại diện -->
-    <ImageView
-        android:id="@+id/imgAvatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/loms"
-        android:scaleType="centerCrop"
-        android:layout_marginEnd="8dp"
-        />
+    <TextView
+        android:id="@+id/txtCustomerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tên khách hàng"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/txtCommentContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nội dung bình luận"/>
+
+    <TextView
+        android:id="@+id/txtCommentTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thời gian"/>
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <!-- Tên người dùng -->
-        <TextView
-            android:id="@+id/tvUserName"
+        <Button
+            android:id="@+id/btnCreateOrder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tên người dùng"
-            android:textStyle="bold"
-            android:textSize="14sp"/>
+            android:text="Tạo đơn"/>
 
-        <!-- Nội dung bình luận -->
-        <TextView
-            android:id="@+id/tvComment"
+        <Button
+            android:id="@+id/btnViewInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nội dung bình luận"
-            android:textSize="14sp"/>
-
-        <!-- Thời gian tạo -->
-        <TextView
-            android:id="@+id/tvCreateTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2 phút trước"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"/>
-        
-        <!-- Nút thao tác -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp">
-
-            <Button
-                android:id="@+id/btnCreateOrder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tạo đơn"
-                android:textSize="12sp"
-                android:background="@color/com_facebook_blue"/>
-
-            <Button
-                android:id="@+id/btnUserInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thông tin"
-                android:textSize="12sp"
-                android:layout_marginStart="8dp"
-                android:background="@color/com_facebook_blue"/>
-        </LinearLayout>
+            android:text="Thông tin"/>
     </LinearLayout>
 </LinearLayout>

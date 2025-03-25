@@ -4,11 +4,12 @@ namespace LOMSUI.Models
 {
     public class CommentModel
     {
-        public string Id { get; set; }
-        public string UserName { get; set; }
-        public string AvatarUrl { get; set; }
+        public string CommentID { get; set; }
         public string Content { get; set; }
-        public string CreateTime { get; set; }
+        public string CommentTime { get; set; }
+        public string CustomerID { get; set; }
+        public string CustomerName { get; set; }
+        public string LiveStreamID { get; set; }
     }
 
 }
