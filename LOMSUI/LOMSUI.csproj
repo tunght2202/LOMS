@@ -15,6 +15,7 @@
     <TrimMode>full</TrimMode>
   </PropertyGroup>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   <ItemGroup>	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 =======
    <ItemGroup>	
@@ -26,6 +27,22 @@
 
 	  <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
     <PackageReference Include="Xamarin.Facebook.Android" Version="11.2.0.1" />
+=======
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Xamarin.FFImageLoading" Version="2.4.11.982" />
+		<PackageReference Include="Xamarin.FFImageLoading.Transformations" Version="2.4.11.982" />
+		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2478" />
+
+		<PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
+		<PackageReference Include="Xamarin.Facebook.Android" Version="11.2.0.1" />
+	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Activities\" />
+    <Folder Include="Adapter\" />
+    <Folder Include="Models\" />
+    <Folder Include="Services\" />
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\" />

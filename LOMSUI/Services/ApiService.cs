@@ -61,7 +61,10 @@ namespace LOMSUI.Services
             }
         }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 
         public class FacebookLiveService
         {
@@ -95,6 +98,9 @@ namespace LOMSUI.Services
 
 
         }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 }
