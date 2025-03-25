@@ -17,6 +17,7 @@ namespace LOMSAPI.Data.Entities
         public DbSet<Shipping> Shippings { get; set; }
         public DbSet<LiveStream> LiveStreams { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<LiveStreamProduct> LiveStreamsProducts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
 
@@ -34,10 +35,10 @@ namespace LOMSAPI.Data.Entities
             }
 
             builder.Entity<LiveStream>()
-           .HasOne(ls => ls.User)
-           .WithMany(u => u.LiveStreams)
-           .HasForeignKey(ls => ls.UserID)
-           .OnDelete(DeleteBehavior.Restrict); // Ví dụ: Không cho xóa User nếu có LiveStream
+               .HasOne(ls => ls.User)
+               .WithMany(u => u.LiveStreams)
+               .HasForeignKey(ls => ls.UserID)
+               .OnDelete(DeleteBehavior.Restrict); 
 
             builder.Entity<Comment>()
                 .HasOne(c => c.LiveStream)
@@ -62,11 +63,6 @@ namespace LOMSAPI.Data.Entities
                 .WithMany(ls => ls.Orders)
                 .HasForeignKey(o => o.LivestreamID)
                 .OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<Product>()
-                .HasOne(p => p.LiveStream)
-                .WithMany(ls => ls.Products)
-                .HasForeignKey(p => p.LiveStreamID)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<OrderDetail>()
                 .HasOne(od => od.Order)
@@ -80,6 +76,18 @@ namespace LOMSAPI.Data.Entities
                 .HasForeignKey(od => od.ProductID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<LiveStreamProduct>()
+                .HasOne(lp => lp.LiveStream)
+                .WithMany(ls => ls.LiveStreamProducts)
+                .HasForeignKey(lp => lp.LivestreamID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<LiveStreamProduct>()
+                .HasOne(lp => lp.Product)
+                .WithMany(ls => ls.LiveStreamProducts)
+                .HasForeignKey(lp => lp.ProductID)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Payment>()
                 .HasOne(pm => pm.Order)
                 .WithMany(o => o.Payments)
@@ -87,9 +95,9 @@ namespace LOMSAPI.Data.Entities
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Order>()
-            .HasOne(o => o.Shipping)
-            .WithOne(s => s.Order)
-            .HasForeignKey<Shipping>(s => s.OrderID);
+                .HasOne(o => o.Shipping)
+                .WithOne(s => s.Order)
+                .HasForeignKey<Shipping>(s => s.OrderID);
         }
     }
 }
