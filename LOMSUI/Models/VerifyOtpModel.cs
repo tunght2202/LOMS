@@ -11,11 +11,7 @@ namespace LOMSUI.Models
     {
         public string Email { get; set; }
 
-<<<<<<< Updated upstream
-        [JsonProperty("OtpCode")]  // Đổi tên thành OtpCode để khớp với API
-=======
         [JsonProperty("OtpCode")]  
->>>>>>> Stashed changes
         public string Otp { get; set; }
     }
 }

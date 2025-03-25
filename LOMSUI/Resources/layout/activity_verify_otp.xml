@@ -3,36 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    android:orientation="vertical">
-=======
     android:orientation="vertical"
     android:background="@android:color/white">
->>>>>>> Stashed changes
-=======
-    android:orientation="vertical"
-    android:background="@android:color/white">
->>>>>>> Stashed changes
 
     <TextView
         android:text="Enter OTP sent to your email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-         android:textColor="#333" />
-=======
         android:textStyle="bold"
         android:textColor="#333"
         android:layout_marginTop="50dp"/>
->>>>>>> Stashed changes
-=======
-        android:textStyle="bold"
-        android:textColor="#333"
-        android:layout_marginTop="50dp"/>
->>>>>>> Stashed changes
 
     <EditText
         android:id="@+id/etOtp"
@@ -44,15 +25,7 @@
     <Button
         android:id="@+id/btnVerifyOtp"
         android:text="Verify OTP"
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        android:backgroundTint="#40ff00"
-=======
         android:backgroundTint="#00bfff"
->>>>>>> Stashed changes
-=======
-        android:backgroundTint="#00bfff"
->>>>>>> Stashed changes
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>
