@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace LOMSAPI.Data.Migrations
+namespace LOMSAPI.Migrations
 {
     [DbContext(typeof(LOMSDbContext))]
-    [Migration("20250212170930_AddEntity")]
-    partial class AddEntity
+    [Migration("20250325060316_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,8 @@ namespace LOMSAPI.Data.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Comment", b =>
                 {
-                    b.Property<int>("CommentID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentID"));
+                    b.Property<string>("CommentID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CommentTime")
                         .HasColumnType("datetime2");
@@ -40,11 +37,13 @@ namespace LOMSAPI.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("LiveStreamID")
-                        .HasColumnType("int");
+                    b.Property<string>("LiveStreamID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CommentID");
 
@@ -57,36 +56,35 @@ namespace LOMSAPI.Data.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Customer", b =>
                 {
-                    b.Property<int>("CustomerID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
+                    b.Property<string>("CustomerID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("FacebookName")
+                        .HasMaxLength(255)
+                        .HasColumnType("int");
 
                     b.Property<int>("FailedDeliveries")
                         .HasColumnType("int");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SuccessfulDeliveries")
                         .HasColumnType("int");
@@ -101,17 +99,17 @@ namespace LOMSAPI.Data.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStream", b =>
                 {
-                    b.Property<int>("LivestreamID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LivestreamID"));
+                    b.Property<string>("LivestreamID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<string>("StreamTitle")
                         .IsRequired()
@@ -140,11 +138,13 @@ namespace LOMSAPI.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"));
 
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("LivestreamID")
-                        .HasColumnType("int");
+                    b.Property<string>("LivestreamID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -225,8 +225,11 @@ namespace LOMSAPI.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductID"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LiveStreamID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -236,10 +239,18 @@ namespace LOMSAPI.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ProductCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.HasKey("ProductID");
+
+                    b.HasIndex("LiveStreamID");
 
                     b.ToTable("Products");
                 });
@@ -551,6 +562,17 @@ namespace LOMSAPI.Data.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("LOMSAPI.Data.Entities.Product", b =>
+                {
+                    b.HasOne("LOMSAPI.Data.Entities.LiveStream", "LiveStream")
+                        .WithMany("Products")
+                        .HasForeignKey("LiveStreamID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LiveStream");
+                });
+
             modelBuilder.Entity("LOMSAPI.Data.Entities.Shipping", b =>
                 {
                     b.HasOne("LOMSAPI.Data.Entities.Order", "Order")
@@ -625,6 +647,8 @@ namespace LOMSAPI.Data.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>

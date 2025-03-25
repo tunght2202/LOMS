@@ -7,14 +7,14 @@ namespace LOMSAPI.Data.Entities
     public class Comment
     {
         [Key]
-        public int CommentID { get; set; }
+        public string CommentID { get; set; }
 
         [ForeignKey("Customer")]
-        public int CustomerID { get; set; }
+        public string CustomerID { get; set; }
         public Customer Customer { get; set; }
 
         [ForeignKey("LiveStream")]
-        public int LiveStreamID { get; set; }
+        public string LiveStreamID { get; set; }
         public LiveStream LiveStream { get; set; }
 
         public string Content { get; set; }

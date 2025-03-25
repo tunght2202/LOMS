@@ -7,7 +7,7 @@ namespace LOMSAPI.Data.Entities
     public class LiveStream
     {
         [Key]
-        public int LivestreamID { get; set; }
+        public string LivestreamID { get; set; }
 
         [ForeignKey("User")] // Foreign key đến bảng Users của Identity
         public string UserID { get; set; } // Chú ý kiểu dữ liệu phải tương thích với Id của Users
@@ -15,9 +15,11 @@ namespace LOMSAPI.Data.Entities
         public string StreamTitle { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public bool Status { get; set; } = true;
 
         public virtual User User { get; set; } // Navigation property
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
     }
 }
