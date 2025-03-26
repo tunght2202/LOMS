@@ -34,19 +34,12 @@ namespace LOMSAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustomerID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LiveStreamID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("LiveStreamCustomerID")
+                        .HasColumnType("int");
 
                     b.HasKey("CommentID");
 
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("LiveStreamID");
+                    b.HasIndex("LiveStreamCustomerID");
 
                     b.ToTable("Comments");
                 });
@@ -128,13 +121,38 @@ namespace LOMSAPI.Migrations
                     b.ToTable("LiveStreams");
                 });
 
-            modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamProduct", b =>
+            modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamCustomer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("LiveStreamCustomerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LiveStreamCustomerId"));
+
+                    b.Property<string>("CustomerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LivestreamID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LiveStreamCustomerId");
+
+                    b.HasIndex("CustomerID");
+
+                    b.HasIndex("LivestreamID");
+
+                    b.ToTable("LiveStreamCustomers");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamProduct", b =>
+                {
+                    b.Property<int>("LiveStreamProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LiveStreamProductId"));
 
                     b.Property<int?>("DisplayOrder")
                         .HasColumnType("int");
@@ -146,7 +164,7 @@ namespace LOMSAPI.Migrations
                     b.Property<int>("ProductID")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("LiveStreamProductId");
 
                     b.HasIndex("LivestreamID");
 
@@ -163,13 +181,8 @@ namespace LOMSAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"));
 
-                    b.Property<string>("CustomerID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LivestreamID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("LiveStreamCustomerID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -180,9 +193,7 @@ namespace LOMSAPI.Migrations
 
                     b.HasKey("OrderID");
 
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("LivestreamID");
+                    b.HasIndex("LiveStreamCustomerID");
 
                     b.ToTable("Orders");
                 });
@@ -510,21 +521,13 @@ namespace LOMSAPI.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Comment", b =>
                 {
-                    b.HasOne("LOMSAPI.Data.Entities.Customer", "Customer")
+                    b.HasOne("LOMSAPI.Data.Entities.LiveStreamCustomer", "LiveStreamCustomer")
                         .WithMany("Comments")
-                        .HasForeignKey("CustomerID")
+                        .HasForeignKey("LiveStreamCustomerID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LOMSAPI.Data.Entities.LiveStream", "LiveStream")
-                        .WithMany("Comments")
-                        .HasForeignKey("LiveStreamID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("LiveStream");
+                    b.Navigation("LiveStreamCustomer");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStream", b =>
@@ -536,6 +539,25 @@ namespace LOMSAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamCustomer", b =>
+                {
+                    b.HasOne("LOMSAPI.Data.Entities.Customer", "Customer")
+                        .WithMany("LiveStreamCustomers")
+                        .HasForeignKey("CustomerID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LOMSAPI.Data.Entities.LiveStream", "LiveStream")
+                        .WithMany("LiveStreamCustomers")
+                        .HasForeignKey("LivestreamID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("LiveStream");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamProduct", b =>
@@ -559,21 +581,13 @@ namespace LOMSAPI.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>
                 {
-                    b.HasOne("LOMSAPI.Data.Entities.Customer", "Customer")
+                    b.HasOne("LOMSAPI.Data.Entities.LiveStreamCustomer", "LiveStreamCustomer")
                         .WithMany("Orders")
-                        .HasForeignKey("CustomerID")
+                        .HasForeignKey("LiveStreamCustomerID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LOMSAPI.Data.Entities.LiveStream", "LiveStream")
-                        .WithMany("Orders")
-                        .HasForeignKey("LivestreamID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("LiveStream");
+                    b.Navigation("LiveStreamCustomer");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.OrderDetail", b =>
@@ -611,7 +625,7 @@ namespace LOMSAPI.Migrations
                     b.HasOne("LOMSAPI.Data.Entities.User", "user")
                         .WithMany("Products")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("user");
@@ -681,16 +695,19 @@ namespace LOMSAPI.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Customer", b =>
                 {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Orders");
+                    b.Navigation("LiveStreamCustomers");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStream", b =>
                 {
-                    b.Navigation("Comments");
+                    b.Navigation("LiveStreamCustomers");
 
                     b.Navigation("LiveStreamProducts");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamCustomer", b =>
+                {
+                    b.Navigation("Comments");
 
                     b.Navigation("Orders");
                 });

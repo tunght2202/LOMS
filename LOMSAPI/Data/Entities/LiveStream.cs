@@ -8,7 +8,6 @@ namespace LOMSAPI.Data.Entities
     {
         [Key]
         public string LivestreamID { get; set; }
-
         [ForeignKey("User")] 
         public string UserID { get; set; } 
         public string StreamURL { get; set; }
@@ -16,11 +15,9 @@ namespace LOMSAPI.Data.Entities
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public bool Status { get; set; } = true;
-
         public virtual User User { get; set; } 
-        public virtual ICollection<Comment> Comments { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
         public virtual ICollection<LiveStreamProduct> LiveStreamProducts { get; set; }
+        public virtual ICollection<LiveStreamCustomer> LiveStreamCustomers { get; set; }
 
     }
 }
