@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@android:color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -27,7 +28,7 @@
             android:layout_marginEnd="16dp"
             android:text="v3.2.2 (1)"
             android:textSize="14sp"
-            android:textColor="#000000"/>
+            android:textColor="#000000" />
 
         <ImageView
             android:layout_width="24dp"
@@ -63,7 +64,7 @@
                     android:text="Báo cáo tổng quan"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"/>
+                    android:textColor="#000000" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -104,7 +105,7 @@
                             android:layout_height="wrap_content"
                             android:text="Doanh thu"
                             android:textSize="16sp"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -112,7 +113,7 @@
                             android:text="0 vnd"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                     </LinearLayout>
 
@@ -127,7 +128,7 @@
                             android:layout_height="wrap_content"
                             android:text="Doanh thu dự kiến"
                             android:textSize="16sp"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -135,7 +136,7 @@
                             android:text="0 vnd"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                     </LinearLayout>
 
@@ -159,7 +160,7 @@
                             android:layout_height="wrap_content"
                             android:text="Khách hàng"
                             android:textSize="16sp"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -167,7 +168,7 @@
                             android:text="0 KH"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                     </LinearLayout>
 
@@ -182,7 +183,7 @@
                             android:layout_height="wrap_content"
                             android:text="Số đơn"
                             android:textSize="16sp"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -190,7 +191,7 @@
                             android:text="0 đơn"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#000000"/>
+                            android:textColor="#000000" />
 
                     </LinearLayout>
 
@@ -205,40 +206,77 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
-                android:textColor="#000000"/>
+                android:textColor="#000" />
 
-            </LinearLayout>
+        </LinearLayout>
 
     </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="5"
-        android:background="#FFFFFF">
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_report" />
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:weightSum="5"
+            android:background="#FFFFFF">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Báo cáo"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
+                android:textColor="#000000"
+                android:gravity="center"
+                android:drawablePadding="4dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout
+android:layout_weight="1"
+                android:text="Bán Hàng"
+                android:textSize="12sp"
+                android:textColor="#000000"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Đơn Hàng"
+                android:textSize="12sp"
+                android:textColor="#000000"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Khách Hàng"
+                android:textSize="12sp"
+                android:textColor="#000000"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Menu"
+                android:textSize="12sp"
+                android:textColor="#000000"
+                android:gravity="center" />
 
         </LinearLayout>
 
-        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
