@@ -7,7 +7,7 @@ namespace LOMSAPI.Data.Entities
     public class LiveStreamProduct
     {
         [Key]
-        public int Id { get; set; }
+        public int LiveStreamProductId { get; set; }
 
         [ForeignKey("LiveStream")]
         public string LivestreamID { get; set; }

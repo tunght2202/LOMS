@@ -138,7 +138,7 @@ namespace LOMSAPI.Migrations
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -227,54 +227,25 @@ namespace LOMSAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Comments",
+                name: "LiveStreamCustomers",
                 columns: table => new
                 {
-                    CommentID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LiveStreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CommentTime = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Comments", x => x.CommentID);
-                    table.ForeignKey(
-                        name: "FK_Comments_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Comments_LiveStreams_LiveStreamID",
-                        column: x => x.LiveStreamID,
-                        principalTable: "LiveStreams",
-                        principalColumn: "LivestreamID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    OrderID = table.Column<int>(type: "int", nullable: false)
+                    LiveStreamCustomerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.OrderID);
+                    table.PrimaryKey("PK_LiveStreamCustomers", x => x.LiveStreamCustomerId);
                     table.ForeignKey(
-                        name: "FK_Orders_Customers_CustomerID",
+                        name: "FK_LiveStreamCustomers_Customers_CustomerID",
                         column: x => x.CustomerID,
                         principalTable: "Customers",
                         principalColumn: "CustomerID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Orders_LiveStreams_LivestreamID",
+                        name: "FK_LiveStreamCustomers_LiveStreams_LivestreamID",
                         column: x => x.LivestreamID,
                         principalTable: "LiveStreams",
                         principalColumn: "LivestreamID",
@@ -285,7 +256,7 @@ namespace LOMSAPI.Migrations
                 name: "LiveStreamProducts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    LiveStreamProductId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProductID = table.Column<int>(type: "int", nullable: false),
@@ -293,7 +264,7 @@ namespace LOMSAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LiveStreamProducts", x => x.Id);
+                    table.PrimaryKey("PK_LiveStreamProducts", x => x.LiveStreamProductId);
                     table.ForeignKey(
                         name: "FK_LiveStreamProducts_LiveStreams_LivestreamID",
                         column: x => x.LivestreamID,
@@ -305,6 +276,47 @@ namespace LOMSAPI.Migrations
                         column: x => x.ProductID,
                         principalTable: "Products",
                         principalColumn: "ProductID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    CommentID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CommentTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LiveStreamCustomerID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.CommentID);
+                    table.ForeignKey(
+                        name: "FK_Comments_LiveStreamCustomers_LiveStreamCustomerID",
+                        column: x => x.LiveStreamCustomerID,
+                        principalTable: "LiveStreamCustomers",
+                        principalColumn: "LiveStreamCustomerId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    OrderID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LiveStreamCustomerID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.OrderID);
+                    table.ForeignKey(
+                        name: "FK_Orders_LiveStreamCustomers_LiveStreamCustomerID",
+                        column: x => x.LiveStreamCustomerID,
+                        principalTable: "LiveStreamCustomers",
+                        principalColumn: "LiveStreamCustomerId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -379,14 +391,19 @@ namespace LOMSAPI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_CustomerID",
+                name: "IX_Comments_LiveStreamCustomerID",
                 table: "Comments",
+                column: "LiveStreamCustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LiveStreamCustomers_CustomerID",
+                table: "LiveStreamCustomers",
                 column: "CustomerID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_LiveStreamID",
-                table: "Comments",
-                column: "LiveStreamID");
+                name: "IX_LiveStreamCustomers_LivestreamID",
+                table: "LiveStreamCustomers",
+                column: "LivestreamID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LiveStreamProducts_LivestreamID",
@@ -414,14 +431,9 @@ namespace LOMSAPI.Migrations
                 column: "ProductID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_CustomerID",
+                name: "IX_Orders_LiveStreamCustomerID",
                 table: "Orders",
-                column: "CustomerID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_LivestreamID",
-                table: "Orders",
-                column: "LivestreamID");
+                column: "LiveStreamCustomerID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_OrderID",
@@ -520,6 +532,9 @@ namespace LOMSAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "LiveStreamCustomers");
 
             migrationBuilder.DropTable(
                 name: "Customers");
