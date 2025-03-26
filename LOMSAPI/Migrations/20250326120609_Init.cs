@@ -33,6 +33,19 @@ namespace LOMSAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ListProducts",
+                columns: table => new
+                {
+                    ListProductId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ListProductName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ListProducts", x => x.ListProductId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -99,6 +112,7 @@ namespace LOMSAPI.Migrations
                 {
                     LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ListProductID = table.Column<int>(type: "int", nullable: false),
                     StreamURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StreamTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -108,6 +122,12 @@ namespace LOMSAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LiveStreams", x => x.LivestreamID);
+                    table.ForeignKey(
+                        name: "FK_LiveStreams_ListProducts_ListProductID",
+                        column: x => x.ListProductID,
+                        principalTable: "ListProducts",
+                        principalColumn: "ListProductId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_LiveStreams_Users_UserID",
                         column: x => x.UserID,
@@ -253,26 +273,25 @@ namespace LOMSAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LiveStreamProducts",
+                name: "ProductListProducts",
                 columns: table => new
                 {
-                    LiveStreamProductId = table.Column<int>(type: "int", nullable: false)
+                    ProductListProductID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProductID = table.Column<int>(type: "int", nullable: false),
-                    DisplayOrder = table.Column<int>(type: "int", nullable: true)
+                    ListProductID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LiveStreamProducts", x => x.LiveStreamProductId);
+                    table.PrimaryKey("PK_ProductListProducts", x => x.ProductListProductID);
                     table.ForeignKey(
-                        name: "FK_LiveStreamProducts_LiveStreams_LivestreamID",
-                        column: x => x.LivestreamID,
-                        principalTable: "LiveStreams",
-                        principalColumn: "LivestreamID",
+                        name: "FK_ProductListProducts_ListProducts_ListProductID",
+                        column: x => x.ListProductID,
+                        principalTable: "ListProducts",
+                        principalColumn: "ListProductId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_LiveStreamProducts_Products_ProductID",
+                        name: "FK_ProductListProducts_Products_ProductID",
                         column: x => x.ProductID,
                         principalTable: "Products",
                         principalColumn: "ProductID",
@@ -406,14 +425,9 @@ namespace LOMSAPI.Migrations
                 column: "LivestreamID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LiveStreamProducts_LivestreamID",
-                table: "LiveStreamProducts",
-                column: "LivestreamID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LiveStreamProducts_ProductID",
-                table: "LiveStreamProducts",
-                column: "ProductID");
+                name: "IX_LiveStreams_ListProductID",
+                table: "LiveStreams",
+                column: "ListProductID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LiveStreams_UserID",
@@ -439,6 +453,16 @@ namespace LOMSAPI.Migrations
                 name: "IX_Payments_OrderID",
                 table: "Payments",
                 column: "OrderID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductListProducts_ListProductID",
+                table: "ProductListProducts",
+                column: "ListProductID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductListProducts_ProductID",
+                table: "ProductListProducts",
+                column: "ProductID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_UserID",
@@ -498,13 +522,13 @@ namespace LOMSAPI.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "LiveStreamProducts");
-
-            migrationBuilder.DropTable(
                 name: "OrderDetails");
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "ProductListProducts");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
@@ -541,6 +565,9 @@ namespace LOMSAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "LiveStreams");
+
+            migrationBuilder.DropTable(
+                name: "ListProducts");
 
             migrationBuilder.DropTable(
                 name: "Users");

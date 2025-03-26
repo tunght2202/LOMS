@@ -35,18 +35,7 @@ namespace LOMSAPI.Controllers
             }
             return Ok(product);
         }
-        
-        // Lấy sản phẩm theo LiveStream ID
-        [HttpGet("GetProductByLiveStreamId/{liveStreamId}")]
-        public async Task<ActionResult<ProductModel>> GetProductByLiveStreamId(string liveStreamId)
-        {
-            var product = await _productRepository.GetAllProductsByLiveStream(liveStreamId);
-            if (product == null)
-            {
-                return NotFound("Sản phẩm không tồn tại.");
-            }
-            return Ok(product);
-        }
+
 
         // Lấy sản phẩm theo User ID
         [HttpGet("GetAllProductsByUser/{userId}")]
@@ -59,6 +48,8 @@ namespace LOMSAPI.Controllers
             }
             return Ok(product);
         }
+
+        //
 
         // Thêm sản phẩm mới
         [HttpPost]
