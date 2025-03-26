@@ -1,0 +1,73 @@
+﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace LOMSAPI.Repositories.Customers
+{
+    public class CustomerRepository : ICustomerRepository
+    {
+        private readonly LOMSDbContext _context;
+        public CustomerRepository(LOMSDbContext context)
+        {
+            _context = context;
+        }
+        public async Task<int> AddCustomer(string customerId, string customerFacebookName)
+        {
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.CustomerID.Equals(customerId));
+            if (customer != null) 
+            {
+                throw new Exception($"{customerFacebookName} was exit!");
+            }
+            var newCustomer = new Customer()
+            {
+                CustomerID = customerId,
+                FacebookName = customerFacebookName
+            };
+            
+            await _context.Customers.AddAsync(newCustomer);
+            return _context.SaveChanges();
+        }
+
+        public async Task<GetCustomerModel> GetCustomerById(string customerId)
+        {
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.CustomerID.Equals(customerId));
+            if (customer == null) 
+            {
+                throw new Exception($"{customerId} was exit!");
+            }
+            var getCustomer = new GetCustomerModel()
+            {
+                CustomerID = customerId,
+                FacebookName = customer.FacebookName,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                Address = customer.Address,
+                PhoneNumber = customer.PhoneNumber,
+                FailedDeliveries = customer.FailedDeliveries,
+                SuccessfulDeliveries = customer.SuccessfulDeliveries
+
+            };
+
+            return getCustomer;
+
+        }
+
+        public async Task<int> UpdateCustomer(string customerId, UpdateCustomerModel customerUpdate)
+        {
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.CustomerID.Equals(customerId));
+            if (customer == null)
+            {
+                throw new Exception($"{customerId} was exit!");
+            }
+
+            customer.FullName = customerUpdate.FullName;
+            customer.Email = customerUpdate.Email;
+            customer.Address = customerUpdate.Address;
+            customer.PhoneNumber = customerUpdate.PhoneNumber;
+            return await _context.SaveChangesAsync();
+        }
+    }
+}
