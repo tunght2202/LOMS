@@ -2,6 +2,6 @@
 {
     public interface IOrderRepository
     {
-        Task<int> CreateOrderByProductCode(string productCode);
+        Task<int> CreateOrderByProductCodeAuto(string productCode);
     }
 }

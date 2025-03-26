@@ -1,5 +1,6 @@
 ﻿
 using LOMSAPI.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace LOMSAPI.Repositories.Orders
@@ -13,17 +14,11 @@ namespace LOMSAPI.Repositories.Orders
             _context = context;
             _httpClient = httpClient;
         }
-        public async Task<int> CreateOrderByProductCodeAuto(string productCode, string StreamURL)
+        public async Task<int> CreateOrderByProductCodeAuto(string productCode)
         {
-            string LiveStreamId = _context.LiveStreams.FirstOrDefault(s => s.StreamURL == StreamURL).LivestreamID;
-            // Tìm sản phẩm theo ProductCode
-            Product p = _context.Products.FirstOrDefault(s => s.ProductCode == productCode && s.LiveStreamID==LiveStreamId);
-            if (p == null)
-            {
-                return 0;
-            }
-
-            int productId = p.ProductID;
+            int ProductID = _context.Products.FirstOrDefault(p => p.ProductCode == productCode).ProductID;
+            string LiveStreamId = _context.LiveStreamsProducts.FirstOrDefault(p => p.ProductID == ProductID).LivestreamID;
+            string StreamURL = _context.LiveStreams.FirstOrDefault(l => l.LivestreamID == LiveStreamId).StreamURL;
             
             string apiUrl = $"https://localhost:7112/api/Comment/get-comments-productcode?liveStreamURL={StreamURL}&ProductCode={productCode}";
 
@@ -50,18 +45,10 @@ namespace LOMSAPI.Repositories.Orders
             {
                 _context.Orders.Add(new Order
                 {
-                    CustomerID = comment.CustomerID,
-                    LivestreamID = comment.LiveStreamID,
-                    OrderDate = DateTime.UtcNow,
-                    Status = "Pending",
-                    OrderDetails = new OrderDetail 
-                    {
-                        OrderID = OrderID,
-                        Quantity = 1,
-                    }
+                    
                 });
                 orderCount++;
-                
+
             }
 
             // Lưu thay đổi vào database
