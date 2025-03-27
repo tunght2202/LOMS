@@ -14,6 +14,7 @@ using LOMSAPI.Repositories.Products;
 using LOMSAPI.Repositories.Users;
 using LOMSAPI.Repositories.Customers;
 using LOMSAPI.Repositories.Comments;
+using LOMSAPI.Repositories.ListProducts;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,6 +66,7 @@ builder.Services.AddTransient<SignInManager<User>, SignInManager<User>>();
 builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
+builder.Services.AddTransient<IListProductRepository, ListProductRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 //builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
