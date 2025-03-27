@@ -17,6 +17,8 @@ namespace LOMSAPI.Controllers
             _commentRepository = commentRepository;
         }
         [HttpGet("get-all-comment")]
+        [AllowAnonymous]
+
         public async Task<IActionResult> GetAllComments(string liveStreamURL)
         {
             try
@@ -30,6 +32,7 @@ namespace LOMSAPI.Controllers
             }
         }
         [HttpGet("get-comments-productcode")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCommentsByProductCode(string liveStreamURL, string ProductCode)
         {
             try

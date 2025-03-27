@@ -10,7 +10,7 @@ namespace LOMSAPI.Repositories.Comments
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
 
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBO1gZBjycUJLWSy2CV9KeLZBZBQ6jtd5WfvS6QqRiYRGTWt7UXJmfUFY71T4HiDEoBGatv3eT9UZAcV9QwTwdn5DXCpkm93X8BlZCbTUctymxcWyZBefqKsXsPoVJlMjcOpAh7OeMZBUXjxTXeuunAOJHfpiZCnSBhfcU5e21sZC9Sj9cWO2nZB0D61YwLMdItPtvMXrdeDaC3ikMMZD";
+        private const string ACCESS_TOKEN = "EAAIYLfie53cBOyeyevc6OvgUSNYinoDI7Iy4EfsgNXjPq1I4VmB7ZBuLCK9iZA6MPACGroRenMPe8wM4uSHhEZB4pTcBXIARaiXxzTjZBDG9s7aaYeOrbL6IDdj5cIOqG1ZAKUzd6owhkCmYHUbPXw4dK9uLTnrXhuMH0vRgTK14GoQkGh3Y6OFwy2gaZB0MfFVIBwG9ewZBXeQ9YiNNWZCRPXHM";
         public CommentRepository(LOMSDbContext context, HttpClient httpClient)
         {
             _context = context;
@@ -23,7 +23,7 @@ namespace LOMSAPI.Repositories.Comments
             if (string.IsNullOrEmpty(liveStreamId))
                 throw new ArgumentException("Không thể lấy LiveStream ID từ URL");
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{liveStreamId}/comments?fields=from%2Cmessage%2Ccreated_time&access_token={ACCESS_TOKEN}";
+            string apiUrl = $"https://graph.facebook.com/v22.0/{liveStreamId}/comments?fields=from{{id,name,picture}},message,created_time&access_token={ACCESS_TOKEN}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
@@ -59,23 +59,63 @@ namespace LOMSAPI.Repositories.Comments
                 {
                     var comment = new Comment
                     {
-                        CommentID = item.GetProperty("id").GetString(),
+                        CommentID = item.TryGetProperty("id", out JsonElement idElement) ? idElement.GetString() : "",
                         Content = item.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : "",
                         CommentTime = DateTime.Parse(item.GetProperty("created_time").GetString().Replace("+0000", "Z")),
-                        CustomerID = item.TryGetProperty("from", out JsonElement fromElement)
-                                && fromElement.TryGetProperty("id", out JsonElement idElement)
-                                ? idElement.GetString()
-                                : "Unknown", // Gán giá trị mặc định nếu không có "from"
+                        CustomerID = item.TryGetProperty("from", out JsonElement fromElement) &&
+                                     fromElement.TryGetProperty("id", out JsonElement userIdElement)
+                                     ? userIdElement.GetString()
+                                     : "Unknown",
+                        CustomerName = item.TryGetProperty("from", out fromElement) &&
+                                       fromElement.TryGetProperty("name", out JsonElement userNameElement)
+                                       ? userNameElement.GetString()
+                                       : "Unknown",
+                        AvatarUrl = item.TryGetProperty("from", out fromElement) &&
+                                    fromElement.TryGetProperty("picture", out JsonElement pictureElement) &&
+                                    pictureElement.TryGetProperty("data", out JsonElement dataElementPic) &&
+                                    dataElementPic.TryGetProperty("url", out JsonElement urlElement)
+                                    ? urlElement.GetString()
+                                    : null,
                         LiveStreamID = LiveStreamId,
-                        
                     };
                     comments.Add(comment);
                 }
             }
-            
-            
+
             return comments;
         }
 
+
     }
 }
+
+/*private List<Comment> ParseComments(string jsonResponse, string LiveStreamId)
+{
+    using JsonDocument doc = JsonDocument.Parse(jsonResponse);
+    JsonElement root = doc.RootElement;
+
+    List<Comment> comments = new List<Comment>();
+
+    if (root.TryGetProperty("data", out JsonElement dataElement))
+    {
+        foreach (JsonElement item in dataElement.EnumerateArray())
+        {
+            var comment = new Comment
+            {
+                CommentID = item.GetProperty("id").GetString(),
+                Content = item.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : "",
+                CommentTime = DateTime.Parse(item.GetProperty("created_time").GetString().Replace("+0000", "Z")),
+                CustomerID = item.TryGetProperty("from", out JsonElement fromElement)
+                        && fromElement.TryGetProperty("id", out JsonElement idElement)
+                        ? idElement.GetString()
+                        : "Unknown", // Gán giá trị mặc định nếu không có "from"
+                LiveStreamID = LiveStreamId,
+
+            };
+            comments.Add(comment);
+        }
+    }
+
+
+    return comments;
+}*/

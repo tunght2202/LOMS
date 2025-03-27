@@ -19,6 +19,8 @@ namespace LOMSAPI.Data.Entities
 
         public string Content { get; set; }
         public DateTime CommentTime { get; set; } = DateTime.Now;
+        public string CustomerName { get; set; } 
+        public string AvatarUrl { get; set; }
     }
 
 }

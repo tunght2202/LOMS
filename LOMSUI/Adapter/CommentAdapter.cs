@@ -8,15 +8,15 @@ using System.Collections.Generic;
 
 namespace LOMSUI.Adapter
 {
-   /* public class CommentAdapter : RecyclerView.Adapter
+    public class CommentAdapter : RecyclerView.Adapter
     {
-       *//* private List<CommentModel> _comments;
+        private List<CommentModel> _comments;
         public event Action<CommentModel> OnCreateOrder;
         public event Action<CommentModel> OnViewInfo;
 
         public CommentAdapter(List<CommentModel> comments)
         {
-            _comments = comments;
+            _comments = comments ?? new List<CommentModel>();
         }
 
         public override int ItemCount => _comments.Count;
@@ -27,18 +27,21 @@ namespace LOMSUI.Adapter
             {
                 var comment = _comments[position];
 
-                // Gán dữ liệu vào TextView
-                commentHolder.TxtCustomerName.Text = comment.CustomerName;
+                commentHolder.TxtCustomerName.Text = comment.CustomerName ?? "Khách hàng ẩn danh";
                 commentHolder.TxtCommentContent.Text = comment.Content;
                 commentHolder.TxtCommentTime.Text = comment.GetFormattedTime();
 
                 Glide.With(commentHolder.ItemView.Context)
                      .Load(comment.AvatarUrl)
-                     .Placeholder(Resource.Drawable.loms) 
-                     .Error(Resource.Drawable.mtrl_ic_error) 
+                     .Placeholder(Resource.Drawable.loms)
+                     .Error(Resource.Drawable.mtrl_ic_error)
                      .Into(commentHolder.ImgCustomerAvatar);
 
+                // Xóa sự kiện cũ trước khi gán sự kiện mới (tránh lặp sự kiện)
+                commentHolder.BtnCreateOrder.Click -= (s, e) => OnCreateOrder?.Invoke(comment);
                 commentHolder.BtnCreateOrder.Click += (s, e) => OnCreateOrder?.Invoke(comment);
+
+                commentHolder.BtnViewInfo.Click -= (s, e) => OnViewInfo?.Invoke(comment);
                 commentHolder.BtnViewInfo.Click += (s, e) => OnViewInfo?.Invoke(comment);
             }
         }
@@ -67,6 +70,6 @@ namespace LOMSUI.Adapter
             TxtCommentTime = itemView.FindViewById<TextView>(Resource.Id.txtCommentTime);
             BtnCreateOrder = itemView.FindViewById<Button>(Resource.Id.btnCreateOrder);
             BtnViewInfo = itemView.FindViewById<Button>(Resource.Id.btnViewInfo);
-        }*//*
-    }*/
+        }
+    }
 }

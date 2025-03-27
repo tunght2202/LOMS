@@ -80,10 +80,27 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<List<CommentModel>> GetCommentsByProductCode(string liveStreamURL, string productCode)
+        {
+            try
+            {
+                string fullUrl = $"{BASE_URLL}/Comment/get-comments-productcode?liveStreamURL={liveStreamURL}&ProductCode={productCode}";
+                var response = await _httpClient.GetAsync(fullUrl);
+                var json = await response.Content.ReadAsStringAsync();
+                var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
+
+                return comments ?? new List<CommentModel>();
+            }
+            catch (Exception)
+            {
+                return new List<CommentModel>();
+            }
+        }
+
 
         public class FacebookLiveService
         {
-            private const string AccessToken = "EAAIYLfie53cBOxdeb1mZBTbQ7MlRf1X64vFfdmnHLnnoIjMAwQvgkqTGvLxwbbZB8WSaGmflSalq8angfExMilsdsK6QwdvyxOLCGSxIIHSrtnNmU1BZAQNI8PfFKJ2SQJxGJMH695QVj9NtNtgKMWaZCUbTJ0ZB8DKZBlxfzvpiuIZAqMUDizeCxn1oAYQfyQtln5fAphmxwhEnpZB8yQZDZD";
+            private const string AccessToken = "EAAIYLfie53cBOyeyevc6OvgUSNYinoDI7Iy4EfsgNXjPq1I4VmB7ZBuLCK9iZA6MPACGroRenMPe8wM4uSHhEZB4pTcBXIARaiXxzTjZBDG9s7aaYeOrbL6IDdj5cIOqG1ZAKUzd6owhkCmYHUbPXw4dK9uLTnrXhuMH0vRgTK14GoQkGh3Y6OFwy2gaZB0MfFVIBwG9ewZBXeQ9YiNNWZCRPXHM";
             private const string PageId = "266349363239226";
             private const string BaseUrl = "https://graph.facebook.com/v22.0";
 
