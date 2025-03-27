@@ -12,9 +12,14 @@
       Enables trim analyzers and full trimming during Release mode.
       To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options#trimming-granularity
     -->
-    <TrimMode>full</TrimMode>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Xamarin.Facebook.Android" Version="11.2.0.1" />
-  </ItemGroup>
+		<TrimMode>full</TrimMode>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Xamarin.FFImageLoading" Version="2.4.11.982" />
+		<PackageReference Include="Xamarin.FFImageLoading.Transformations" Version="2.4.11.982" />
+		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2478" />
+		<PackageReference Include="Xamarin.Facebook.Android" Version="11.2.0.1" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
+	</ItemGroup>
 </Project>
