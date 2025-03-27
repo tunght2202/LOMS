@@ -97,7 +97,6 @@ namespace LOMSUI.Services
                 {
                     HttpResponseMessage response = await _httpClient.GetAsync(url);
                     string json = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[DEBUG] API Response: {json}");
 
                     if (!response.IsSuccessStatusCode) return new List<LiveVideo>();
 
@@ -106,7 +105,6 @@ namespace LOMSUI.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[ERROR] Fetching live streams failed: {ex.Message}");
                     return new List<LiveVideo>();
                 }
             }

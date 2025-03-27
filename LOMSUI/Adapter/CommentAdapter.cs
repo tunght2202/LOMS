@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Android.Views;
+﻿using Android.Views;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
+using Bumptech.Glide;
 using LOMSUI.Models;
+using System;
+using System.Collections.Generic;
 
 namespace LOMSUI.Adapter
 {
-    public class CommentAdapter : RecyclerView.Adapter
+   /* public class CommentAdapter : RecyclerView.Adapter
     {
-        private List<CommentModel> _comments;
+       *//* private List<CommentModel> _comments;
         public event Action<CommentModel> OnCreateOrder;
         public event Action<CommentModel> OnViewInfo;
 
@@ -25,9 +26,17 @@ namespace LOMSUI.Adapter
             if (holder is CommentViewHolder commentHolder)
             {
                 var comment = _comments[position];
+
+                // Gán dữ liệu vào TextView
                 commentHolder.TxtCustomerName.Text = comment.CustomerName;
                 commentHolder.TxtCommentContent.Text = comment.Content;
-                commentHolder.TxtCommentTime.Text = comment.CommentTime;
+                commentHolder.TxtCommentTime.Text = comment.GetFormattedTime();
+
+                Glide.With(commentHolder.ItemView.Context)
+                     .Load(comment.AvatarUrl)
+                     .Placeholder(Resource.Drawable.loms) 
+                     .Error(Resource.Drawable.mtrl_ic_error) 
+                     .Into(commentHolder.ImgCustomerAvatar);
 
                 commentHolder.BtnCreateOrder.Click += (s, e) => OnCreateOrder?.Invoke(comment);
                 commentHolder.BtnViewInfo.Click += (s, e) => OnViewInfo?.Invoke(comment);
@@ -43,6 +52,7 @@ namespace LOMSUI.Adapter
 
     public class CommentViewHolder : RecyclerView.ViewHolder
     {
+        public ImageView ImgCustomerAvatar { get; }
         public TextView TxtCustomerName { get; }
         public TextView TxtCommentContent { get; }
         public TextView TxtCommentTime { get; }
@@ -51,11 +61,12 @@ namespace LOMSUI.Adapter
 
         public CommentViewHolder(View itemView) : base(itemView)
         {
+            ImgCustomerAvatar = itemView.FindViewById<ImageView>(Resource.Id.imgCustomerAvatar);
             TxtCustomerName = itemView.FindViewById<TextView>(Resource.Id.txtCustomerName);
             TxtCommentContent = itemView.FindViewById<TextView>(Resource.Id.txtCommentContent);
             TxtCommentTime = itemView.FindViewById<TextView>(Resource.Id.txtCommentTime);
             BtnCreateOrder = itemView.FindViewById<Button>(Resource.Id.btnCreateOrder);
             BtnViewInfo = itemView.FindViewById<Button>(Resource.Id.btnViewInfo);
-        }
-    }
+        }*//*
+    }*/
 }
