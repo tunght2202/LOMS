@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LOMSAPI.Data.Entities
+namespace LOMSAPI.Models
 {
-    [Table("Customers")]
-    public class Customer
+    public class GetCustomerModel
     {
-        [Key]
         public string CustomerID { get; set; }
         [Required, MaxLength(255)]
         public string FacebookName { get; set; }
@@ -24,11 +21,6 @@ namespace LOMSAPI.Data.Entities
         public int SuccessfulDeliveries { get; set; } = 0;
         public int FailedDeliveries { get; set; } = 0;
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
-        public bool Status { get; set; }
-        public ICollection<LiveStreamCustomer> LiveStreamCustomers { get; set; }
     }
-
 }

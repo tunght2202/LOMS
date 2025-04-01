@@ -139,7 +139,7 @@ namespace LOMSAPI.Repositories.Users
             var cachedOtp = await _cache.GetStringAsync($"OTP_RESET_{userEmail}");
             if (cachedOtp == null || cachedOtp != model.OtpCode) return false;
 
-            
+
             await _cache.SetStringAsync($"Verified_{userEmail}", "true", new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
@@ -190,6 +190,6 @@ namespace LOMSAPI.Repositories.Users
             await smtpClient.SendMailAsync(mailMessage);
         }
 
-        
+
     }
 }

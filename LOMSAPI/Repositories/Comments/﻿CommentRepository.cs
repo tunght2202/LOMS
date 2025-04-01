@@ -2,6 +2,9 @@
 using System.Text.RegularExpressions;
 using System;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace LOMSAPI.Repositories.Comments
 {
@@ -9,113 +12,121 @@ namespace LOMSAPI.Repositories.Comments
     {
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
+        private readonly IDistributedCache _cache;
 
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBOyeyevc6OvgUSNYinoDI7Iy4EfsgNXjPq1I4VmB7ZBuLCK9iZA6MPACGroRenMPe8wM4uSHhEZB4pTcBXIARaiXxzTjZBDG9s7aaYeOrbL6IDdj5cIOqG1ZAKUzd6owhkCmYHUbPXw4dK9uLTnrXhuMH0vRgTK14GoQkGh3Y6OFwy2gaZB0MfFVIBwG9ewZBXeQ9YiNNWZCRPXHM";
-        public CommentRepository(LOMSDbContext context, HttpClient httpClient)
+        private const string ACCESS_TOKEN = "EAAIYLfie53cBO7EK9Qa5eACCzok7nGR1XZAEAMamRlHR4vlEvhrlP0u4MWdaV24xlvQ7qzUVEuRPLbdml76vMlfxaYU6fcvzvluX9iHOb5UsL8xxUU27EzYSUauhqYWKXuYHWCZBlGE1tXLxZCsfb9uwYN7HvWZBdhYCURxjvw88SFGfI5jpWcr4xYwqTM8y0ZBCgW2ZAcDMQ2JDIt7CDtCUkZD";
+        public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache)
         {
             _context = context;
             _httpClient = httpClient;
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
-        public async Task<List<Comment>> GetAllComments(string LiveStreamURL)
-        {
-            string liveStreamId = ExtractLiveStreamId(LiveStreamURL);
-            if (string.IsNullOrEmpty(liveStreamId))
-                throw new ArgumentException("Không thể lấy LiveStream ID từ URL");
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{liveStreamId}/comments?fields=from{{id,name,picture}},message,created_time&access_token={ACCESS_TOKEN}";
+        public async Task<List<Comment>> GetAllComments(string LiveStreamId)
+        {
+            //string liveStreamId = ExtractLiveStreamId(LiveStreamURL);
+            if (string.IsNullOrEmpty(LiveStreamId))
+                throw new ArgumentException("Không thể lấy LiveStream ID từ URL");
+            await _cache.SetStringAsync("Livestream_Id", LiveStreamId, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
+            });
+
+            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%2Cmessage%2Ccreated_time&access_token={ACCESS_TOKEN}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"Lỗi khi gọi API: {response.StatusCode}");
 
             string jsonResponse = await response.Content.ReadAsStringAsync();
-            return ParseComments(jsonResponse, liveStreamId);
+            return await ParseCommentsAsync(jsonResponse, LiveStreamId);
         }
 
 
-        public async Task<List<Comment>> GetCommentsByProductCode(string LiveStreamURL, string ProductCode)
+        public async Task<List<Comment>> GetCommentsByProductCode(string ProductCode)
         {
-            List<Comment> allComments = await GetAllComments(LiveStreamURL);
-            return allComments.FindAll(c => c.Content.Contains(ProductCode, StringComparison.OrdinalIgnoreCase));
+            var LiveStreamId = await _cache.GetStringAsync("Livestream_Id");
+            List<Comment> allComments = await GetAllComments(LiveStreamId);
+            var filteredComments = allComments
+                            .Where(c => c.Content.Contains(ProductCode, StringComparison.OrdinalIgnoreCase))
+                            .OrderBy(c => c.CommentTime)
+                            .ToList();
+
+            return filteredComments;
         }
 
-        private string ExtractLiveStreamId(string url)
-        {
-            var match = Regex.Match(url, @"/videos/(\d+)");
-            return match.Success ? match.Groups[1].Value : null;
-        }
+        //private string ExtractLiveStreamId(string url)
+        //{
+        //    var match = Regex.Match(url, @"/videos/(\d+)");
+        //    return match.Success ? match.Groups[1].Value : null;
+        //}
 
-        private List<Comment> ParseComments(string jsonResponse, string LiveStreamId)
+        private async Task<List<Comment>> ParseCommentsAsync(string jsonResponse, string LiveStreamId)
         {
             using JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement root = doc.RootElement;
 
-            List<Comment> comments = new List<Comment>();
+
 
             if (root.TryGetProperty("data", out JsonElement dataElement))
             {
+
+
                 foreach (JsonElement item in dataElement.EnumerateArray())
                 {
-                    var comment = new Comment
+                    string? commentID = item.GetProperty("id").GetString();
+                    string? content = item.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : "";
+                    DateTime commentTime = DateTime.Parse(item.GetProperty("created_time").GetString().Replace("+0000", "Z"));
+
+                    string? customerID = item.TryGetProperty("from", out JsonElement fromElement)
+                                && fromElement.TryGetProperty("id", out JsonElement idElement)
+                                ? idElement.GetString()
+                                : "Unknown";
+
+                    string? customerName = item.TryGetProperty("from", out JsonElement from1Element)
+                                && from1Element.TryGetProperty("name", out JsonElement nameElement)
+                                ? nameElement.GetString()
+                                : "Unknown";
+
+                    if (!_context.Customers.Any(s => s.CustomerID == customerID))
                     {
-                        CommentID = item.TryGetProperty("id", out JsonElement idElement) ? idElement.GetString() : "",
-                        Content = item.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : "",
-                        CommentTime = DateTime.Parse(item.GetProperty("created_time").GetString().Replace("+0000", "Z")),
-                        CustomerID = item.TryGetProperty("from", out JsonElement fromElement) &&
-                                     fromElement.TryGetProperty("id", out JsonElement userIdElement)
-                                     ? userIdElement.GetString()
-                                     : "Unknown",
-                        CustomerName = item.TryGetProperty("from", out fromElement) &&
-                                       fromElement.TryGetProperty("name", out JsonElement userNameElement)
-                                       ? userNameElement.GetString()
-                                       : "Unknown",
-                        AvatarUrl = item.TryGetProperty("from", out fromElement) &&
-                                    fromElement.TryGetProperty("picture", out JsonElement pictureElement) &&
-                                    pictureElement.TryGetProperty("data", out JsonElement dataElementPic) &&
-                                    dataElementPic.TryGetProperty("url", out JsonElement urlElement)
-                                    ? urlElement.GetString()
-                                    : null,
-                        LiveStreamID = LiveStreamId,
-                    };
-                    comments.Add(comment);
+                        _context.Customers.Add(new Customer
+                        {
+                            CustomerID = customerID,
+                            FacebookName = customerName
+                        });
+                        _context.SaveChangesAsync();
+                    }
+
+                    if (!_context.LiveStreamsCustomers.Any(s => s.LivestreamID == LiveStreamId && s.CustomerID == customerID))
+                    {
+                        _context.LiveStreamsCustomers.Add(new LiveStreamCustomer
+                        {
+                            CustomerID = customerID,
+                            LivestreamID = LiveStreamId,
+                        });
+                        _context.SaveChangesAsync();
+                    }
+
+                    if (!_context.Comments.Any(s => s.CommentID == commentID))
+                    {
+                        var lsci = _context.LiveStreamsCustomers.FirstOrDefault(v => v.LivestreamID == LiveStreamId && v.CustomerID == customerID).LiveStreamCustomerId;
+                        _context.Comments.Add(new Comment
+                        {
+                            CommentID = commentID,
+                            Content = content,
+                            CommentTime = commentTime,
+                            LiveStreamCustomerID = lsci
+                        });
+                        await _context.SaveChangesAsync();
+                    }
+
                 }
+
+
             }
-
-            return comments;
+            return await _context.Comments.ToListAsync();
         }
-
-
     }
 }
-
-/*private List<Comment> ParseComments(string jsonResponse, string LiveStreamId)
-{
-    using JsonDocument doc = JsonDocument.Parse(jsonResponse);
-    JsonElement root = doc.RootElement;
-
-    List<Comment> comments = new List<Comment>();
-
-    if (root.TryGetProperty("data", out JsonElement dataElement))
-    {
-        foreach (JsonElement item in dataElement.EnumerateArray())
-        {
-            var comment = new Comment
-            {
-                CommentID = item.GetProperty("id").GetString(),
-                Content = item.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : "",
-                CommentTime = DateTime.Parse(item.GetProperty("created_time").GetString().Replace("+0000", "Z")),
-                CustomerID = item.TryGetProperty("from", out JsonElement fromElement)
-                        && fromElement.TryGetProperty("id", out JsonElement idElement)
-                        ? idElement.GetString()
-                        : "Unknown", // Gán giá trị mặc định nếu không có "from"
-                LiveStreamID = LiveStreamId,
-
-            };
-            comments.Add(comment);
-        }
-    }
-
-
-    return comments;
-}*/
