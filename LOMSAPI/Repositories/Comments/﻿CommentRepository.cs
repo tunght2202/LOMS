@@ -48,7 +48,12 @@ namespace LOMSAPI.Repositories.Comments
         {
             var LiveStreamId = await _cache.GetStringAsync("Livestream_Id");
             List<Comment> allComments = await GetAllComments(LiveStreamId);
-            return allComments.FindAll(c => c.Content.Contains(ProductCode, StringComparison.OrdinalIgnoreCase));
+            var filteredComments = allComments
+                            .Where(c => c.Content.Contains(ProductCode, StringComparison.OrdinalIgnoreCase))
+                            .OrderBy(c => c.CommentTime)
+                            .ToList();
+
+            return filteredComments;
         }
 
         //private string ExtractLiveStreamId(string url)
