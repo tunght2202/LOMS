@@ -3,7 +3,7 @@ namespace LOMSAPI.Repositories.Comments
 {
     public interface ICommentRepository
     {
-        Task<List<Comment>> GetAllComments(string LiveStreamURL);
-        Task<List<Comment>> GetCommentsByProductCode(string LiveStreamURL, string ProductCode);
+        Task<List<Comment>> GetAllComments(string LiveStreamId);
+        Task<List<Comment>> GetCommentsByProductCode(string ProductCode);
     }
 }

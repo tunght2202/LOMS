@@ -68,7 +68,7 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IListProductRepository, ListProductRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-//builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 builder.Services.AddSwaggerGen(c =>
 {
