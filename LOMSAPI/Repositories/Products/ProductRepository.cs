@@ -18,16 +18,15 @@ namespace LOMSAPI.Repositories.Products
         {
             var listProduct = await _context.Products.ToListAsync();
 
-            var getProductList =  listProduct
+            var getProductList = listProduct
                 .Select(x => new ProductModel()
-            {
-                ProductID = x.ProductID,
-                LiveStreamID = x.LiveStreamID,
-                Description = x.Description,
-                Name = x.Name,
-                Price = x.Price,
-                Stock = x.Stock,
-                Status = x.Status
+                {
+                    ProductID = x.ProductID,
+                    Description = x.Description,
+                    Name = x.Name,
+                    Price = x.Price,
+                    Stock = x.Stock,
+                    Status = x.Status
                 })
                 .ToList();
             return getProductList;
@@ -41,7 +40,6 @@ namespace LOMSAPI.Repositories.Products
             var product = new ProductModel()
             {
                 ProductID = getProduct.ProductID,
-                LiveStreamID = getProduct.LiveStreamID,
                 Price = getProduct.Price,
                 Stock = getProduct.Stock,
                 Description = getProduct.Description,
@@ -60,8 +58,7 @@ namespace LOMSAPI.Repositories.Products
 
             var getProductModels = getProducts.Select(x => new ProductModel()
             {
-                ProductID= x.ProductID,
-                LiveStreamID = x.LiveStreamID,
+                ProductID = x.ProductID,
                 Name = x.Name,
                 Price = x.Price,
                 Description = x.Description,
@@ -71,35 +68,32 @@ namespace LOMSAPI.Repositories.Products
             return getProductModels;
         }
 
-        public async Task<IEnumerable<ProductModel>> GetAllProductsByLiveStream(string liveStreamId)
+        public async Task<IEnumerable<ProductModel>> GetAllProductsByUser(string userId)
         {
-            var getLiveStreamId = await _context.LiveStreams
-                .FirstOrDefaultAsync(x => x.LivestreamID.Equals(liveStreamId));
-            if(getLiveStreamId == null)
-            {
-                throw new Exception($"Can't find livestream id {liveStreamId}");
-            }
-            var getProductByLiveStream = await _context.Products
-                .Where(p => p.LiveStreamID.Equals(liveStreamId))
+            var getUser = await _context.Users
+                .FindAsync(userId);
+            if (getUser == null) { throw new Exception("this user not exit!"); }
+            var getProductByUser = await _context.Products
+                .Where( p => p.UserID == userId)
                 .ToListAsync();
-            var getProductModels = getProductByLiveStream.Select(x => new ProductModel()
+            var productList =  getProductByUser.Select(x => new ProductModel()
             {
                 ProductID = x.ProductID,
-                LiveStreamID = x.LiveStreamID,
                 Name = x.Name,
                 Price = x.Price,
                 Description = x.Description,
                 Stock = x.Stock,
                 Status = x.Status
             }).ToList();
-            return getProductModels;
+            return productList;
         }
+
         public async Task<int> AddProduct(ProductModel postProduct)
         {
             var product = new Product()
             {
                 Name = postProduct.Name,
-                LiveStreamID = postProduct.LiveStreamID,
+                UserID = postProduct.UserID,
                 ProductID = 0,
                 Price = postProduct.Price,
                 Description = postProduct.Description,
@@ -108,21 +102,20 @@ namespace LOMSAPI.Repositories.Products
             };
             await _context.Products.AddAsync(product);
             return await _context.SaveChangesAsync();
-           
+
         }
-        public async Task<int> UpdateProduct(int productId, ProductModel product)
+        public async Task<int> UpdateProduct(int productId, UpdateProductModel product)
         {
             var productById = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == productId);
-            if (productById == null) 
+            if (productById == null)
             {
                 throw new Exception($"Can't find a product with id = {productId}");
             }
             productById.Name = product.Name;
-            productById.LiveStreamID = product.LiveStreamID;
+            productById.ProductCode = product.ProductCode;
             productById.Price = product.Price;
             productById.Description = product.Description;
             productById.Stock = product.Stock;
-            productById.Status = product.Status;
 
             return await _context.SaveChangesAsync();
         }
@@ -131,7 +124,7 @@ namespace LOMSAPI.Repositories.Products
         {
             var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == productId);
 
-            if (product == null) 
+            if (product == null)
             {
                 throw new Exception($"Can't find a product with id = {productId}");
             }
@@ -150,12 +143,12 @@ namespace LOMSAPI.Repositories.Products
             }
             var stock = product.Stock;
 
-            if (stock < reduceProduct) 
+            if (stock < reduceProduct)
             {
                 throw new Exception("stock not enough !");
             }
 
-            if(reduceProduct < 0)
+            if (reduceProduct < 0)
             {
                 throw new Exception("reduce product can't is  negative number");
             }

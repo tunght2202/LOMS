@@ -13,13 +13,14 @@ namespace LOMSAPI.Data.Entities
         public string Name { get; set; }
         public string? ProductCode { get; set; }
         public string? Description { get; set; }
-        public string LiveStreamID { get; set; }
+        public string UserID { get; set; } 
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public bool Status { get; set; } = true;
-
-        public LiveStream LiveStream { get; set; }
+        public User user { get; set; }
         public ICollection<OrderDetail> OrderDetails { get; set; }
+        public ICollection<ProductListProduct> ProductListProducts { get; set; }
+
     }
 
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+
+    <!-- Ô nhập URL Livestream -->
+    <EditText
+        android:id="@+id/txtLiveStreamURL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập URL Livestream"
+        android:inputType="textUri"/>
+
+    <Button
+        android:id="@+id/btnFetchComments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lấy bình luận"
+        android:layout_marginTop="8dp"/>
+
+      <TextView
+    android:id="@+id/txtNoComments"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Không có bình luận nào!"
+    android:textSize="16sp"
+    android:gravity="center"
+    android:visibility="gone"
+    android:layout_marginTop="16dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewComments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
