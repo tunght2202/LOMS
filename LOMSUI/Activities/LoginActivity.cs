@@ -32,7 +32,6 @@ namespace LOMSUI
 
             if (_emailEditText == null || _passwordEditText == null || _loginButton == null)
             {
-                Log.Error("LoginActivity", "Error: One or more UI elements not found!");
                 Toast.MakeText(this, "Error loading UI components!", ToastLength.Long).Show();
                 return;
             }

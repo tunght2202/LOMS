@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "CommentsActivity")]
+    [Activity(Label = "Comments")]
     public class CommentsActivity : Activity
     {
         private EditText txtLiveStreamURL, txtProductCode;

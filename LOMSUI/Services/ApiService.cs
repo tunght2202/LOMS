@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Text;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -43,7 +44,6 @@ namespace LOMSUI.Services
                 using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/{endpoint}", content))
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[API] {endpoint} Response: {response.StatusCode} - {responseBody}");
 
                     if (!response.IsSuccessStatusCode) return false;
 
@@ -59,7 +59,6 @@ namespace LOMSUI.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {endpoint}: {ex.Message}");
                 return false;
             }
         }
@@ -98,35 +97,25 @@ namespace LOMSUI.Services
         }
 
 
-        public class FacebookLiveService
+        public async Task<List<LiveVideo>> GetLiveStreamsAsync()
         {
-            private const string AccessToken = "EAAIYLfie53cBOyeyevc6OvgUSNYinoDI7Iy4EfsgNXjPq1I4VmB7ZBuLCK9iZA6MPACGroRenMPe8wM4uSHhEZB4pTcBXIARaiXxzTjZBDG9s7aaYeOrbL6IDdj5cIOqG1ZAKUzd6owhkCmYHUbPXw4dK9uLTnrXhuMH0vRgTK14GoQkGh3Y6OFwy2gaZB0MfFVIBwG9ewZBXeQ9YiNNWZCRPXHM";
-            private const string PageId = "266349363239226";
-            private const string BaseUrl = "https://graph.facebook.com/v22.0";
-
-            private readonly HttpClient _httpClient = new HttpClient();
-
-            public async Task<List<LiveVideo>> GetLiveStreamsAsync()
+            try
             {
-                string url = $"{BaseUrl}/{PageId}/live_videos?fields=id,title,permalink_url,creation_time,status&access_token={AccessToken}";
+                string url = $"{BASE_URLL}/LiveStream/fetch-from-facebook";
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                string json = await response.Content.ReadAsStringAsync();
 
-                try
-                {
-                    HttpResponseMessage response = await _httpClient.GetAsync(url);
-                    string json = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode) return new List<LiveVideo>();
-
-                    var result = JsonConvert.DeserializeObject<FacebookLiveResponse>(json);
-                    return result?.Data ?? new List<LiveVideo>();
-                }
-                catch (Exception ex)
-                {
+                if (!response.IsSuccessStatusCode)
                     return new List<LiveVideo>();
-                }
+
+                return JsonConvert.DeserializeObject<List<LiveVideo>>(json);
             }
-
-
+            catch (Exception ex)
+            {
+                return new List<LiveVideo>();
+            }
         }
+
     }
 }
