@@ -3,6 +3,7 @@ using LOMSAPI.Repositories.Comments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace LOMSAPI.Controllers
 {
@@ -12,16 +13,18 @@ namespace LOMSAPI.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentRepository _commentRepository;
-        public CommentController(ICommentRepository commentRepository)
+        
+        public CommentController(ICommentRepository commentRepository,IDistributedCache cache)
         {
             _commentRepository = commentRepository;
+            
         }
         [HttpGet("get-all-comment")]
-        public async Task<IActionResult> GetAllComments(string liveStreamURL)
+        public async Task<IActionResult> GetAllComments(string liveStreamId)
         {
             try
             {
-                var comments = await _commentRepository.GetAllComments(liveStreamURL);
+                var comments = await _commentRepository.GetAllComments(liveStreamId);
                 return Ok(comments);
             }
             catch (Exception ex)
@@ -30,11 +33,11 @@ namespace LOMSAPI.Controllers
             }
         }
         [HttpGet("get-comments-productcode")]
-        public async Task<IActionResult> GetCommentsByProductCode(string liveStreamURL, string ProductCode)
+        public async Task<IActionResult> GetCommentsByProductCode(string ProductCode)
         {
             try
             {
-                var comments = await _commentRepository.GetCommentsByProductCode(liveStreamURL, ProductCode);
+                var comments = await _commentRepository.GetCommentsByProductCode(ProductCode);
                 return Ok(comments);
             }
             catch (Exception ex)
