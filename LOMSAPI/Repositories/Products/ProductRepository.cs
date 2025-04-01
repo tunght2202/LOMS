@@ -167,51 +167,6 @@ namespace LOMSAPI.Repositories.Products
             product.Status = false; return await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ProductModel>> GetProductListProductById(int ListProductId)
-        {
-            var productListProduct = await _context.ListProducts
-                .Where(lp => lp.ListProductId == ListProductId)
-                .Include(lp => lp.ProductListProducts)
-                .ThenInclude(plp => plp.Product)
-                .SelectMany(lp => lp.ProductListProducts
-                .Select(plp => new ProductModel()
-                {
-                    ProductID = plp.ProductID,
-                    Name = plp.Product.Name,
-                    Price = plp.Product.Price,
-                    Description = plp.Product.Description,
-                    ProductCode = plp.Product.ProductCode,
-                    Status = plp.Product.Status,
-                    Stock = plp.Product.Stock
-                })) // Lấy danh sách Product
-                .ToListAsync();
-            return productListProduct;
-        }
 
-        public async Task<IEnumerable<ListProduct>> GetAllListProduct()
-        {
-            var listProduct = await _context.ListProducts.ToListAsync();
-            return listProduct;
-        }
-
-        public async Task<IEnumerable<ListProduct>> GetListProductByName(string listProductName)
-        {
-            var listProduct = await _context.ListProducts
-                .Where(x => x.ListProductName.ToLower().Contains(listProductName.ToLower()))
-                .ToListAsync();
-            return listProduct;
-        }
-
-        public async Task<int> AddProductListProduct(string listProductName, List<int> listProduct)
-        {
-            var checkExit = await _context.ListProducts
-                .AnyAsync(x => x.ListProductName.ToLower()
-                .Equals(listProductName.ToLower()));
-            if (checkExit)
-            {
-                throw new Exception($"{listProductName} exit");
-            }
-            return 1;
-        }
     }
 }
