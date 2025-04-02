@@ -74,26 +74,42 @@ namespace LOMSUI.Activities
 
         private void UpdateCommentList(List<CommentModel> comments)
         {
-            if (comments == null || comments.Count == 0)
+            RunOnUiThread(() =>
             {
-                recyclerViewComments.Visibility = Android.Views.ViewStates.Gone;
-                txtNoComments.Visibility = Android.Views.ViewStates.Visible;
-                txtNoComments.Text = "Không có bình luận nào!";
-            }
-            else
-            {
-                recyclerViewComments.Visibility = Android.Views.ViewStates.Visible;
-                txtNoComments.Visibility = Android.Views.ViewStates.Gone;
+                if (comments == null || comments.Count == 0)
+                {
+                    recyclerViewComments.Visibility = Android.Views.ViewStates.Gone;
+                    txtNoComments.Visibility = Android.Views.ViewStates.Visible;
+                    txtNoComments.Text = "Không có bình luận nào!";
 
-                _commentAdapter = new CommentAdapter(comments);
-                recyclerViewComments.SetAdapter(_commentAdapter);
+                    txtProductCode.Visibility = Android.Views.ViewStates.Gone;
+                    btnFilterByProduct.Visibility = Android.Views.ViewStates.Gone;
 
-                _commentAdapter.OnCreateOrder += comment =>
-                    Toast.MakeText(this, $"Tạo đơn cho: {comment.CustomerName}", ToastLength.Short).Show();
+                    Toast.MakeText(this, "Không có bình luận nào!", ToastLength.Short).Show();
+                }
+                else
+                {
+                    recyclerViewComments.Visibility = Android.Views.ViewStates.Visible;
+                    txtNoComments.Visibility = Android.Views.ViewStates.Gone;
 
-                _commentAdapter.OnViewInfo += comment =>
-                    Toast.MakeText(this, $"Xem thông tin: {comment.CustomerName}", ToastLength.Short).Show();
-            }
+                    _commentAdapter = new CommentAdapter(comments);
+                    recyclerViewComments.SetAdapter(_commentAdapter);
+
+                    txtProductCode.Visibility = Android.Views.ViewStates.Visible;
+                    btnFilterByProduct.Visibility = Android.Views.ViewStates.Visible;
+
+                    Toast.MakeText(this, $"Tổng số bình luận: {comments.Count}", ToastLength.Short).Show();
+
+                    _commentAdapter.OnCreateOrder += comment =>
+                        Toast.MakeText(this, $"Tạo đơn cho: {comment.CustomerName}", ToastLength.Short).Show();
+
+                    _commentAdapter.OnViewInfo += comment =>
+                        Toast.MakeText(this, $"Xem thông tin: {comment.CustomerName}", ToastLength.Short).Show();
+                }
+            });
         }
+
+
+
     }
 }
