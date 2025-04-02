@@ -14,7 +14,7 @@ namespace LOMSAPI.Repositories.Comments
         private readonly HttpClient _httpClient;
         private readonly IDistributedCache _cache;
 
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBO7ZAfbJSewdnvOhErzqgSiVJiMZCKBpTqqZANbZA2whTgehQCzeZC7eeG4Gmiv5LsvnzPiZAg2qjrDUy3JYFFmCKCl8gCCquP9sB7njId1CrB7bOJXg4ddWPWbqsJG92ZC1EQonWMBYg3DLL4oByoFcGvOOEeH0TvrnwxNbwvVYIHtoZBDa4lP8lPSGyH7SuZB7rMGTk0ZCSG4gJcZD";
+        private const string ACCESS_TOKEN = "EAAIYLfie53cBOy5PHvG4NNqNnDCkWIqP7ahuKRitvybSZBXtgxNtvBEzZBzLkgmO89dvMhif8YWMZACkgox5dWRgQBa3Mj6kdAptr4lZCuRDWm503FoIjcZB26RlreiQgrllbBiYsBWZAchmxWUmiszf4cUy86HxuLmS0XcAqFmLxgDtQy5fAmUfNvx5Oon1ZANvrm4KUOKn4iODEpgcjEYdJYZD";
         public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache)
         {
             _context = context;
