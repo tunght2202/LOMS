@@ -17,8 +17,9 @@ namespace LOMSAPI.Data.Entities
         public DbSet<Shipping> Shippings { get; set; }
         public DbSet<LiveStream> LiveStreams { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<LiveStreamProduct> LiveStreamsProducts { get; set; }
-        public DbSet<LiveStreamCustomer> LiveStreamsCustomer { get; set; }
+        public DbSet<ListProduct> ListProducts { get; set; }
+        public DbSet<LiveStreamCustomer> LiveStreamsCustomers { get; set; }
+        public DbSet<ProductListProduct> ProductListProducts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
 
@@ -53,16 +54,22 @@ namespace LOMSAPI.Data.Entities
                 .HasForeignKey(od => od.ProductID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<LiveStreamProduct>()
-                .HasOne(lp => lp.LiveStream)
-                .WithMany(ls => ls.LiveStreamProducts)
-                .HasForeignKey(lp => lp.LivestreamID)
+            builder.Entity<ProductListProduct>()
+                .HasOne(plp => plp.Product)
+                .WithMany(p => p.ProductListProducts)
+                .HasForeignKey(plp => plp.ProductID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<LiveStreamProduct>()
-                .HasOne(lp => lp.Product)
-                .WithMany(ls => ls.LiveStreamProducts)
-                .HasForeignKey(lp => lp.ProductID)
+            builder.Entity<ProductListProduct>()
+                .HasOne(plp => plp.ListProduct)
+                .WithMany(lp => lp.ProductListProducts)
+                .HasForeignKey(plp => plp.ListProductID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<LiveStream>()
+                .HasOne(l => l.ListProduct)
+                .WithMany(lp => lp.LiveStreams)
+                .HasForeignKey(l => l.ListProductID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<LiveStreamCustomer>()

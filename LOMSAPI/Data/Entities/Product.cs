@@ -17,11 +17,9 @@ namespace LOMSAPI.Data.Entities
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public bool Status { get; set; } = true;
-
         public User user { get; set; }
-
         public ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<LiveStreamProduct> LiveStreamProducts { get; set; } 
+        public ICollection<ProductListProduct> ProductListProducts { get; set; }
 
     }
 
