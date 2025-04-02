@@ -1,4 +1,5 @@
-﻿using LOMSAPI.Repositories.LiveStreams;
+﻿using System.Security.Claims;
+using LOMSAPI.Repositories.LiveStreams;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LOMSAPI.Controllers
@@ -12,13 +13,44 @@ namespace LOMSAPI.Controllers
         {
             _liveStreamRepositories = liveStreamRepositories;
         }
-       
-        [HttpGet("page/live-streams")]
-        public async Task<IActionResult> GetLiveStreams()
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllLiveStreams()
         {
-            var liveStreams = await _liveStreamRepositories.GetAllLiveStreams();
-            if (liveStreams == null || !liveStreams.Any()) return NotFound("Không tìm thấy livestream nào.");
-            return Ok(liveStreams);
+           // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           string userId = "269841f9-391e-4b7c-83f4-2f14459ad728";
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("UserID not found in token.");
+
+            try
+            {
+                var liveStreams = await _liveStreamRepositories.GetAllLiveStreams(userId);
+                return Ok(liveStreams);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{liveStreamId}")]
+        public async Task<IActionResult> GetLiveStreamById(string liveStreamId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("UserID not found in token.");
+
+            try
+            {
+                var liveStream = await _liveStreamRepositories.GetLiveStreamById(liveStreamId, userId);
+                if (liveStream == null)
+                    return NotFound();
+                return Ok(liveStream);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
         }
     }
 }

@@ -15,7 +15,6 @@ namespace LOMSAPI.Data.Entities
         public string StreamURL { get; set; }
         public string StreamTitle { get; set; }
         public DateTime StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
         // Neu la VOD thi da ket thuc phien live stream, con neu la LIVE stream thi chua ket thuc
         public string Status { get; set;  }
         // Neu la true thi da xoa, con neu la false thi chua xoa
