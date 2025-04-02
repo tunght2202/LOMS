@@ -53,46 +53,52 @@
 			android:orientation="vertical"
 			android:padding="16dp">
 
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:background="#F0F0F0"
-				android:padding="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#F0F0F0"
+                android:padding="16dp">
 
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="Báo cáo tổng quan"
-					android:textSize="18sp"
-					android:textStyle="bold"
-					android:textColor="#000000" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Báo cáo tổng quan"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000" />
 
-				<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_marginTop="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    >
 
-					<Spinner
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						/>
+                    <EditText
+                        android:id="@+id/startDateEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Ngày bắt đầu"
+                        android:inputType="date"
+                        android:textColor="#000000"/>
 
-					<Spinner
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						 />
+                    <EditText
+                        android:id="@+id/endDateEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Ngày kết thúc"
+                        android:inputType="date" />
 
-				</LinearLayout>
+                </LinearLayout>
 
-				<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_marginTop="16dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
 
                     <LinearLayout
                         android:layout_height="wrap_content"
@@ -100,22 +106,23 @@
                         android:orientation="vertical"
                         android:layout_width="match_parent">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Doanh thu"
-                            android:textSize="16sp"
-                            android:textColor="#000000" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Doanh thu"
+                        android:textSize="16sp"
+                        android:textColor="#000000" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 vnd"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:textColor="#000000" />
+                    <TextView
+                        android:id="@+id/doanhThuTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 vnd"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" />
 
-                    </LinearLayout>
+                </LinearLayout>
 
                     <LinearLayout
                         android:layout_height="wrap_content"
@@ -140,13 +147,13 @@
 
                     </LinearLayout>
 
-				</LinearLayout>
+                </LinearLayout>
 
-				<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_marginTop="16dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
 
                     <LinearLayout
                         android:layout_height="wrap_content"
@@ -171,32 +178,33 @@
 
                     </LinearLayout>
 
-					<LinearLayout
-						android:layout_width="1dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent">
 
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="Số đơn"
-							android:textSize="16sp"
-							android:textColor="#000000" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Số Đơn"
+                            android:textSize="16sp"
+                            android:textColor="#000000" />
 
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="0 đơn"
-							android:textSize="20sp"
-							android:textStyle="bold"
-							android:textColor="#000000" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 "
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="#000000"
+                            android:id="@+id/textView2" />
 
-					</LinearLayout>
+                    </LinearLayout>
 
-				</LinearLayout>
+                </LinearLayout>
 
-			</LinearLayout>
+            </LinearLayout>
 
 			<TextView
 				android:layout_width="wrap_content"
