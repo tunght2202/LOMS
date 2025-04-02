@@ -13,10 +13,10 @@ namespace LOMSAPI.Controllers
             _liveStreamRepositories = liveStreamRepositories;
         }
        
-        [HttpGet("page/{pageId}/live-streams")]
-        public async Task<IActionResult> GetLiveStreams(string pageId)
+        [HttpGet("page/live-streams")]
+        public async Task<IActionResult> GetLiveStreams()
         {
-            var liveStreams = await _liveStreamRepositories.GetAllLiveStreams(pageId);
+            var liveStreams = await _liveStreamRepositories.GetAllLiveStreams();
             if (liveStreams == null || !liveStreams.Any()) return NotFound("Không tìm thấy livestream nào.");
             return Ok(liveStreams);
         }

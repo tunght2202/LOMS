@@ -10,12 +10,16 @@ namespace LOMSAPI.Data.Entities
         public string LivestreamID { get; set; }
         [ForeignKey("User")] 
         public string UserID { get; set; }
-        public int ListProductID { get; set; }
+        [ForeignKey("ListProduct")]
+        public int? ListProductID { get; set; }
         public string StreamURL { get; set; }
         public string StreamTitle { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public bool Status { get; set; } = true;
+        // Neu la VOD thi da ket thuc phien live stream, con neu la LIVE stream thi chua ket thuc
+        public string Status { get; set;  }
+        // Neu la true thi da xoa, con neu la false thi chua xoa
+        public bool StatusDelete { get; set; } = false;
         public virtual User User { get; set; } 
         public virtual ListProduct ListProduct { get; set; }
         public virtual ICollection<LiveStreamCustomer> LiveStreamCustomers { get; set; }

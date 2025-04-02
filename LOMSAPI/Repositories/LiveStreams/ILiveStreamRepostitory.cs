@@ -4,7 +4,7 @@ namespace LOMSAPI.Repositories.LiveStreams
 {
     public interface ILiveStreamRepostitory
     {
-        Task<IEnumerable<LiveStream>> GetAllLiveStreams(string pageId);
+        Task<IEnumerable<LiveStream>> GetAllLiveStreams();
         Task<LiveStream> GetLiveStreamById(string liveStreamId);
         Task<int> DeleteLiveStream(string liveStreamId);
     }
