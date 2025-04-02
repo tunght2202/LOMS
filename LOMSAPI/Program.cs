@@ -15,6 +15,7 @@ using LOMSAPI.Repositories.Users;
 using LOMSAPI.Repositories.Customers;
 using LOMSAPI.Repositories.Comments;
 using LOMSAPI.Repositories.ListProducts;
+using LOMSAPI.Repositories.LiveStreams;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,7 +70,7 @@ builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IListProductRepository, ListProductRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-
+builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepository>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger eShop Solution", Version = "v1" });
