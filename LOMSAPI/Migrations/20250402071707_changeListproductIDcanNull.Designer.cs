@@ -4,6 +4,7 @@ using LOMSAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LOMSAPI.Migrations
 {
     [DbContext(typeof(LOMSDbContext))]
-    partial class LOMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250402071707_changeListproductIDcanNull")]
+    partial class changeListproductIDcanNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,17 +113,16 @@ namespace LOMSAPI.Migrations
                     b.Property<string>("LivestreamID")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("ListProductID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("StatusDelete")
+                    b.Property<bool>("Status")
                         .HasColumnType("bit");
 
                     b.Property<string>("StreamTitle")
