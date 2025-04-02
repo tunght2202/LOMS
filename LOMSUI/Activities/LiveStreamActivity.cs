@@ -15,7 +15,6 @@ namespace LOMSUI
     public class LiveStreamActivity : Activity
     {
         private ListView _listView;
-        private FacebookLiveService _facebookLiveService = new FacebookLiveService();
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -26,23 +25,22 @@ namespace LOMSUI
             await LoadLiveStreamsAsync();
         }
 
-        private async Task LoadLiveStreamsAsync()   
+        private async Task LoadLiveStreamsAsync()
         {
-            List<LiveVideo> liveStreams = await _facebookLiveService.GetLiveStreamsAsync();
+            var apiService = new ApiService();
+            List<LiveVideo> liveStreams = await apiService.GetLiveStreamsAsync();
+
+
             if (liveStreams.Count == 0)
             {
-                Toast.MakeText(this, "No live streams found.", ToastLength.Short).Show();
+                Toast.MakeText(this, "Không có livestream nào.", ToastLength.Short).Show();
                 return;
             }
 
             var adapter = new LiveStreamAdapter(this, liveStreams);
             _listView.Adapter = adapter;
-            _listView.ItemClick += (sender, e) =>
-            {
-                var stream = liveStreams[e.Position];
-                var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(stream.PermalinkUrl));
-                StartActivity(intent);
-            };
         }
+
+
     }
 }

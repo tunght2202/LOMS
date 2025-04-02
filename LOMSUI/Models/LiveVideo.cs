@@ -9,28 +9,28 @@ namespace LOMSUI.Models
 {
     public class LiveVideo
     {
-        [JsonProperty("id")]
-        public string Id { get; set; }
+        [JsonProperty("livestreamID")]
+        public string LivestreamID { get; set; }
 
-        [JsonProperty("title")]
-        public string Title { get; set; }
+        [JsonProperty("streamTitle")]
+        public string StreamTitle { get; set; }
 
-        [JsonProperty("permalink_url")]
-        public string PermalinkUrl { get; set; }
+        [JsonProperty("streamURL")]
+        public string StreamURL { get; set; }
 
-        [JsonProperty("creation_time")]
-        public string CreationTimeRaw { get; set; }
+        [JsonProperty("startTime")]
+        public DateTime? StartTime { get; set; }
 
         [JsonProperty("status")]
-        public string Status { get; set; }
+        public bool Status { get; set; }
 
-        public string FormattedCreationTime
+        public string FormattedStartTime
         {
             get
             {
-                if (DateTime.TryParse(CreationTimeRaw, out DateTime dateTime))
+                if (StartTime.HasValue)
                 {
-                    return dateTime.ToString("dd/MM/yyyy HH:mm:ss");
+                    return StartTime.Value.ToString("dd/MM/yyyy HH:mm:ss");
                 }
                 return "Invalid Date";
             }

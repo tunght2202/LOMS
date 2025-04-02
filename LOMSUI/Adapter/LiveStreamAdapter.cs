@@ -28,8 +28,8 @@ namespace LOMSUI.Adapter
             var view = convertView ?? _context.LayoutInflater.Inflate(Android.Resource.Layout.SimpleListItem2, null);
             var stream = _items[position];
 
-            view.FindViewById<TextView>(Android.Resource.Id.Text1).Text = stream.Title;
-            view.FindViewById<TextView>(Android.Resource.Id.Text2).Text = $"Status: {stream.Status} - {stream.FormattedCreationTime}";
+            view.FindViewById<TextView>(Android.Resource.Id.Text1).Text = stream.StreamTitle;
+            view.FindViewById<TextView>(Android.Resource.Id.Text2).Text = $"Status: {stream.Status} - {stream.FormattedStartTime}";
 
             return view;
         }

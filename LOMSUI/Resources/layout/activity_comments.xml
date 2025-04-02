@@ -3,38 +3,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:padding="16dp">
 
-
-    <!-- Ô nhập URL Livestream -->
-    <EditText
-        android:id="@+id/txtLiveStreamURL"
+	<ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nhập URL Livestream"
-        android:inputType="textUri"/>
+        android:fillViewport="true">
 
-    <Button
-        android:id="@+id/btnFetchComments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lấy bình luận"
-        android:layout_marginTop="8dp"/>
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-      <TextView
-    android:id="@+id/txtNoComments"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Không có bình luận nào!"
-    android:textSize="16sp"
-    android:gravity="center"
-    android:visibility="gone"
-    android:layout_marginTop="16dp"/>
+			<EditText
+                android:id="@+id/txtLiveStreamId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nhập ID Livestream"
+                android:inputType="text"
+                android:layout_marginBottom="8dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
+			<Button
+                android:id="@+id/btnFetchComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lấy bình luận theo ID"
+                android:layout_marginBottom="8dp"/>
+
+			<EditText
+                android:id="@+id/txtProductCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nhập mã sản phẩm"
+                android:inputType="text"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp"/>
+
+			<Button
+                android:id="@+id/btnFilterByProductCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lọc theo mã sản phẩm"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp"/>
+
+			<TextView
+                android:id="@+id/txtNoComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Không có bình luận nào!"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="16dp"/>
+
+		</LinearLayout>
+	</ScrollView>
+
+	<androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewComments"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginTop="16dp"/>
 </LinearLayout>
