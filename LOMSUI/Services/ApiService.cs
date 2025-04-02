@@ -62,11 +62,11 @@ namespace LOMSUI.Services
                 return false;
             }
         }
-        public async Task<List<CommentModel>> GetComments(string liveStreamURL)
+        public async Task<List<CommentModel>> GetComments(string liveStreamId)
         {
             try
             {
-                string fullUrl = $"{BASE_URLL}/Comment/get-all-comment?liveStreamURL={liveStreamURL}";
+                string fullUrl = $"{BASE_URLL}/Comment/get-all-comment?liveStreamId={liveStreamId}";
                 var response = await _httpClient.GetAsync(fullUrl);
                 var json = await response.Content.ReadAsStringAsync();
                 var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
@@ -79,23 +79,24 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<List<CommentModel>> GetCommentsByProductCode(string liveStreamURL, string productCode)
-        {
-            try
-            {
-                string fullUrl = $"{BASE_URLL}/Comment/get-comments-productcode?liveStreamURL={liveStreamURL}&ProductCode={productCode}";
-                var response = await _httpClient.GetAsync(fullUrl);
-                var json = await response.Content.ReadAsStringAsync();
-                var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
 
-                return comments ?? new List<CommentModel>();
-            }
-            catch (Exception)
-            {
-                return new List<CommentModel>();
-            }
-        }
+        /* public async Task<List<CommentModel>> GetCommentsByProductCode(string liveStreamURL, string productCode)
+         {
+             try
+             {
+                 string fullUrl = $"{BASE_URLL}/Comment/get-comments-productcode?liveStreamURL={liveStreamURL}&ProductCode={productCode}";
+                 var response = await _httpClient.GetAsync(fullUrl);
+                 var json = await response.Content.ReadAsStringAsync();
+                 var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
 
+                 return comments ?? new List<CommentModel>();
+             }
+             catch (Exception)
+             {
+                 return new List<CommentModel>();
+             }
+         }
+ */
 
         public async Task<List<LiveVideo>> GetLiveStreamsAsync()
         {

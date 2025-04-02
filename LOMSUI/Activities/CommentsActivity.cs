@@ -6,6 +6,7 @@ using LOMSUI.Adapter;
 using LOMSUI.Models;
 using LOMSUI.Services;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LOMSUI.Activities
@@ -13,13 +14,13 @@ namespace LOMSUI.Activities
     [Activity(Label = "Comments")]
     public class CommentsActivity : Activity
     {
-        private EditText txtLiveStreamURL, txtProductCode;
-        private Button btnFetchComments;
+        private EditText txtLiveStreamId, txtProductCode;
+        private Button btnFetchComments, btnFilterByProduct;
         private RecyclerView recyclerViewComments;
         private TextView txtNoComments;
         private CommentAdapter _commentAdapter;
         private ApiService _apiService;
-        private List<CommentModel> _comments;
+        private List<CommentModel> _allComments;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -27,33 +28,53 @@ namespace LOMSUI.Activities
             SetContentView(Resource.Layout.activity_comments);
 
             _apiService = new ApiService();
-            _comments = new List<CommentModel>();
+            _allComments = new List<CommentModel>();
 
-            txtLiveStreamURL = FindViewById<EditText>(Resource.Id.txtLiveStreamURL);
+            txtLiveStreamId = FindViewById<EditText>(Resource.Id.txtLiveStreamId);
             txtProductCode = FindViewById<EditText>(Resource.Id.txtProductCode);
             btnFetchComments = FindViewById<Button>(Resource.Id.btnFetchComments);
+            btnFilterByProduct = FindViewById<Button>(Resource.Id.btnFilterByProductCode);
             recyclerViewComments = FindViewById<RecyclerView>(Resource.Id.recyclerViewComments);
             txtNoComments = FindViewById<TextView>(Resource.Id.txtNoComments);
 
             recyclerViewComments.SetLayoutManager(new LinearLayoutManager(this));
 
             btnFetchComments.Click += async (s, e) => await LoadComments();
+            btnFilterByProduct.Click += (s, e) => FilterCommentsByProduct();
         }
 
         private async Task LoadComments()
         {
-            string liveStreamURL = txtLiveStreamURL.Text.Trim();
-            string productCode = txtProductCode.Text.Trim();
-
-            if (string.IsNullOrEmpty(liveStreamURL) || string.IsNullOrEmpty(productCode))
+            string liveStreamId = txtLiveStreamId.Text.Trim();
+            if (string.IsNullOrEmpty(liveStreamId))
             {
-                Toast.MakeText(this, "Vui lòng nhập URL và mã sản phẩm", ToastLength.Short).Show();
+                Toast.MakeText(this, "Vui lòng nhập ID Livestream", ToastLength.Short).Show();
                 return;
             }
 
-            _comments = await _apiService.GetCommentsByProductCode(liveStreamURL, productCode);
+            _allComments = await _apiService.GetComments(liveStreamId);
+            UpdateCommentList(_allComments);
+        }
 
-            if (_comments == null || _comments.Count == 0)
+        private void FilterCommentsByProduct()
+        {
+            string productCode = txtProductCode.Text.Trim();
+            if (string.IsNullOrEmpty(productCode))
+            {
+                UpdateCommentList(_allComments); // Hiển thị lại toàn bộ nếu không nhập mã
+            }
+            else
+            {
+                var filteredComments = _allComments
+                    .Where(c => c.Content.Contains(productCode, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                UpdateCommentList(filteredComments);
+            }
+        }
+
+        private void UpdateCommentList(List<CommentModel> comments)
+        {
+            if (comments == null || comments.Count == 0)
             {
                 recyclerViewComments.Visibility = Android.Views.ViewStates.Gone;
                 txtNoComments.Visibility = Android.Views.ViewStates.Visible;
@@ -64,7 +85,7 @@ namespace LOMSUI.Activities
                 recyclerViewComments.Visibility = Android.Views.ViewStates.Visible;
                 txtNoComments.Visibility = Android.Views.ViewStates.Gone;
 
-                _commentAdapter = new CommentAdapter(_comments);
+                _commentAdapter = new CommentAdapter(comments);
                 recyclerViewComments.SetAdapter(_commentAdapter);
 
                 _commentAdapter.OnCreateOrder += comment =>
