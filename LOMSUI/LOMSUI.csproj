@@ -15,6 +15,9 @@
 		<TrimMode>full</TrimMode>
 	</PropertyGroup>
 	<ItemGroup>
+	  <AndroidResource Remove="Resources\drawable\product.jpg" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Xamarin.FFImageLoading" Version="2.4.11.982" />
 		<PackageReference Include="Xamarin.FFImageLoading.Transformations" Version="2.4.11.982" />

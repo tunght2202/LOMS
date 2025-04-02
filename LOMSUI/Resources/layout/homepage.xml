@@ -78,13 +78,13 @@
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
-						android:entries="@array/fanpage_options" />
+						/>
 
 					<Spinner
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
-						android:entries="@array/date_options" />
+						 />
 
 				</LinearLayout>
 
