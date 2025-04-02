@@ -29,6 +29,24 @@ namespace LOMSAPI.Repositories.Customers
             return _context.SaveChanges();
         }
 
+        public async Task<int> AddLivestreamCustomer(string customerId, string livestreamId)
+        {
+            var livestreamCustomer = await _context.LiveStreamsCustomers
+                .FirstOrDefaultAsync(c => c.CustomerID.Equals(customerId) && c.LivestreamID.Equals(livestreamId));
+            if (livestreamCustomer != null)
+            {
+                throw new Exception($"this livestream customer was exit!");
+            }
+            var newLivestreamCustomer = new LiveStreamCustomer()
+            {
+                CustomerID = customerId,
+                LivestreamID = livestreamId
+            };
+
+            await _context.LiveStreamsCustomers.AddAsync(newLivestreamCustomer);
+            return _context.SaveChanges();
+        }
+
         public async Task<GetCustomerModel> GetCustomerById(string customerId)
         {
             var customer = await _context.Customers
