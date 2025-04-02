@@ -14,7 +14,7 @@ namespace LOMSAPI.Repositories.Comments
         private readonly HttpClient _httpClient;
         private readonly IDistributedCache _cache;
 
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBO29YxskVwTNeFdJoh53pKKZCFEIn9kU0eiYdGN48Gw9ZCsvHNagm0p9OwsFfVGDOHUiZAg7m1T3UZCZCmVkhjsroPO84YJ8S6iOKYRSjC2WJgcto0eNNeY1XEwaVAsZChllrocOhi8GFqX8SrxlZAFNeiG2fI7rrYZAXaEjVoMp4jaTawvKfZAByuU3jZC1xGt7svT5CWDf53nyvkZD";
+        private const string ACCESS_TOKEN = "EAAIYLfie53cBO7MwmvdAL3EkZCY8dfSQ4131c26c7wqNsnbeSDfIMkzqqtc13nr9WCD506tMewbKkLhVrzim8AJtoYeaIPJuGJKpi9tUZBYnz44pOIXKjJZBTA5s0n3HS3wRS5W3ThNiTB4e2fQ0grrT7zGmPLyAX6RMXnwFEym7SPjTwIORWQcmPPWipG80bcSS2Ugs8zu6tNs5jVoBngZD";
         public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache)
         {
             _context = context;
@@ -62,17 +62,13 @@ namespace LOMSAPI.Repositories.Comments
         //    return match.Success ? match.Groups[1].Value : null;
         //}
 
-        private async Task<List<Comment>> ParseCommentsAsync(string jsonResponse, string LiveStreamId)
+        private async Task<List<Comment>> ParseCommentsAsync(string jsonResponse, string liveStreamId)
         {
             using JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement root = doc.RootElement;
 
-
-
             if (root.TryGetProperty("data", out JsonElement dataElement))
             {
-
-
                 foreach (JsonElement item in dataElement.EnumerateArray())
                 {
                     string? commentID = item.GetProperty("id").GetString();
@@ -82,51 +78,70 @@ namespace LOMSAPI.Repositories.Comments
                     string? customerID = item.TryGetProperty("from", out JsonElement fromElement)
                                 && fromElement.TryGetProperty("id", out JsonElement idElement)
                                 ? idElement.GetString()
-                                : "Unknown";
+                                : null;
 
                     string? customerName = item.TryGetProperty("from", out JsonElement from1Element)
                                 && from1Element.TryGetProperty("name", out JsonElement nameElement)
                                 ? nameElement.GetString()
-                                : "Unknown";
+                                : null;
 
-                    if (!_context.Customers.Any(s => s.CustomerID == customerID))
+                    // Kiểm tra nếu có dữ liệu bị null
+                    if (string.IsNullOrEmpty(commentID) || string.IsNullOrEmpty(customerID) || string.IsNullOrEmpty(content))
                     {
-                        _context.Customers.Add(new Customer
-                        {
-                            CustomerID = customerID,
-                            FacebookName = customerName
-                        });
-                        _context.SaveChangesAsync();
+                        Console.WriteLine("Dữ liệu comment bị thiếu! Bỏ qua comment này.");
+                        continue;
                     }
 
-                    if (!_context.LiveStreamsCustomers.Any(s => s.LivestreamID == LiveStreamId && s.CustomerID == customerID))
+                    try
                     {
-                        _context.LiveStreamsCustomers.Add(new LiveStreamCustomer
+                        // Kiểm tra Customer có tồn tại chưa
+                        var customer = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == customerID);
+                        if (customer == null)
                         {
-                            CustomerID = customerID,
-                            LivestreamID = LiveStreamId,
-                        });
-                        _context.SaveChangesAsync();
-                    }
+                            customer = new Customer { CustomerID = customerID, FacebookName = customerName };
+                            _context.Customers.Add(customer);
+                            await _context.SaveChangesAsync(); // Lưu ngay lập tức để tránh lỗi khóa ngoại
+                        }
 
-                    if (!_context.Comments.Any(s => s.CommentID == commentID))
-                    {
-                        var lsci = _context.LiveStreamsCustomers.FirstOrDefault(v => v.LivestreamID == LiveStreamId && v.CustomerID == customerID).LiveStreamCustomerId;
-                        _context.Comments.Add(new Comment
+                        // Kiểm tra LiveStreamCustomer có tồn tại chưa
+                        var liveStreamCustomer = await _context.LiveStreamsCustomers
+                            .FirstOrDefaultAsync(s => s.LivestreamID == liveStreamId && s.CustomerID == customerID);
+
+                        if (liveStreamCustomer == null)
                         {
-                            CommentID = commentID,
-                            Content = content,
-                            CommentTime = commentTime,
-                            LiveStreamCustomerID = lsci
-                        });
-                        await _context.SaveChangesAsync();
+                            liveStreamCustomer = new LiveStreamCustomer { CustomerID = customerID, LivestreamID = liveStreamId };
+                            _context.LiveStreamsCustomers.Add(liveStreamCustomer);
+                            await _context.SaveChangesAsync();
+                        }
+
+                        // Lấy ID của LiveStreamCustomer sau khi lưu
+                        int liveStreamCustomerId = liveStreamCustomer.LiveStreamCustomerId;
+
+                        // Kiểm tra Comment có tồn tại chưa
+                        bool commentExists = await _context.Comments.AnyAsync(s => s.CommentID == commentID);
+                        if (!commentExists)
+                        {
+                            _context.Comments.Add(new Comment
+                            {
+                                CommentID = commentID,
+                                Content = content,
+                                CommentTime = commentTime,
+                                LiveStreamCustomerID = liveStreamCustomerId
+                            });
+
+                            await _context.SaveChangesAsync();
+                        }
                     }
-                    
+                    catch (DbUpdateException ex)
+                    {
+                        Console.WriteLine($"Lỗi khi lưu dữ liệu: {ex.InnerException?.Message}");
+                    }
                 }
-
-                
             }
+
             return await _context.Comments.ToListAsync();
         }
+
+
     }
 }
