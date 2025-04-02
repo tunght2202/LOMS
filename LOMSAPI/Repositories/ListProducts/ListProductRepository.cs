@@ -1,0 +1,171 @@
+﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace LOMSAPI.Repositories.ListProducts
+{
+    public class ListProductRepository : IListProductRepository
+    {
+        private readonly LOMSDbContext _context;
+
+        public ListProductRepository(LOMSDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IEnumerable<ListProductModel>> GetAllListProduct()
+        {
+            var listProduct = await _context.ListProducts
+                .Select(x=>new ListProductModel()
+                {
+                    ListProductId = x.ListProductId,
+                    ListProductName = x.ListProductName
+                }).ToListAsync();
+            return listProduct;
+        }
+
+        public async Task<IEnumerable<ListProductModel>> GetListProductByName(string listProductName)
+        {
+            var listProduct = await _context.ListProducts
+                .Where(x => x.ListProductName.ToLower().Contains(listProductName.ToLower()))
+                .Select( x => new ListProductModel()
+                {
+                    ListProductId = x.ListProductId,
+                    ListProductName = x.ListProductName
+                })
+                .ToListAsync();
+            return listProduct;
+        }
+
+        public async Task<ListProduct> GetListProductById(int listProductId)
+        {
+            var result = await _context.ListProducts
+                .FirstOrDefaultAsync(x => x.ListProductId == listProductId);
+
+            if (result == null)
+            {
+                throw new Exception($"List product ID:{listProductId} not exit!");
+            }
+            return result;
+        }
+
+        public async Task<int> AddProductListProduct(string listProductName, List<int> listProduct)
+        {
+            var checkExit = await _context.ListProducts
+                .AnyAsync(x => x.ListProductName.ToLower()
+                .Equals(listProductName.ToLower()));
+            if (checkExit)
+            {
+                throw new Exception($"{listProductName} exit");
+            }
+            return 1;
+        }
+
+
+        public async Task<bool> CheckExitListProductByName(string listProductName)
+        {
+            var result = await _context.ListProducts
+                .AnyAsync(x => x.ListProductName.ToLower().Equals(listProductName.ToLower()));
+            return result;
+        }
+
+        public async Task<bool> CheckExitListProductById(int listProductId)
+        {
+            var result = await _context.ListProducts
+                .AnyAsync(x => x.ListProductId.Equals(listProductId));
+            return result;
+        }
+
+        public async Task<int> AddNewListProduct(string listProductName)
+        {
+            if(listProductName == null)
+            {
+                throw new Exception("List product name can't null");
+            }
+            var listProduct = new ListProduct()
+            {
+                ListProductName = listProductName
+            };
+            await _context.ListProducts.AddAsync(listProduct);
+            return await _context.SaveChangesAsync();
+        }
+        public async Task<IEnumerable<ProductModel>> GetProductListProductById(int ListProductId)
+        {
+            var productListProduct = await _context.ListProducts
+                .Where(lp => lp.ListProductId == ListProductId)
+                .Include(lp => lp.ProductListProducts)
+                .ThenInclude(plp => plp.Product)
+                .SelectMany(lp => lp.ProductListProducts
+                .Select(plp => new ProductModel()
+                {
+                    ProductID = plp.ProductID,
+                    Name = plp.Product.Name,
+                    Price = plp.Product.Price,
+                    Description = plp.Product.Description,
+                    ProductCode = plp.Product.ProductCode,
+                    Status = plp.Product.Status,
+                    Stock = plp.Product.Stock
+                })) // Lấy danh sách Product
+                .ToListAsync();
+            return productListProduct;
+        }
+        public async Task<int> AddProductIntoListProduct(int listProductId, List<int> listProduct)
+        {
+            var checkExitListProduct = await CheckExitListProductById(listProductId);
+            if (!checkExitListProduct)
+            {
+                throw new Exception("This listProduct not exit!");
+            }
+            var listproductlistproduct = new List<ProductListProduct>();
+            foreach (var item in listProduct)
+            {
+                var productListProduct = new ProductListProduct()
+                {
+                    ListProductID = listProductId,
+                    ProductID = item
+                };
+                listproductlistproduct.Add(productListProduct);
+                
+            }
+            await _context.AddRangeAsync(listproductlistproduct);
+            return await _context.SaveChangesAsync();
+
+
+        }
+
+        public async Task<int> DeleteProductOutListProduct(int listProductId, List<int> listProductIds)
+        {
+            if (listProductIds.Count == 0)
+            {
+                throw new Exception("list product null");
+            }
+            var listProductListProduct = new List<ProductListProduct>();
+            foreach (var item in listProductIds)
+            {
+                var productListProduct = await _context.ProductListProducts
+                    .FirstOrDefaultAsync(x => x.ListProductID == listProductId && x.ProductID == item);
+                listProductListProduct.Add(productListProduct);
+            }
+             _context.ProductListProducts.RemoveRange(listProductListProduct);
+            return await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> DeleteListProduct(int listProductId)
+        {
+            var relatedProducts = _context.ProductListProducts
+    .Where(p => p.ListProductID == listProductId);
+            _context.ProductListProducts.RemoveRange(relatedProducts);
+
+            // Sau đó mới xóa ListProduct
+            var listProduct = _context.ListProducts.Find(listProductId);
+            if (listProduct != null)
+            {
+                _context.ListProducts.Remove(listProduct);
+            }
+
+            return await _context.SaveChangesAsync();
+        }
+
+
+    }
+}

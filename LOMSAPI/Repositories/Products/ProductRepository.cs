@@ -88,32 +88,6 @@ namespace LOMSAPI.Repositories.Products
             return productList;
         }
 
-        public async Task<IEnumerable<ProductModel>> GetAllProductsByLiveStream(string liveStreamId)
-        {
-            var getLiveStreamId = await _context.LiveStreams
-                .FirstOrDefaultAsync(x => x.LivestreamID.Equals(liveStreamId));
-            if (getLiveStreamId == null)
-            {
-                throw new Exception($"Can't find livestream id {liveStreamId}");
-            }
-            var getProductByLiveStream = await _context.LiveStreamsProducts
-                .Where(lsp => lsp.LivestreamID.Equals(liveStreamId))
-                .Join(_context.Products,
-                lsp => lsp.ProductID,
-                p => p.ProductID,
-                (lsp, p) => new ProductModel()
-                {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Description = p.Description,
-                    Stock = p.Stock,
-                    Status = p.Status
-
-                }).ToListAsync();
-            return getProductByLiveStream;
-
-        }
         public async Task<int> AddProduct(ProductModel postProduct)
         {
             var product = new Product()
@@ -192,6 +166,7 @@ namespace LOMSAPI.Repositories.Products
             }
             product.Status = false; return await _context.SaveChangesAsync();
         }
+
 
     }
 }

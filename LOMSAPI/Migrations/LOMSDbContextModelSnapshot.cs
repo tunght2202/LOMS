@@ -88,6 +88,23 @@ namespace LOMSAPI.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("LOMSAPI.Data.Entities.ListProduct", b =>
+                {
+                    b.Property<int>("ListProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ListProductId"));
+
+                    b.Property<string>("ListProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ListProductId");
+
+                    b.ToTable("ListProducts");
+                });
+
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStream", b =>
                 {
                     b.Property<string>("LivestreamID")
@@ -95,6 +112,9 @@ namespace LOMSAPI.Migrations
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("ListProductID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -115,6 +135,8 @@ namespace LOMSAPI.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LivestreamID");
+
+                    b.HasIndex("ListProductID");
 
                     b.HasIndex("UserID");
 
@@ -144,33 +166,6 @@ namespace LOMSAPI.Migrations
                     b.HasIndex("LivestreamID");
 
                     b.ToTable("LiveStreamCustomers");
-                });
-
-            modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamProduct", b =>
-                {
-                    b.Property<int>("LiveStreamProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LiveStreamProductId"));
-
-                    b.Property<int?>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LivestreamID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("int");
-
-                    b.HasKey("LiveStreamProductId");
-
-                    b.HasIndex("LivestreamID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("LiveStreamProducts");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>
@@ -289,6 +284,29 @@ namespace LOMSAPI.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.ProductListProduct", b =>
+                {
+                    b.Property<int>("ProductListProductID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductListProductID"));
+
+                    b.Property<int>("ListProductID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductListProductID");
+
+                    b.HasIndex("ListProductID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("ProductListProducts");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Shipping", b =>
@@ -532,11 +550,19 @@ namespace LOMSAPI.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStream", b =>
                 {
+                    b.HasOne("LOMSAPI.Data.Entities.ListProduct", "ListProduct")
+                        .WithMany("LiveStreams")
+                        .HasForeignKey("ListProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("LOMSAPI.Data.Entities.User", "User")
                         .WithMany("LiveStreams")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ListProduct");
 
                     b.Navigation("User");
                 });
@@ -558,25 +584,6 @@ namespace LOMSAPI.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("LiveStream");
-                });
-
-            modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamProduct", b =>
-                {
-                    b.HasOne("LOMSAPI.Data.Entities.LiveStream", "LiveStream")
-                        .WithMany("LiveStreamProducts")
-                        .HasForeignKey("LivestreamID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("LOMSAPI.Data.Entities.Product", "Product")
-                        .WithMany("LiveStreamProducts")
-                        .HasForeignKey("ProductID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("LiveStream");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>
@@ -629,6 +636,25 @@ namespace LOMSAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.ProductListProduct", b =>
+                {
+                    b.HasOne("LOMSAPI.Data.Entities.ListProduct", "ListProduct")
+                        .WithMany("ProductListProducts")
+                        .HasForeignKey("ListProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LOMSAPI.Data.Entities.Product", "Product")
+                        .WithMany("ProductListProducts")
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ListProduct");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Shipping", b =>
@@ -698,11 +724,16 @@ namespace LOMSAPI.Migrations
                     b.Navigation("LiveStreamCustomers");
                 });
 
+            modelBuilder.Entity("LOMSAPI.Data.Entities.ListProduct", b =>
+                {
+                    b.Navigation("LiveStreams");
+
+                    b.Navigation("ProductListProducts");
+                });
+
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStream", b =>
                 {
                     b.Navigation("LiveStreamCustomers");
-
-                    b.Navigation("LiveStreamProducts");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamCustomer", b =>
@@ -724,9 +755,9 @@ namespace LOMSAPI.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Product", b =>
                 {
-                    b.Navigation("LiveStreamProducts");
-
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("ProductListProducts");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.User", b =>
