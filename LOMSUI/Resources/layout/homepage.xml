@@ -9,215 +9,241 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:orientation="horizontal"
         android:background="#50BD81"
-        android:layout_marginBottom="0.0dp">
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-       
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:text="LOMS App"
+            android:textSize="20sp"
+            android:textColor="#000" 
+            android:textStyle="bold"/>
 
-            <LinearLayout
-                android:layout_width="1dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginStart="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="LOWS"
-                    android:textSize="18sp"
-                    android:textColor="#000"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-        </LinearLayout>
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+             />
 
     </LinearLayout>
 
-	<ScrollView
-		android:layout_width="match_parent"
-		android:layout_weight="1"
-		android:layout_height="wrap_content">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="vertical"
-			android:padding="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#F0F0F0"
-                android:padding="16dp">
+                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <Spinner
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Báo cáo tổng quan"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#000000" />
+                    android:layout_weight="1"
+                    />
+
+                <Spinner
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    >
-
-                    <EditText
-                        android:id="@+id/startDateEditText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Ngày bắt đầu"
-                        android:inputType="date"
-                        android:textColor="#000000"/>
-
-                    <EditText
-                        android:id="@+id/endDateEditText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Ngày kết thúc"
-                        android:inputType="date" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="16dp">
-
-                    <LinearLayout
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_width="match_parent">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="#E0F8E0"
+                    android:padding="8dp"
+                    android:layout_marginRight="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Doanh thu"
+                        android:text="Doanh Thu"
                         android:textSize="16sp"
                         android:textColor="#000000" />
 
                     <TextView
-                        android:id="@+id/doanhThuTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 vnd"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="#000000" />
 
                 </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_width="match_parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Doanh thu dự kiến"
-                            android:textSize="16sp"
-                            android:textColor="#000000" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 vnd"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:textColor="#000000" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="16dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="#E0F8E0"
+                    android:padding="8dp">
 
-                    <LinearLayout
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_width="match_parent">
+                        android:text="Số đơn hàng"
+                        android:textSize="16sp"
+                        android:textColor="#000000" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Khách hàng"
-                            android:textSize="16sp"
-                            android:textColor="#000000" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 KH"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:textColor="#000000" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_width="match_parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Số Đơn"
-                            android:textSize="16sp"
-                            android:textColor="#000000" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 "
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:textColor="#000000"
-                            android:id="@+id/textView2" />
-
-                    </LinearLayout>
+                        android:text="0"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="Thống kê theo trạng thái đơn hàng"
-				android:textSize="18sp"
-				android:textStyle="bold"
-				android:layout_marginTop="16dp"
-				android:textColor="#000" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
 
-		</LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:background="#E0F8E0"
+                    android:padding="8dp"
+                    android:layout_marginRight="8dp">
 
-	</ScrollView>
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1/1/2025"
+                        android:textSize="16sp"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="8dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:background="#E0F8E0"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1/1/2025"
+                        android:textSize="16sp"
+                        android:textColor="#000000"
+                        android:layout_marginLeft="8dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="16dp"
+                android:background="#E0F8E0"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Doanh thu theo thời gian"
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sản phẩm trong kho"
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#E0F8E0">
+
+                    <TableRow
+                        android:background="#C0E0C0">
+
+                        <TextView
+                            android:text="STT"
+                            android:padding="8dp"
+                            android:textSize="14sp"
+                            android:textColor="#000000" />
+
+                        <TextView
+                            android:text="Tên SP"
+                            android:padding="8dp"
+                            android:textSize="14sp"
+                            android:textColor="#000000" />
+
+                        <TextView
+                            android:text="Số Lượng"
+                            android:padding="8dp"
+                            android:textSize="14sp"
+                            android:textColor="#000000" />
+
+                        <TextView
+                            android:text="Giá"
+                            android:padding="8dp"
+                            android:textSize="14sp"
+                            android:textColor="#000000" />
+
+                    </TableRow>
+
+                    </TableLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -263,8 +289,7 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"            
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:text="Bán Hàng"
                 android:textSize="12sp"
                 android:textColor="#000000"/>
@@ -280,7 +305,7 @@
 
             <ImageView
                 android:layout_width="24dp"
-                android:layout_height="24dp" 
+                android:layout_height="24dp"
                 android:src="@drawable/productselling"
                 android:layout_marginTop="8dp"
                 />
