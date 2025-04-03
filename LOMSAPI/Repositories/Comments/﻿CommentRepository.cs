@@ -14,7 +14,7 @@ namespace LOMSAPI.Repositories.Comments
         private readonly HttpClient _httpClient;
         private readonly IDistributedCache _cache;
 
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBOy5PHvG4NNqNnDCkWIqP7ahuKRitvybSZBXtgxNtvBEzZBzLkgmO89dvMhif8YWMZACkgox5dWRgQBa3Mj6kdAptr4lZCuRDWm503FoIjcZB26RlreiQgrllbBiYsBWZAchmxWUmiszf4cUy86HxuLmS0XcAqFmLxgDtQy5fAmUfNvx5Oon1ZANvrm4KUOKn4iODEpgcjEYdJYZD";
+        private const string ACCESS_TOKEN = "EAAIYLfie53cBOzvhMQbWXbi6Cvr2EIZBvEbdlR8iLlXrCcO7vLauR58Rml6yOmG48alhc3gNJo1idD3HlwJxkgKDZCpnc8rRh32r6QszIiAmRZCeizRgwiW4ZCnYoZA6QF19lVnq503LjHTneQkr3h3m7iy4LsVEt30AKQpD8zu0xX3NyEHPDEMPQugR9QZB3iTPxbF65MZCugescVPVYyUZBY0ZD";
         public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache)
         {
             _context = context;
@@ -66,7 +66,7 @@ namespace LOMSAPI.Repositories.Comments
         {
             using JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement root = doc.RootElement;
-
+            List<Comment> comments = new List<Comment>();
             if (root.TryGetProperty("data", out JsonElement dataElement))
             {
                 foreach (JsonElement item in dataElement.EnumerateArray())
@@ -128,18 +128,20 @@ namespace LOMSAPI.Repositories.Comments
                                 CommentTime = commentTime,
                                 LiveStreamCustomerID = liveStreamCustomerId
                             });
-
                             await _context.SaveChangesAsync();
                         }
+                        var comment = await _context.Comments.FirstOrDefaultAsync(s => s.CommentID == commentID);
+                        comments.Add(comment);
                     }
                     catch (DbUpdateException ex)
                     {
                         Console.WriteLine($"Lỗi khi lưu dữ liệu: {ex.InnerException?.Message}");
                     }
+                    
                 }
             }
 
-            return await _context.Comments.ToListAsync();
+            return  comments;
         }
 
 

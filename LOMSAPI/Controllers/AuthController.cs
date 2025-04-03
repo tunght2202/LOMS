@@ -26,6 +26,8 @@ namespace LOMSAPI.Controllers
         {
             _userRepository = userRepository;
         }
+        // Thanh Tùng
+        // Login 
         [HttpPost("login-account-request")]
         [AllowAnonymous]
         public async Task<IActionResult> Authenticate([FromBody] Models.LoginRequest loginRequest)

@@ -4,6 +4,7 @@ using LOMSAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LOMSAPI.Migrations
 {
     [DbContext(typeof(LOMSDbContext))]
-    partial class LOMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250402092959_changeTableLivestream")]
+    partial class changeTableLivestream
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,9 +73,6 @@ namespace LOMSAPI.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageURL")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -112,6 +112,9 @@ namespace LOMSAPI.Migrations
                 {
                     b.Property<string>("LivestreamID")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("ListProductID")
                         .HasColumnType("int");
@@ -192,8 +195,7 @@ namespace LOMSAPI.Migrations
 
                     b.HasKey("OrderID");
 
-                    b.HasIndex("LiveStreamCustomerID")
-                        .IsUnique();
+                    b.HasIndex("LiveStreamCustomerID");
 
                     b.ToTable("Orders");
                 });
@@ -349,9 +351,6 @@ namespace LOMSAPI.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -365,12 +364,6 @@ namespace LOMSAPI.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageURL")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -396,9 +389,6 @@ namespace LOMSAPI.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -605,8 +595,8 @@ namespace LOMSAPI.Migrations
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>
                 {
                     b.HasOne("LOMSAPI.Data.Entities.LiveStreamCustomer", "LiveStreamCustomer")
-                        .WithOne("Order")
-                        .HasForeignKey("LOMSAPI.Data.Entities.Order", "LiveStreamCustomerID")
+                        .WithMany("Orders")
+                        .HasForeignKey("LiveStreamCustomerID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -756,8 +746,7 @@ namespace LOMSAPI.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("Order")
-                        .IsRequired();
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>

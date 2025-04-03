@@ -15,7 +15,8 @@ namespace LOMSAPI.Controllers
         {
             _customerRepository = customerRepository;
         }
-
+        // Thanh Tùng
+        // Get customer by ID  
         [HttpGet("GetCustomerById/{id}")]
         public async Task<IActionResult> GetCustomerById(string id) 
         {
@@ -23,7 +24,8 @@ namespace LOMSAPI.Controllers
             if (customer == null) { return BadRequest($"{id} not exit"); }
             return Ok(customer);
         }
-
+        // Thanh Tùng
+        // Add customer by id and Facebook Name  
         [HttpPost("AddCustomer/{customerId}/{customerFacebookName}")]
         public async Task<IActionResult> AddCustomer(string customerId, string customerFacebookName)
         {

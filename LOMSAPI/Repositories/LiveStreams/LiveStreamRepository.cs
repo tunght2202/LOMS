@@ -125,7 +125,7 @@ namespace LOMSAPI.Repositories.LiveStreams
                     StreamTitle = root.TryGetProperty("title", out JsonElement title) ? title.GetString() : "Untitled",
                     StreamURL = permalink != null ? $"https://www.facebook.com{permalink}" : "Unknown",
                     StartTime = DateTime.Parse(creationTimeElement.GetString().Replace("+0000", "Z")),
-
+                
                     Status = status,
                     UserID = userId, // Use UserID from token
                     ListProductID = null,
@@ -170,7 +170,7 @@ namespace LOMSAPI.Repositories.LiveStreams
                     StreamTitle = item.TryGetProperty("title", out JsonElement title) ? title.GetString() : "Untitled",
                     StreamURL = permalink != null ? $"https://www.facebook.com{permalink}" : "Unknown",
                     StartTime = DateTime.Parse(creationTimeElement.GetString().Replace("+0000", "Z")),
-
+                  
                     Status = status,
                     UserID = userId, // Use UserID from token
                     ListProductID = null,

@@ -17,10 +17,10 @@ namespace LOMSAPI.Data.Entities
         public string StreamTitle { get; set; }
         public DateTime StartTime { get; set; }
         // Neu la VOD thi da ket thuc phien live stream, con neu la LIVE stream thi chua ket thuc
-        public string Status { get; set; }
+        public string Status { get; set;  }
         // Neu la true thi da xoa, con neu la false thi chua xoa
         public bool StatusDelete { get; set; } = false;
-        public virtual User User { get; set; }
+        public virtual User User { get; set; } 
         public virtual ListProduct ListProduct { get; set; }
         public virtual ICollection<LiveStreamCustomer> LiveStreamCustomers { get; set; }
 
