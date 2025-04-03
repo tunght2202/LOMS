@@ -13,13 +13,15 @@ namespace LOMSAPI.Repositories.Comments
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly IDistributedCache _cache;
-
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBO4NPu9A2sL4AKQAZBtVCjp4l3HcYuoYU4p0bkAb9R7MS8VCR4WJaVGfvMDnmTUAvKmmpvg6UcaBroL3XrE0CdNxuyCKAz7733XsPK5q7dCAMsQVeIRUljZCn4rM6sFMdkmukZCgZBcQcb2ocysBrsEhFVRbT8iZCMlhjy8JRSlO1cViZBRD5YxpWAsHqNDLdC51OUHAqJZBAvIZD";
-        public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache)
+        private readonly IConfiguration _configuration;
+        private string ACCESS_TOKEN;
+        public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache, IConfiguration configuration)
         {
             _context = context;
             _httpClient = httpClient;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _configuration = configuration;
+            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token không được cấu hình.");
         }
 
 
@@ -78,6 +80,13 @@ namespace LOMSAPI.Repositories.Comments
                                 && from1Element.TryGetProperty("name", out JsonElement nameElement)
                                 ? nameElement.GetString()
                                 : null;
+                    string? avatar = item.TryGetProperty("from", out JsonElement from2Element) &&
+                            from2Element.TryGetProperty("picture", out JsonElement pictureElement) &&
+                            pictureElement.TryGetProperty("data", out JsonElement data1Element) &&
+                            data1Element.TryGetProperty("url", out JsonElement urlElement)
+                            ? urlElement.GetString()
+                            : null;
+
 
                     // Kiểm tra nếu có dữ liệu bị null
                     if (string.IsNullOrEmpty(commentID) || string.IsNullOrEmpty(customerID) || string.IsNullOrEmpty(content))
@@ -92,7 +101,7 @@ namespace LOMSAPI.Repositories.Comments
                         var customer = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == customerID);
                         if (customer == null)
                         {
-                            customer = new Customer { CustomerID = customerID, FacebookName = customerName };
+                            customer = new Customer { CustomerID = customerID, FacebookName = customerName, ImageURL = avatar };
                             _context.Customers.Add(customer);
                             await _context.SaveChangesAsync(); // Lưu ngay lập tức để tránh lỗi khóa ngoại
                         }
@@ -120,7 +129,7 @@ namespace LOMSAPI.Repositories.Comments
                                 CommentID = commentID,
                                 Content = content,
                                 CommentTime = commentTime,
-                                LiveStreamCustomerID = liveStreamCustomerId
+                                LiveStreamCustomerID = liveStreamCustomerId,
                             });
                             await _context.SaveChangesAsync();
                         }
