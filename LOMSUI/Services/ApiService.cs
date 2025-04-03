@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Text;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -43,7 +44,6 @@ namespace LOMSUI.Services
                 using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/{endpoint}", content))
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[API] {endpoint} Response: {response.StatusCode} - {responseBody}");
 
                     if (!response.IsSuccessStatusCode) return false;
 
@@ -59,15 +59,14 @@ namespace LOMSUI.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {endpoint}: {ex.Message}");
                 return false;
             }
         }
-        public async Task<List<CommentModel>> GetComments(string liveStreamURL)
+        public async Task<List<CommentModel>> GetComments(string liveStreamId)
         {
             try
             {
-                string fullUrl = $"{BASE_URLL}/Comment/get-all-comment?liveStreamURL={liveStreamURL}";
+                string fullUrl = $"{BASE_URLL}/Comment/get-all-comment?liveStreamId={liveStreamId}";
                 var response = await _httpClient.GetAsync(fullUrl);
                 var json = await response.Content.ReadAsStringAsync();
                 var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
@@ -81,37 +80,81 @@ namespace LOMSUI.Services
         }
 
 
-        public class FacebookLiveService
+        /* public async Task<List<CommentModel>> GetCommentsByProductCode(string liveStreamURL, string productCode)
+         {
+             try
+             {
+                 string fullUrl = $"{BASE_URLL}/Comment/get-comments-productcode?liveStreamURL={liveStreamURL}&ProductCode={productCode}";
+                 var response = await _httpClient.GetAsync(fullUrl);
+                 var json = await response.Content.ReadAsStringAsync();
+                 var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
+
+                 return comments ?? new List<CommentModel>();
+             }
+             catch (Exception)
+             {
+                 return new List<CommentModel>();
+             }
+         }
+ */
+
+
+        // Lấy danh sách tất cả livestreams
+        public async Task<List<LiveStreamModel>> GetAllLiveStreamsAsync()
         {
-            private const string AccessToken = "EAAIYLfie53cBOxdeb1mZBTbQ7MlRf1X64vFfdmnHLnnoIjMAwQvgkqTGvLxwbbZB8WSaGmflSalq8angfExMilsdsK6QwdvyxOLCGSxIIHSrtnNmU1BZAQNI8PfFKJ2SQJxGJMH695QVj9NtNtgKMWaZCUbTJ0ZB8DKZBlxfzvpiuIZAqMUDizeCxn1oAYQfyQtln5fAphmxwhEnpZB8yQZDZD";
-            private const string PageId = "266349363239226";
-            private const string BaseUrl = "https://graph.facebook.com/v22.0";
+            string url = $"{BASE_URLL}/GetAllLiveStreams";
 
-            private readonly HttpClient _httpClient = new HttpClient();
-
-            public async Task<List<LiveVideo>> GetLiveStreamsAsync()
+            try
             {
-                string url = $"{BaseUrl}/{PageId}/live_videos?fields=id,title,permalink_url,creation_time,status&access_token={AccessToken}";
-
-                try
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage response = await _httpClient.GetAsync(url);
                     string json = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[DEBUG] API Response: {json}");
-
-                    if (!response.IsSuccessStatusCode) return new List<LiveVideo>();
-
-                    var result = JsonConvert.DeserializeObject<FacebookLiveResponse>(json);
-                    return result?.Data ?? new List<LiveVideo>();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[ERROR] Fetching live streams failed: {ex.Message}");
-                    return new List<LiveVideo>();
+                    return JsonConvert.DeserializeObject<List<LiveStreamModel>>(json);
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching live streams: {ex.Message}");
+            }
+            return new List<LiveStreamModel>();
+        }
 
+        // Lấy chi tiết livestream theo ID
+        public async Task<LiveStreamModel> GetLiveStreamByIdAsync(string livestreamId)
+        {
+            string url = $"{BASE_URLL}/GetLiveStreamById/{livestreamId}";
 
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<LiveStreamModel>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching livestream details: {ex.Message}");
+            }
+            return null;
+        }
+
+        public async Task<bool> DeleteLiveStreamAsync(string livestreamId)
+        {
+            string url = $"{BASE_URLL}/DeleteLiveStream/{livestreamId}";
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.DeleteAsync(url);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting livestream: {ex.Message}");
+            }
+            return false;
         }
     }
 }
