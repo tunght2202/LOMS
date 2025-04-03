@@ -37,9 +37,18 @@ namespace LOMSAPI.Repositories.LiveStreams
             liveStream.StatusDelete = true;
             return await _context.SaveChangesAsync();
         }
+        // API 1: Lấy livestream từ DB
+        public async Task<IEnumerable<LiveStream>> GetAllLiveStreamsFromDb(string userId)
+        {
+            if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
+                throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
 
-        // Updated to take userId from token
-        public async Task<IEnumerable<LiveStream>> GetAllLiveStreams(string userId)
+            return await _context.LiveStreams
+                .Where(ls => ls.UserID == userId && !ls.StatusDelete)
+                .ToListAsync();
+        }
+        // API 2: Lấy livestream từ Facebook API
+        public async Task<IEnumerable<LiveStream>> GetAllLiveStreamsFromFacebook(string userId)
         {
             if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
                 throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
@@ -61,7 +70,7 @@ namespace LOMSAPI.Repositories.LiveStreams
                     }
 
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    liveStreams.AddRange(ParseLiveStreams(jsonResponse, userId)); // Pass userId
+                    liveStreams.AddRange(ParseLiveStreams(jsonResponse, userId));
 
                     using JsonDocument doc = JsonDocument.Parse(jsonResponse);
                     apiUrl = doc.RootElement.TryGetProperty("paging", out JsonElement paging) &&
@@ -69,14 +78,66 @@ namespace LOMSAPI.Repositories.LiveStreams
                             ? next.GetString() : null;
                 }
 
-                await SaveLiveStreamsToDb(liveStreams); // Uncommented to save to DB
-                return liveStreams;
+                // Lưu vào DB (tùy chọn, có thể bỏ nếu không muốn lưu ngay)
+                await SaveLiveStreamsToDb(liveStreams);
+
+                return liveStreams.Where(ls => !ls.StatusDelete);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching live streams from Facebook: {ex.Message}", ex);
+            }
+        }
+/*        // Updated to take userId from token
+        public async Task<IEnumerable<LiveStream>> GetAllLiveStreams(string userId)
+        {
+            if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
+                throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
+            // Kiểm tra trong DB trước để lấy các livestream chưa xóa
+            var dbLiveStreams = await _context.LiveStreams
+                .Where(ls => ls.UserID == userId && !ls.StatusDelete)
+                .ToListAsync();
+
+
+            var apiLiveStreams = new List<LiveStream>();
+            string apiUrl = $"https://graph.facebook.com/v22.0/{_pageId}/live_videos?fields=id,title,creation_time,status,embed_html,permalink_url&access_token={_accessToken}";
+
+            try
+            {
+                while (!string.IsNullOrEmpty(apiUrl))
+                {
+                    HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorResponse = await response.Content.ReadAsStringAsync();
+                        if (errorResponse.Contains("OAuthException") && errorResponse.Contains("code\":190"))
+                            throw new UnauthorizedAccessException("Access token has expired. Please update the token.");
+                        throw new Exception($"API call failed: {response.StatusCode} - {errorResponse}");
+                    }
+
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    apiLiveStreams.AddRange(ParseLiveStreams(jsonResponse, userId));
+
+                    using JsonDocument doc = JsonDocument.Parse(jsonResponse);
+                    apiUrl = doc.RootElement.TryGetProperty("paging", out JsonElement paging) &&
+                            paging.TryGetProperty("next", out JsonElement next)
+                            ? next.GetString() : null;
+                }
+
+                // Hợp nhất dữ liệu từ DB và API
+                var allLiveStreams = MergeLiveStreams(dbLiveStreams, apiLiveStreams);
+
+                // Lưu dữ liệu mới từ API vào DB
+                await SaveLiveStreamsToDb(apiLiveStreams);
+
+                // Chỉ trả về các livestream chưa bị xóa
+                return allLiveStreams.Where(ls => !ls.StatusDelete);
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error fetching live streams: {ex.Message}", ex);
             }
-        }
+        }*/
 
         // Updated to take userId from token
         public async Task<LiveStream> GetLiveStreamById(string liveStreamId, string userId)
@@ -180,14 +241,6 @@ namespace LOMSAPI.Repositories.LiveStreams
             return liveStreams;
         }
 
-        // Kept for reference but not used for UserID
-        private string pageIdFromPermalink(string permalinkUrl)
-        {
-            if (string.IsNullOrEmpty(permalinkUrl)) return null;
-            var parts = permalinkUrl.Split('/');
-            return parts.Length > 1 ? parts[1] : null;
-        }
-
         private async Task SaveLiveStreamsToDb(List<LiveStream> liveStreams)
         {
             if (liveStreams == null || !liveStreams.Any())
@@ -195,12 +248,23 @@ namespace LOMSAPI.Repositories.LiveStreams
 
             foreach (var liveStream in liveStreams)
             {
-                if (!await _context.LiveStreams.AnyAsync(ls => ls.LivestreamID == liveStream.LivestreamID))
+                var existing = await _context.LiveStreams
+                    .FirstOrDefaultAsync(ls => ls.LivestreamID == liveStream.LivestreamID);
+
+                if (existing == null)
                 {
                     await _context.LiveStreams.AddAsync(liveStream);
+                }
+                else if (!existing.StatusDelete) // Chỉ cập nhật nếu chưa bị xóa
+                {
+                    existing.StreamTitle = liveStream.StreamTitle;
+                    existing.StreamURL = liveStream.StreamURL;
+                    existing.StartTime = liveStream.StartTime;
+                    existing.Status = liveStream.Status;
                 }
             }
             await _context.SaveChangesAsync();
         }
+     
     }
 }

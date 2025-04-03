@@ -15,8 +15,8 @@ namespace LOMSAPI.Controllers
             _liveStreamRepositories = liveStreamRepositories;
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllLiveStreams()
+        [HttpGet("allDb")]
+        public async Task<IActionResult> GetAllLiveStreamsFromDb()
         {
            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
            string userId = "269841f9-391e-4b7c-83f4-2f14459ad728";
@@ -25,7 +25,25 @@ namespace LOMSAPI.Controllers
 
             try
             {
-                var liveStreams = await _liveStreamRepositories.GetAllLiveStreams(userId);
+                var liveStreams = await _liveStreamRepositories.GetAllLiveStreamsFromDb(userId);
+                return Ok(liveStreams);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
+        }
+        [HttpGet("facebook")] // Lấy từ Facebook API
+        public async Task<IActionResult> GetAllLiveStreamsFromFacebook()
+        {
+            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string userId = "269841f9-391e-4b7c-83f4-2f14459ad728";
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("UserID not found in token.");
+
+            try
+            {
+                var liveStreams = await _liveStreamRepositories.GetAllLiveStreamsFromFacebook(userId);
                 return Ok(liveStreams);
             }
             catch (Exception ex)
