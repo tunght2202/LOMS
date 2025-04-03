@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using LOMSAPI.Repositories.LiveStreams;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LOMSAPI.Controllers
@@ -50,6 +51,33 @@ namespace LOMSAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error: {ex.Message}");
+            }
+        }
+        [HttpDelete("{liveStreamId}")]
+        public async Task<IActionResult> DeleteLiveStream(string liveStreamId)
+        {
+            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string userId = "269841f9-391e-4b7c-83f4-2f14459ad728";
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("UserID not found in token.");
+
+            try
+            {
+                // Check if the livestream exists and belongs to the user
+                var liveStream = await _liveStreamRepositories.GetLiveStreamById(liveStreamId, userId);
+                if (liveStream == null || liveStream.UserID != userId)
+                    return NotFound("Livestream not found or you do not have permission to delete it.");
+
+                // Perform the soft delete
+                int result = await _liveStreamRepositories.DeleteLiveStream(liveStreamId);
+                if (result == 0)
+                    return NotFound("Livestream not found or already deleted.");
+
+                return Ok(); // 204 No Content - successful deletion
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error deleting livestream: {ex.Message}");
             }
         }
     }
