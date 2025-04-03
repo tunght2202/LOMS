@@ -9,6 +9,10 @@ using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using LOMSAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
 namespace LOMSAPI.Repositories.Users
 {
     public class UserRepository : IUserRepository
@@ -17,13 +21,15 @@ namespace LOMSAPI.Repositories.Users
         private readonly SignInManager<User> _signInManager;
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
+        private readonly CloudinaryService _cloudinaryService;
         public UserRepository(UserManager<User> userManager, SignInManager<User> signInManager
-            , IConfiguration config, IDistributedCache cache)
+            , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = config;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _cloudinaryService = cloudinaryService;
         }
         public async Task<string> Authencate(LoginRequest loginRequest)
         {
@@ -52,14 +58,20 @@ namespace LOMSAPI.Repositories.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model)
+        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image)
         {
+            string imageUrl = await _cloudinaryService.UploadImageAsync(image);
             var user = new User
             {
                 UserName = model.UserName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
-                EmailConfirmed = false
+                EmailConfirmed = false,
+                FullName = model.FullName,
+                ImageURL = imageUrl,
+                Address = model.Address,
+                Sex = model.Gender,
+                
             };
 
             var passwordHasher = new PasswordHasher<User>();
@@ -103,7 +115,11 @@ namespace LOMSAPI.Repositories.Users
                 Email = userEmail,
                 PhoneNumber = userInfo.PhoneNumber,
                 EmailConfirmed = true,
-                PasswordHash = userInfo.PasswordHash
+                PasswordHash = userInfo.PasswordHash,
+                FullName = userInfo.FullName,
+                ImageURL = userInfo.ImageURL,
+                Address = userInfo.Address,
+                Sex = userInfo.Sex,
             };
 
             var result = await _userManager.CreateAsync(newUser);
