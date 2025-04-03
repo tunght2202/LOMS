@@ -28,6 +28,13 @@ namespace LOMSAPI.Repositories.Revenues
                 .SelectMany(o => o.OrderDetails)
                 .SumAsync(od => od.Price * od.Quantity);
         }
+        public async Task<decimal> GetRevenueByDateRange(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Orders
+                .Where(o => o.Status == OrderStatus.Delivered && o.OrderDate >= startDate && o.OrderDate <= endDate)
+                .SelectMany(o => o.OrderDetails)
+                .SumAsync(od => od.Price * od.Quantity);
+        }
     }
 
 }
