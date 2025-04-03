@@ -14,7 +14,8 @@ namespace LOMSAPI.Controllers
         {
             _context = context;
         }
-
+        // Thanh Tùng
+        // Add new Order Detail
         [HttpPost("AddOrderDetail")]
         public async Task<IActionResult> AddOrderDetail([FromForm] OrderDetailAddModel orderModel)
         {
@@ -25,11 +26,24 @@ namespace LOMSAPI.Controllers
             }
             return Ok(result);
         }
-
+        // Thanh Tùng
+        // Get order and order detail by livestream customer id
         [HttpGet("GetOrderByLivestreamCustomerId/{livstreamCustomerId}")]
         public async Task<IActionResult> GetOrderByLivestreamCustomerId(int livstreamCustomerId)
         {
             var result = await _context.GetOrderByLivestreamCustomerId(livstreamCustomerId);
+            if(result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
+        }
+        // Thanh Tùng
+        // Get order and order detail by livestream customer id
+        [HttpGet("GetOrderByLivestreamId/{livstreamId}")]
+        public async Task<IActionResult> GetOrderByLivestreamId(string livstreamId)
+        {
+            var result = await _context.GetOrderByLivestreamId(livstreamId);
             if(result != null)
             {
                 return Ok(result);

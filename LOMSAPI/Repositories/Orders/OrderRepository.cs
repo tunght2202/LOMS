@@ -139,5 +139,24 @@ namespace LOMSAPI.Repositories.Orders
 
             return result;
         }
+
+        public async Task<IEnumerable<OrderModel>> GetOrderByLivestreamId(string livestreamId)
+        {
+            var orders = await _context.Orders
+                                        .Where(o => o.LiveStreamCustomer.LivestreamID.Equals(livestreamId)) // Lọc theo LiveStreamID
+                                        .Select(o => new OrderModel()
+                                        {
+                                            OrderID = o.OrderID,
+                                            OrderDate = o.OrderDate,
+                                            Status = o.Status,
+                                            LiveStreamCustomerID = o.LiveStreamCustomerID
+                                        })
+                                        .ToListAsync();
+            if (orders.Any())
+            {
+                return orders;
+            }
+            throw new Exception("not exit order");
+        }
     }
 }

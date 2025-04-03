@@ -7,6 +7,7 @@ namespace LOMSAPI.Repositories.Orders
         Task<int> CreateOrderByProductCodeAuto(string productCode);
         Task<int> CreateOrderDetail(OrderDetailAddModel orderModel);
         Task<GetOrderDetailByOrderModel> GetOrderByLivestreamCustomerId(int livestreamCustomerId);
+        Task<IEnumerable<OrderModel>> GetOrderByLivestreamId(string livestreamId);
 
     }
 }
