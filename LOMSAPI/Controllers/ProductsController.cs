@@ -17,14 +17,16 @@ namespace LOMSAPI.Controllers
             _productRepository = productRepository;
         }
 
-        // Lấy danh sách sản phẩm
+        // Thanh Tùng
+        // Get all Product 
         [HttpGet("GetProducts")]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return Ok(await _productRepository.GetAllProducts());
         }
 
-        // Lấy sản phẩm theo ID
+        // Thanh Tùng
+        // Get Product by ID 
         [HttpGet("GetProductId/{id}")]
         public async Task<ActionResult<ProductModel>> GetProduct(int id)
         {
@@ -37,7 +39,8 @@ namespace LOMSAPI.Controllers
         }
 
 
-        // Lấy sản phẩm theo User ID
+        // Thanh Tùng
+        // Get List Product By User 
         [HttpGet("GetAllProductsByUser/{userId}")]
         public async Task<ActionResult<ProductModel>> GetAllProductsByUser(string userId)
         {
@@ -49,9 +52,8 @@ namespace LOMSAPI.Controllers
             return Ok(product);
         }
 
-        //
-
-        // Thêm sản phẩm mới
+        // Thanh Tùng
+        // Add new product 
         [HttpPost]
         public async Task<ActionResult> AddProduct([FromBody] ProductModel product)
         {
@@ -63,7 +65,8 @@ namespace LOMSAPI.Controllers
             return BadRequest("Create Producr Fail");
         }
 
-        // Cập nhật sản phẩm
+        // Thanh Tùng
+        // Update product by ID 
         [HttpPut("updateProduct/{id}")]
         public async Task<ActionResult> UpdateProduct(int id,[FromForm] UpdateProductModel product)
         {
@@ -74,7 +77,8 @@ namespace LOMSAPI.Controllers
             }
             return BadRequest("Update Producr Fail");
         }
-        // Cập nhật số lượng hàng tồn kho sau khi order 
+        // Thanh Tùng
+        // Update stock after customer order 
         [HttpPut("reduceStock/{id}/{reduceStockProduct}")]
         public async Task<ActionResult> UpdateStockProduct(int id,int reduceStockProduct)
         {
@@ -86,7 +90,8 @@ namespace LOMSAPI.Controllers
             return BadRequest("Update Producr Fail");
         }
 
-        // Cập nhật giá bán sản phẩm
+        // Thanh Tùng
+        // Update Price Product by id 
         [HttpPut("updatePriceProduct/{id}/{newPrice}")]
         public async Task<ActionResult> UpdatePriceProduct(int id, int newPrice)
         {
@@ -97,8 +102,8 @@ namespace LOMSAPI.Controllers
             }
             return BadRequest("Update Price  Product Fail");
         }
-
-        // Xóa sản phẩm theo status
+        // Thanh Tùng
+        // Delete product by id using status 
         [HttpDelete("DeleteProductById/{id}")]
         public async Task<ActionResult> DeleteProdutById(int id)
         {

@@ -15,7 +15,7 @@ namespace LOMSAPI.Data.Entities
         public string CustomerID { get; set; }
         public Customer Customer { get; set; }
         public ICollection<Comment> Comments { get; set; }
-        public ICollection<Order> Orders { get; set; }
+        public Order Order { get; set; }
 
     }
 }
