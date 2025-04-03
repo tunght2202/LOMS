@@ -98,25 +98,63 @@ namespace LOMSUI.Services
          }
  */
 
-        public async Task<List<LiveVideo>> GetLiveStreamsAsync()
+
+        // Lấy danh sách tất cả livestreams
+        public async Task<List<LiveStreamModel>> GetAllLiveStreamsAsync()
         {
+            string url = $"{BASE_URLL}/GetAllLiveStreams";
+
             try
             {
-                string url = $"{BASE_URLL}/LiveStream/fetch-from-facebook";
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
-                string json = await response.Content.ReadAsStringAsync();
-
-
-                if (!response.IsSuccessStatusCode)
-                    return new List<LiveVideo>();
-
-                return JsonConvert.DeserializeObject<List<LiveVideo>>(json);
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<List<LiveStreamModel>>(json);
+                }
             }
             catch (Exception ex)
             {
-                return new List<LiveVideo>();
+                Console.WriteLine($"Error fetching live streams: {ex.Message}");
             }
+            return new List<LiveStreamModel>();
         }
 
+        // Lấy chi tiết livestream theo ID
+        public async Task<LiveStreamModel> GetLiveStreamByIdAsync(string livestreamId)
+        {
+            string url = $"{BASE_URLL}/GetLiveStreamById/{livestreamId}";
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<LiveStreamModel>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching livestream details: {ex.Message}");
+            }
+            return null;
+        }
+
+        public async Task<bool> DeleteLiveStreamAsync(string livestreamId)
+        {
+            string url = $"{BASE_URLL}/DeleteLiveStream/{livestreamId}";
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.DeleteAsync(url);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting livestream: {ex.Message}");
+            }
+            return false;
+        }
     }
 }
