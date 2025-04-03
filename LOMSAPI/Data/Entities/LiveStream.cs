@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace LOMSAPI.Data.Entities
@@ -8,7 +9,7 @@ namespace LOMSAPI.Data.Entities
     {
         [Key]
         public string LivestreamID { get; set; }
-        [ForeignKey("User")] 
+        [ForeignKey("User")]
         public string UserID { get; set; }
         [ForeignKey("ListProduct")]
         public int? ListProductID { get; set; }
