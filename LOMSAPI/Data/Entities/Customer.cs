@@ -10,7 +10,7 @@ namespace LOMSAPI.Data.Entities
         public string CustomerID { get; set; }
         [Required, MaxLength(255)]
         public string FacebookName { get; set; }
-
+        public string? ImageURL { get; set; }
         public string? FullName { get; set; }
 
         [MaxLength(20)]

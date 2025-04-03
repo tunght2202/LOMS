@@ -2,45 +2,71 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp"
-    android:layout_margin="10dp"
-    android:background="#a6a6a6">
+    android:orientation="horizontal"
+    android:padding="4dp"
+    android:layout_margin="6dp">
 
-    <TextView
-        android:id="@+id/txtCustomerName"
+	<!-- Ảnh đại diện -->
+	<ImageView
+        android:id="@+id/imgCustomerAvatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="6dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/loms"
+        android:background="@android:color/darker_gray"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="Ảnh đại diện"/>
+
+	<LinearLayout
         android:layout_width="wrap_content"
+        android:background="#cfc9c9"
         android:layout_height="wrap_content"
-        android:text="Tên khách hàng"
-        android:textStyle="bold"/>
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txtCommentContent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nội dung bình luận"/>
-
-    <TextView
-        android:id="@+id/txtCommentTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Thời gian"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnCreateOrder"
+		<TextView
+            android:id="@+id/txtCustomerName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tạo đơn"/>
+            android:text="Tên khách hàng"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"/>
 
-        <Button
-            android:id="@+id/btnViewInfo"
+		<TextView
+            android:id="@+id/txtCommentContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thông tin"/>
-    </LinearLayout>
+            android:text="Nội dung bình luận"
+            android:textColor="@android:color/black"/>
+
+		<TextView
+            android:id="@+id/txtCommentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1 phút trước"
+            android:textSize="12sp"
+			android:textColor="@android:color/black"/>
+
+
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+
+			<Button
+                android:id="@+id/btnCreateOrder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tạo đơn"/>
+
+			<Button
+                android:id="@+id/btnViewInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thông tin"/>
+		</LinearLayout>
+	</LinearLayout>
 </LinearLayout>

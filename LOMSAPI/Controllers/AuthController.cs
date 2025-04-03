@@ -44,11 +44,11 @@ namespace LOMSAPI.Controllers
 
         [HttpPost("register-account-request")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterRequest([FromBody] RegisterRequestModel model)
+        public async Task<IActionResult> RegisterRequest([FromForm] RegisterRequestModel model, IFormFile Avatar)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var result = await _userRepository.RegisterRequestAsync(model);
+            var result = await _userRepository.RegisterRequestAsync(model, Avatar);
             if (!result) return BadRequest("Lỗi trong quá trình đăng ký.");
 
             return Ok(new { message = "Vui lòng kiểm tra email để nhập mã xác thực." });
@@ -92,5 +92,10 @@ namespace LOMSAPI.Controllers
 
             return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
         }
+        //[HttpGet("user-profile")]
+        //public async Task<IActionResult> GetUserProfile(int userId)
+        //{
+
+        //}
     }
 }
