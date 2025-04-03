@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using LOMSAPI.Repositories.LiveStreams;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LOMSAPI.Controllers
@@ -14,7 +13,10 @@ namespace LOMSAPI.Controllers
         {
             _liveStreamRepositories = liveStreamRepositories;
         }
-
+        /// <summary>
+        /// Api to get all livestreams from database
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("allDb")]
         public async Task<IActionResult> GetAllLiveStreamsFromDb()
         {
@@ -33,6 +35,10 @@ namespace LOMSAPI.Controllers
                 return StatusCode(500, $"Error: {ex.Message}");
             }
         }
+        /// <summary>
+        /// Api to get all livestreams from Facebook API
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("facebook")] // Lấy từ Facebook API
         public async Task<IActionResult> GetAllLiveStreamsFromFacebook()
         {
@@ -51,7 +57,11 @@ namespace LOMSAPI.Controllers
                 return StatusCode(500, $"Error: {ex.Message}");
             }
         }
-
+        /// <summary>
+        /// Api to get livestream by ID
+        /// </summary>
+        /// <param name="liveStreamId"></param>
+        /// <returns></returns>
         [HttpGet("{liveStreamId}")]
         public async Task<IActionResult> GetLiveStreamById(string liveStreamId)
         {
@@ -71,6 +81,11 @@ namespace LOMSAPI.Controllers
                 return StatusCode(500, $"Error: {ex.Message}");
             }
         }
+        /// <summary>
+        /// Api to delete a livestream
+        /// </summary>
+        /// <param name="liveStreamId"></param>
+        /// <returns></returns>
         [HttpDelete("{liveStreamId}")]
         public async Task<IActionResult> DeleteLiveStream(string liveStreamId)
         {
