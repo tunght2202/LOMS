@@ -21,7 +21,7 @@ namespace LOMSUI.Services
         {
             _httpClient = httpClient ?? CreateDefaultHttpClient();
         }
-
+         
         private HttpClient CreateDefaultHttpClient()
         {
             var handler = new HttpClientHandler();
@@ -102,7 +102,7 @@ namespace LOMSUI.Services
         // Lấy danh sách tất cả livestreams
         public async Task<List<LiveStreamModel>> GetAllLiveStreamsAsync()
         {
-            string url = $"{BASE_URLL}/GetAllLiveStreams";
+            string url = $"{BASE_URLL}/LiveStreams/all";
 
             try
             {
@@ -123,7 +123,7 @@ namespace LOMSUI.Services
         // Lấy chi tiết livestream theo ID
         public async Task<LiveStreamModel> GetLiveStreamByIdAsync(string livestreamId)
         {
-            string url = $"{BASE_URLL}/GetLiveStreamById/{livestreamId}";
+            string url = $"{BASE_URLL}/LiveStreams/{livestreamId}";
 
             try
             {
@@ -143,7 +143,7 @@ namespace LOMSUI.Services
 
         public async Task<bool> DeleteLiveStreamAsync(string livestreamId)
         {
-            string url = $"{BASE_URLL}/DeleteLiveStream/{livestreamId}";
+            string url = $"{BASE_URLL}/LiveStreams/{livestreamId}";
 
             try
             {

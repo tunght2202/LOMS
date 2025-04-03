@@ -37,29 +37,31 @@ namespace LOMSUI.Adapter
             var item = _liveStreams[position];
 
             viewHolder.Title.Text = item.StreamTitle;
-            viewHolder.Status.Text = $"Trạng thái: {item.Status}";
+            viewHolder.Status.Text = $"{item.Status}";
             viewHolder.StartTime.Text = $"Bắt đầu: {item.StartTime}";
 
+            // Mở livestream trên Facebook khi click vào item
             viewHolder.ItemView.Click += (sender, e) =>
             {
                 var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(item.StreamURL));
                 _context.StartActivity(intent);
             };
-        }
 
-        public async Task DeleteItem(int position)
-        {
-            bool success = await _apiService.DeleteLiveStreamAsync(_liveStreams[position].LivestreamID);
-            if (success)
+            // Xóa livestream khi bấm nút
+            viewHolder.BtnDelete.Click += async (sender, e) =>
             {
-                _liveStreams.RemoveAt(position);
-                NotifyItemRemoved(position);
-                Toast.MakeText(_context, "Đã xóa livestream", ToastLength.Short).Show();
-            }
-            else
-            {
-                Toast.MakeText(_context, "Xóa thất bại!", ToastLength.Short).Show();
-            }
+                bool success = await _apiService.DeleteLiveStreamAsync(item.LivestreamID);
+                if (success)
+                {
+                    Toast.MakeText(_context, "Đã xóa livestream", ToastLength.Short).Show();
+                    _liveStreams.RemoveAt(position);
+                    NotifyItemRemoved(position);
+                }
+                else
+                {
+                    Toast.MakeText(_context, "Xóa thất bại!", ToastLength.Short).Show();
+                }
+            };
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -73,54 +75,17 @@ namespace LOMSUI.Adapter
             public TextView Title { get; private set; }
             public TextView Status { get; private set; }
             public TextView StartTime { get; private set; }
+            public Button BtnDelete { get; private set; }
 
             public LiveStreamViewHolder(View itemView) : base(itemView)
             {
                 Title = itemView.FindViewById<TextView>(Resource.Id.txtStreamTitle);
                 Status = itemView.FindViewById<TextView>(Resource.Id.txtStreamStatus);
                 StartTime = itemView.FindViewById<TextView>(Resource.Id.txtStreamStartTime);
+                BtnDelete = itemView.FindViewById<Button>(Resource.Id.btnDeleteLiveStream);
             }
         }
     }
 
-    public class SwipeToDeleteCallback : ItemTouchHelper.SimpleCallback
-    {
-        private readonly LiveStreamAdapter _adapter;
-        private readonly Drawable _deleteIcon;
-        private readonly ColorDrawable _background;
-
-        public SwipeToDeleteCallback(LiveStreamAdapter adapter, Context context) : base(0, ItemTouchHelper.Left)
-        {
-            _adapter = adapter;
-            _deleteIcon = ContextCompat.GetDrawable(context, Android.Resource.Drawable.IcMenuDelete);
-            _background = new ColorDrawable(Color.Red);
-        }
-
-        public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) => false;
-
-        public override void OnSwiped(RecyclerView.ViewHolder viewHolder, int direction)
-        {
-            int position = viewHolder.AdapterPosition;
-            _adapter.DeleteItem(position);
-        }
-
-        public override void OnChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, bool isCurrentlyActive)
-        {
-            View itemView = viewHolder.ItemView;
-            int iconMargin = (itemView.Height - _deleteIcon.IntrinsicHeight) / 2;
-
-            _background.SetBounds(itemView.Right + (int)dX, itemView.Top, itemView.Right, itemView.Bottom);
-            _background.Draw(c);
-
-            int iconLeft = itemView.Right - iconMargin - _deleteIcon.IntrinsicWidth;
-            int iconRight = itemView.Right - iconMargin;
-            int iconTop = itemView.Top + (itemView.Height - _deleteIcon.IntrinsicHeight) / 2;
-            int iconBottom = iconTop + _deleteIcon.IntrinsicHeight;
-
-            _deleteIcon.SetBounds(iconLeft, iconTop, iconRight, iconBottom);
-            _deleteIcon.Draw(c);
-
-            base.OnChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        }
-    }
 }
+

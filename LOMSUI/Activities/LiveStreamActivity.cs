@@ -13,7 +13,7 @@ using AndroidX.RecyclerView.Widget;
 
 namespace LOMSUI
 {
-    [Activity(Label = "Facebook Live Streams")]
+    [Activity(Label = "Live Streams", MainLauncher = true)]
     public class LiveStreamActivity : Activity
     {
         private RecyclerView _recyclerView;
@@ -31,6 +31,7 @@ namespace LOMSUI
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
             await LoadLiveStreams();
+
         }
 
         private async Task LoadLiveStreams()
@@ -43,9 +44,6 @@ namespace LOMSUI
                 _adapter = new LiveStreamAdapter(_liveStreams, this);
                 _recyclerView.SetAdapter(_adapter);
                 _txtNoLiveStreams.Visibility = ViewStates.Gone;
-
-                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(_adapter, this));
-                itemTouchHelper.AttachToRecyclerView(_recyclerView);
             }
             else
             {

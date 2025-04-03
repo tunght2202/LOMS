@@ -14,7 +14,7 @@ namespace LOMSAPI.Repositories.Comments
         private readonly HttpClient _httpClient;
         private readonly IDistributedCache _cache;
 
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBOzvhMQbWXbi6Cvr2EIZBvEbdlR8iLlXrCcO7vLauR58Rml6yOmG48alhc3gNJo1idD3HlwJxkgKDZCpnc8rRh32r6QszIiAmRZCeizRgwiW4ZCnYoZA6QF19lVnq503LjHTneQkr3h3m7iy4LsVEt30AKQpD8zu0xX3NyEHPDEMPQugR9QZB3iTPxbF65MZCugescVPVYyUZBY0ZD";
+        private const string ACCESS_TOKEN = "EAAIYLfie53cBO6G0PGZAUPUL3ffdBup0FXVxpJhX9ZC2V6PrAvaAzzYJkVJAliQMO4J6oRJkpCUFni0Ry0ZBYKLKZAlDqy6h3CBWIrTFptZB5J2yARCLu9AL9M1VuADllI0zJNZCuauIZC0xUuU8TnPy9VXpvJrQK4CesZB7pgBr4l7VlrBCJRA9ABXBNCqyagDthZA4PJRIaRRnZCGPRWzPes7SXB";
         public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache)
         {
             _context = context;
@@ -33,7 +33,7 @@ namespace LOMSAPI.Repositories.Comments
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
             });
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%2Cmessage%2Ccreated_time&access_token={ACCESS_TOKEN}";
+            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={ACCESS_TOKEN}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
@@ -55,12 +55,6 @@ namespace LOMSAPI.Repositories.Comments
 
             return filteredComments;
         }
-
-        //private string ExtractLiveStreamId(string url)
-        //{
-        //    var match = Regex.Match(url, @"/videos/(\d+)");
-        //    return match.Success ? match.Groups[1].Value : null;
-        //}
 
         private async Task<List<Comment>> ParseCommentsAsync(string jsonResponse, string liveStreamId)
         {
@@ -137,11 +131,11 @@ namespace LOMSAPI.Repositories.Comments
                     {
                         Console.WriteLine($"Lỗi khi lưu dữ liệu: {ex.InnerException?.Message}");
                     }
-                    
+
                 }
             }
 
-            return  comments;
+            return comments;
         }
 
 
