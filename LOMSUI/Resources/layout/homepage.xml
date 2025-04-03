@@ -7,6 +7,7 @@
     android:background="@android:color/white">
 
     <LinearLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -15,59 +16,65 @@
         android:gravity="center_vertical">
 
         <TextView
+            android:id="@+id/appNameTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="LOMS App"
             android:textSize="20sp"
-            android:textColor="#000" 
+            android:textColor="#000"
             android:textStyle="bold"/>
 
         <ImageView
+            android:id="@+id/headerImageView"
             android:layout_width="24dp"
-            android:layout_height="24dp"
-             />
+            android:layout_height="24dp" />
 
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="1dp"
         android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/contentLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
             <LinearLayout
+                android:id="@+id/spinnerLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <Spinner
+                    android:id="@+id/spinner1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    />
+                    android:layout_weight="1" />
 
                 <Spinner
+                    android:id="@+id/spinner2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    />
+                    android:layout_weight="1" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/revenueOrderLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="16dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/revenueLayout"
+                    android:layout_width="1dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
@@ -76,6 +83,7 @@
                     android:layout_marginRight="8dp">
 
                     <TextView
+                        android:id="@+id/revenueLabelTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Doanh Thu"
@@ -83,6 +91,7 @@
                         android:textColor="#000000" />
 
                     <TextView
+                        android:id="@+id/revenueValueTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 vnd"
@@ -93,7 +102,8 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/orderLayout"
+                    android:layout_width="1dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
@@ -101,6 +111,7 @@
                     android:padding="8dp">
 
                     <TextView
+                        android:id="@+id/orderLabelTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Số đơn hàng"
@@ -108,6 +119,7 @@
                         android:textColor="#000000" />
 
                     <TextView
+                        android:id="@+id/orderValueTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
@@ -120,12 +132,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/dateLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="16dp">
 
                 <LinearLayout
+                    android:id="@+id/startDateLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -135,11 +149,12 @@
                     android:layout_marginRight="8dp">
 
                     <ImageView
+                        android:id="@+id/startDateImageView"
                         android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        />
+                        android:layout_height="24dp" />
 
                     <TextView
+                        android:id="@+id/startDateTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="1/1/2025"
@@ -150,6 +165,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/endDateLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -158,11 +174,12 @@
                     android:padding="8dp">
 
                     <ImageView
+                        android:id="@+id/endDateImageView"
                         android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        />
+                        android:layout_height="24dp" />
 
                     <TextView
+                        android:id="@+id/endDateTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="1/1/2025"
@@ -175,6 +192,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/revenueChartLayout"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="16dp"
@@ -182,6 +200,7 @@
                 android:padding="8dp">
 
                 <TextView
+                    android:id="@+id/revenueChartLabelTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Doanh thu theo thời gian"
@@ -191,54 +210,67 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/productListLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="16dp">
 
                 <TextView
+                    android:id="@+id/productListLabelTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sản phẩm trong kho"
                     android:textSize="16sp"
                     android:textColor="#000000" />
 
-                <TableLayout
+                <TableRow
+                    android:id="@+id/productTableHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#E0F8E0">
+                    android:background="#C0E0C0">
 
-                    <TableRow
-                        android:background="#C0E0C0">
+                    <TextView
+                        android:id="@+id/sttHeaderTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="STT"
+                        android:padding="8dp"
+                        android:textSize="14sp"
+                        android:textColor="#000000" />
 
-                        <TextView
-                            android:text="STT"
-                            android:padding="8dp"
-                            android:textSize="14sp"
-                            android:textColor="#000000" />
+                    <TextView
+                        android:id="@+id/tenSPHeaderTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tên SP"
+                        android:padding="8dp"
+                        android:textSize="14sp"
+                        android:textColor="#000000" />
 
-                        <TextView
-                            android:text="Tên SP"
-                            android:padding="8dp"
-                            android:textSize="14sp"
-                            android:textColor="#000000" />
+                    <TextView
+                        android:id="@+id/soLuongHeaderTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Số Lượng"
+                        android:padding="8dp"
+                        android:textSize="14sp"
+                        android:textColor="#000000" />
 
-                        <TextView
-                            android:text="Số Lượng"
-                            android:padding="8dp"
-                            android:textSize="14sp"
-                            android:textColor="#000000" />
+                    <TextView
+                        android:id="@+id/giaHeaderTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Giá"
+                        android:padding="8dp"
+                        android:textSize="14sp"
+                        android:textColor="#000000" />
 
-                        <TextView
-                            android:text="Giá"
-                            android:padding="8dp"
-                            android:textSize="14sp"
-                            android:textColor="#000000" />
-
-                    </TableRow>
-
-                    </TableLayout>
-
+                </TableRow>
             </LinearLayout>
 
         </LinearLayout>
@@ -246,12 +278,14 @@
     </ScrollView>
 
     <LinearLayout
+        android:id="@+id/bottomNavLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="#50BD81">
 
         <LinearLayout
+            android:id="@+id/thongKeLayout"
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -259,12 +293,14 @@
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/thongKeImageView"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/statistics"
                 android:layout_marginTop="8dp" />
 
             <TextView
+                android:id="@+id/thongKeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thống kê"
@@ -274,6 +310,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/banHangLayout"
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -281,13 +318,14 @@
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/banHangImageView"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/sell"
-                android:layout_marginTop="8dp"
-                />
+                android:layout_marginTop="8dp" />
 
             <TextView
+                android:id="@+id/banHangTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Bán Hàng"
@@ -297,6 +335,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/sanPhamLayout"
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -304,13 +343,14 @@
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/sanPhamImageView"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/productselling"
-                android:layout_marginTop="8dp"
-                />
+                android:layout_marginTop="8dp" />
 
             <TextView
+                android:id="@+id/sanPhamTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sản phẩm"
@@ -320,6 +360,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/khachHangLayout"
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -327,13 +368,14 @@
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/khachHangImageView"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/customer"
-                android:layout_marginTop="8dp"
-                />
+                android:layout_marginTop="8dp" />
 
             <TextView
+                android:id="@+id/khachHangTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Khách hàng"
@@ -343,6 +385,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/menuLayout"
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -350,13 +393,14 @@
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/menuImageView"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/menucustom"
-                android:layout_marginTop="8dp"
-                />
+                android:layout_marginTop="8dp" />
 
             <TextView
+                android:id="@+id/menuTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Menu"

@@ -7,6 +7,7 @@ using Android.Util;
 using LOMSUI.Models;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
+using System.Collections.Generic;
 
 namespace LOMSUI.Services
 {
@@ -32,6 +33,32 @@ namespace LOMSUI.Services
         public async Task<bool> RequestOtpAsync(ForgotPasswordModel model) => await SendPostRequestAsync("reset-password-request", model);
         public async Task<bool> VerifyOtpAsync(VerifyOtpModel model) => await SendPostRequestAsync("reset-password-verify-otp", model, checkMessage: "OTP hợp lệ");
         public async Task<bool> ResetPasswordAsync(ResetPasswordModel model) => await SendPostRequestAsync("reset-password", model);
+
+        // add RegisterAsync
+        public async Task<bool> RegisterAsync(RegisterModel registerModel)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(registerModel);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[API] register-account-request Response: {response.StatusCode} - {responseBody}");
+
+                    if (!response.IsSuccessStatusCode) return false;
+
+                    var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                    return responseData?.success ?? true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] register-account-request: {ex.Message}");
+                return false;
+            }
+        }
 
         private async Task<bool> SendPostRequestAsync(string endpoint, object model, string checkMessage = null)
         {
@@ -110,8 +137,6 @@ namespace LOMSUI.Services
                     return new List<LiveVideo>();
                 }
             }
-
-
         }
     }
 }
