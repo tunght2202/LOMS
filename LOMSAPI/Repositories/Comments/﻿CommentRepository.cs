@@ -13,13 +13,15 @@ namespace LOMSAPI.Repositories.Comments
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly IDistributedCache _cache;
-
-        private const string ACCESS_TOKEN = "EAAIYLfie53cBOzvhMQbWXbi6Cvr2EIZBvEbdlR8iLlXrCcO7vLauR58Rml6yOmG48alhc3gNJo1idD3HlwJxkgKDZCpnc8rRh32r6QszIiAmRZCeizRgwiW4ZCnYoZA6QF19lVnq503LjHTneQkr3h3m7iy4LsVEt30AKQpD8zu0xX3NyEHPDEMPQugR9QZB3iTPxbF65MZCugescVPVYyUZBY0ZD";
-        public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache)
+        private readonly IConfiguration _configuration;
+        private string ACCESS_TOKEN;
+        public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache, IConfiguration configuration)
         {
             _context = context;
             _httpClient = httpClient;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _configuration = configuration;
+            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token không được cấu hình.");
         }
 
 
@@ -33,7 +35,7 @@ namespace LOMSAPI.Repositories.Comments
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
             });
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%2Cmessage%2Ccreated_time&access_token={ACCESS_TOKEN}";
+            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={ACCESS_TOKEN}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
@@ -55,12 +57,6 @@ namespace LOMSAPI.Repositories.Comments
 
             return filteredComments;
         }
-
-        //private string ExtractLiveStreamId(string url)
-        //{
-        //    var match = Regex.Match(url, @"/videos/(\d+)");
-        //    return match.Success ? match.Groups[1].Value : null;
-        //}
 
         private async Task<List<Comment>> ParseCommentsAsync(string jsonResponse, string liveStreamId)
         {
@@ -84,6 +80,13 @@ namespace LOMSAPI.Repositories.Comments
                                 && from1Element.TryGetProperty("name", out JsonElement nameElement)
                                 ? nameElement.GetString()
                                 : null;
+                    string? avatar = item.TryGetProperty("from", out JsonElement from2Element) &&
+                            from2Element.TryGetProperty("picture", out JsonElement pictureElement) &&
+                            pictureElement.TryGetProperty("data", out JsonElement data1Element) &&
+                            data1Element.TryGetProperty("url", out JsonElement urlElement)
+                            ? urlElement.GetString()
+                            : null;
+
 
                     // Kiểm tra nếu có dữ liệu bị null
                     if (string.IsNullOrEmpty(commentID) || string.IsNullOrEmpty(customerID) || string.IsNullOrEmpty(content))
@@ -98,7 +101,7 @@ namespace LOMSAPI.Repositories.Comments
                         var customer = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == customerID);
                         if (customer == null)
                         {
-                            customer = new Customer { CustomerID = customerID, FacebookName = customerName };
+                            customer = new Customer { CustomerID = customerID, FacebookName = customerName, ImageURL = avatar };
                             _context.Customers.Add(customer);
                             await _context.SaveChangesAsync(); // Lưu ngay lập tức để tránh lỗi khóa ngoại
                         }
@@ -126,7 +129,7 @@ namespace LOMSAPI.Repositories.Comments
                                 CommentID = commentID,
                                 Content = content,
                                 CommentTime = commentTime,
-                                LiveStreamCustomerID = liveStreamCustomerId
+                                LiveStreamCustomerID = liveStreamCustomerId,
                             });
                             await _context.SaveChangesAsync();
                         }
