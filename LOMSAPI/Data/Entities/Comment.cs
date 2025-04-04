@@ -12,6 +12,7 @@ namespace LOMSAPI.Data.Entities
         public DateTime CommentTime { get; set; } = DateTime.Now;
         public int LiveStreamCustomerID { get; set; }
         public LiveStreamCustomer LiveStreamCustomer { get; set; }
+        public Order Order { get; set; }
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using LOMSAPI.Models;
+﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
 using Microsoft.AspNetCore.Mvc;
 
@@ -89,7 +90,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Get list order by status and livestream
         [HttpGet("GetOrderByStatusAndLivestreams/livestream/{livestreamId}/status/{status}")]
-        public async Task<IActionResult> GetOrdersByStatusByLivestreamId(string livestreamId, string status)
+        public async Task<IActionResult> GetOrdersByStatusByLivestreamId(string livestreamId, OrderStatus status)
         {
             try
             {
@@ -105,7 +106,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Get list order by status and user id
         [HttpGet("GetOrderByStatusAndUser/user/{userId}/status/{status}")]
-        public async Task<IActionResult> GetOrdersByStatusByUserId(string userId, string status)
+        public async Task<IActionResult> GetOrdersByStatusByUserId(string userId, OrderStatus status)
         {
             try
             {
@@ -148,7 +149,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Update new status order
         [HttpPut("UpdateStatus/order/{orderId}/status/{newStatus}")]
-        public async Task<IActionResult> UpdateOrderStatus(int orderId, string newStatus)
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, OrderStatus newStatus)
         {
             try
             {
