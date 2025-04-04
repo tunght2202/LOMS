@@ -4,6 +4,7 @@ using LOMSAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LOMSAPI.Migrations
 {
     [DbContext(typeof(LOMSDbContext))]
-    partial class LOMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250403174259_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,6 +122,10 @@ namespace LOMSAPI.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("StatusDelete")
                         .HasColumnType("bit");
 
@@ -176,12 +183,11 @@ namespace LOMSAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"));
 
-                    b.Property<string>("CommentID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("LiveStreamCustomerID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -208,25 +214,44 @@ namespace LOMSAPI.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-
                     b.Property<int>("ProductID")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.HasKey("OrderDetailID");
 
-                    b.HasKey("OrderID");
-
-                    b.HasIndex("CommentID")
-                        .IsUnique()
-                        .HasFilter("[CommentID] IS NOT NULL");
+                    b.HasIndex("OrderID");
 
                     b.HasIndex("ProductID");
 
-                    b.ToTable("Orders");
+                    b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.Payment", b =>
+                {
+                    b.Property<int>("PaymentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrderID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PaymentID");
+
+                    b.HasIndex("OrderID");
+
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Product", b =>
@@ -292,6 +317,33 @@ namespace LOMSAPI.Migrations
                     b.HasIndex("ProductID");
 
                     b.ToTable("ProductListProducts");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.Shipping", b =>
+                {
+                    b.Property<int>("ShippingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShippingID"));
+
+                    b.Property<int>("OrderID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ShippingStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TrackingNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ShippingID");
+
+                    b.HasIndex("OrderID")
+                        .IsUnique();
+
+                    b.ToTable("Shiping");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.User", b =>
@@ -557,20 +609,43 @@ namespace LOMSAPI.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>
                 {
-                    b.HasOne("LOMSAPI.Data.Entities.Comment", "Comment")
+                    b.HasOne("LOMSAPI.Data.Entities.LiveStreamCustomer", "LiveStreamCustomer")
                         .WithOne("Order")
-                        .HasForeignKey("LOMSAPI.Data.Entities.Order", "CommentID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("LOMSAPI.Data.Entities.Order", "LiveStreamCustomerID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LiveStreamCustomer");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.OrderDetail", b =>
+                {
+                    b.HasOne("LOMSAPI.Data.Entities.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("LOMSAPI.Data.Entities.Product", "Product")
-                        .WithMany("Orders")
+                        .WithMany("OrderDetails")
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Comment");
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.Payment", b =>
+                {
+                    b.HasOne("LOMSAPI.Data.Entities.Order", "Order")
+                        .WithMany("Payments")
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Product", b =>
@@ -601,6 +676,17 @@ namespace LOMSAPI.Migrations
                     b.Navigation("ListProduct");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.Shipping", b =>
+                {
+                    b.HasOne("LOMSAPI.Data.Entities.Order", "Order")
+                        .WithOne("Shipping")
+                        .HasForeignKey("LOMSAPI.Data.Entities.Shipping", "OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -654,12 +740,6 @@ namespace LOMSAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LOMSAPI.Data.Entities.Comment", b =>
-                {
-                    b.Navigation("Order")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("LOMSAPI.Data.Entities.Customer", b =>
                 {
                     b.Navigation("LiveStreamCustomers");
@@ -680,11 +760,24 @@ namespace LOMSAPI.Migrations
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStreamCustomer", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Order")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("Shipping")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Product", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrderDetails");
 
                     b.Navigation("ProductListProducts");
                 });
