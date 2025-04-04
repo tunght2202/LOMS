@@ -37,19 +37,28 @@ namespace LOMSUI
         private async Task LoadLiveStreams()
         {
             var apiService = new ApiService();
+
+            var facebookResponse = await apiService.GetLiveStreamsFromFaceBook();
+
+            //await Task.Delay(1000);
+
             _liveStreams = await apiService.GetAllLiveStreamsAsync();
 
-            if (_liveStreams.Any())
+            RunOnUiThread(() =>
             {
-                _adapter = new LiveStreamAdapter(_liveStreams, this);
-                _recyclerView.SetAdapter(_adapter);
-                _txtNoLiveStreams.Visibility = ViewStates.Gone;
-            }
-            else
-            {
-                _txtNoLiveStreams.Visibility = ViewStates.Visible;
-            }
+                if (_liveStreams.Any())
+                {
+                    _adapter = new LiveStreamAdapter(_liveStreams, this);
+                    _recyclerView.SetAdapter(_adapter);
+                    _txtNoLiveStreams.Visibility = ViewStates.Gone;
+                }
+                else
+                {
+                    _txtNoLiveStreams.Visibility = ViewStates.Visible;
+                }
+            });
         }
+
     }
 
 }

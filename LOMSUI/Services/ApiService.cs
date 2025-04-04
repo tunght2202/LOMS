@@ -62,22 +62,90 @@ namespace LOMSUI.Services
                 return false;
             }
         }
-        public async Task<List<CommentModel>> GetComments(string liveStreamId)
-        {
-            try
-            {
-                string fullUrl = $"{BASE_URLL}/Comment/get-all-comment?liveStreamId={liveStreamId}";
-                var response = await _httpClient.GetAsync(fullUrl);
-                var json = await response.Content.ReadAsStringAsync();
-                var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
+       public async Task<List<CommentModel>> GetComments(string liveStreamId)
+{
+    try
+    {
+        string url = $"{BASE_URLL}/Comment/get-all-comment?liveStreamId={liveStreamId}";
+        var response = await _httpClient.GetAsync(url);
 
-                return comments ?? new List<CommentModel>();
-            }
-            catch (Exception)
-            {
-                return new List<CommentModel>();
-            }
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Request failed with status code {response.StatusCode}");
         }
+
+        var json = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"API Response: {json}");
+
+        var apiResponse = JsonConvert.DeserializeObject<List<dynamic>>(json);
+        List<CommentModel> comments = new List<CommentModel>();
+
+        if (apiResponse != null && apiResponse.Any())
+        {
+            foreach (var item in apiResponse)
+            {
+                try
+                {
+                    // Thêm bình luận top-level (bình luận gốc)
+                    comments.Add(new CommentModel
+                    {
+                        CommentID = item.commentID?.ToString() ?? "",
+                        Content = item.content?.ToString() ?? "",
+                        CommentTime = item.commentTime != null ? (DateTime)item.commentTime : DateTime.MinValue,
+                        CustomerID = item.liveStreamCustomer?.customer?.customerID?.ToString() ?? "",
+                        CustomerName = item.liveStreamCustomer?.customer?.facebookName?.ToString() ?? "Ẩn danh",
+                        LiveStreamID = item.liveStreamCustomer?.livestreamID?.ToString() ?? "",
+                        AvatarUrl = item.liveStreamCustomer?.customer?.imageURL?.ToString() ?? ""
+                    });
+
+                    // Xử lý các bình luận nested từ "comments" -> "$values"
+                    var nestedComments = item.liveStreamCustomer?.comments?["$values"];
+                    if (nestedComments != null)
+                    {
+                        foreach (var nestedComment in nestedComments)
+                        {
+                            comments.Add(new CommentModel
+                            {
+                                CommentID = nestedComment.commentID?.ToString() ?? "",
+                                Content = nestedComment.content?.ToString() ?? "",
+                                CommentTime = nestedComment.commentTime != null ? (DateTime)nestedComment.commentTime : DateTime.MinValue,
+                                CustomerID = item.liveStreamCustomer?.customer?.customerID?.ToString() ?? "",
+                                CustomerName = item.liveStreamCustomer?.customer?.facebookName?.ToString() ?? "Ẩn danh",
+                                LiveStreamID = item.liveStreamCustomer?.livestreamID?.ToString() ?? "",
+                                AvatarUrl = item.liveStreamCustomer?.customer?.imageURL?.ToString() ?? ""
+                            });
+                        }
+                    }
+                }
+                catch (Exception innerEx)
+                {
+                    Console.WriteLine($"Error processing item: {innerEx.Message}");
+                }
+            }
+
+            // Loại bỏ các bình luận trùng lặp dựa trên CommentID
+            comments = comments.GroupBy(c => c.CommentID).Select(g => g.First()).ToList();
+
+            // Loại bỏ các bình luận không có nội dung
+            comments = comments.Where(c => !string.IsNullOrEmpty(c.Content)).ToList();
+
+            Console.WriteLine($"Total comments after processing: {comments.Count}");
+        }
+        else
+        {
+            Console.WriteLine("No comments were returned by the API.");
+        }
+
+        return comments;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error fetching comments: {ex.Message}");
+        return new List<CommentModel>();
+    }
+}
+
+
 
 
         /* public async Task<List<CommentModel>> GetCommentsByProductCode(string liveStreamURL, string productCode)
@@ -102,7 +170,7 @@ namespace LOMSUI.Services
         // Lấy danh sách tất cả livestreams
         public async Task<List<LiveStreamModel>> GetAllLiveStreamsAsync()
         {
-            string url = $"{BASE_URLL}/LiveStreams/all";
+            string url = $"{BASE_URLL}/LiveStreams/allDb";
 
             try
             {
@@ -119,6 +187,22 @@ namespace LOMSUI.Services
             }
             return new List<LiveStreamModel>();
         }
+
+        public async Task<bool> GetLiveStreamsFromFaceBook()
+        {
+            string url = $"{BASE_URLL}/LiveStreams/facebook";
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching live streams from Facebook: {ex.Message}");
+                return false;
+            }
+        }
+            
 
         // Lấy chi tiết livestream theo ID
         public async Task<LiveStreamModel> GetLiveStreamByIdAsync(string livestreamId)

@@ -21,7 +21,7 @@ namespace LOMSAPI.Controllers
         public async Task<IActionResult> GetAllLiveStreamsFromDb()
         {
            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-           string userId = "30eb327f-1ccc-4d1e-90ca-b7694be94761";
+           string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
 
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
@@ -44,7 +44,7 @@ namespace LOMSAPI.Controllers
         public async Task<IActionResult> GetAllLiveStreamsFromFacebook()
         {
             // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string userId = "269841f9-391e-4b7c-83f4-2f14459ad728";
+            string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
 
@@ -91,7 +91,7 @@ namespace LOMSAPI.Controllers
         public async Task<IActionResult> DeleteLiveStream(string liveStreamId)
         {
             // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string userId = "30eb327f-1ccc-4d1e-90ca-b7694be94761";
+            string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
 

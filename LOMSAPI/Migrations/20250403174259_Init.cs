@@ -17,6 +17,7 @@ namespace LOMSAPI.Migrations
                 {
                     CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FacebookName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    ImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -65,6 +66,10 @@ namespace LOMSAPI.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -112,12 +117,12 @@ namespace LOMSAPI.Migrations
                 {
                     LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ListProductID = table.Column<int>(type: "int", nullable: false),
+                    ListProductID = table.Column<int>(type: "int", nullable: true),
                     StreamURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StreamTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StatusDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,6 +149,7 @@ namespace LOMSAPI.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     ProductCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -325,7 +331,7 @@ namespace LOMSAPI.Migrations
                     OrderID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     LiveStreamCustomerID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -447,7 +453,8 @@ namespace LOMSAPI.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_LiveStreamCustomerID",
                 table: "Orders",
-                column: "LiveStreamCustomerID");
+                column: "LiveStreamCustomerID",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_OrderID",

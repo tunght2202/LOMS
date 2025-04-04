@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LOMSAPI.Migrations
 {
     [DbContext(typeof(LOMSDbContext))]
-    [Migration("20250402093547_changedb")]
-    partial class changedb
+    [Migration("20250403174259_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,9 @@ namespace LOMSAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -186,13 +189,13 @@ namespace LOMSAPI.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("OrderID");
 
-                    b.HasIndex("LiveStreamCustomerID");
+                    b.HasIndex("LiveStreamCustomerID")
+                        .IsUnique();
 
                     b.ToTable("Orders");
                 });
@@ -260,6 +263,9 @@ namespace LOMSAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductID"));
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -348,6 +354,9 @@ namespace LOMSAPI.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -361,6 +370,12 @@ namespace LOMSAPI.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageURL")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -386,6 +401,9 @@ namespace LOMSAPI.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -592,8 +610,8 @@ namespace LOMSAPI.Migrations
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>
                 {
                     b.HasOne("LOMSAPI.Data.Entities.LiveStreamCustomer", "LiveStreamCustomer")
-                        .WithMany("Orders")
-                        .HasForeignKey("LiveStreamCustomerID")
+                        .WithOne("Order")
+                        .HasForeignKey("LOMSAPI.Data.Entities.Order", "LiveStreamCustomerID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -743,7 +761,8 @@ namespace LOMSAPI.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("Orders");
+                    b.Navigation("Order")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Order", b =>

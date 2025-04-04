@@ -38,7 +38,7 @@ namespace LOMSUI.Adapter
 
             viewHolder.Title.Text = item.StreamTitle;
             viewHolder.Status.Text = $"{item.Status}";
-            viewHolder.StartTime.Text = $"Bắt đầu: {item.StartTime}";
+            viewHolder.StartTime.Text = $"Start: {item.GetFormattedTime()}";
 
             // Mở livestream trên Facebook khi click vào item
             viewHolder.ItemView.Click += (sender, e) =>
