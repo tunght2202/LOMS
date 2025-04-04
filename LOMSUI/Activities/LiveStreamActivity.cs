@@ -8,41 +8,50 @@ using LOMSUI.Services;
 using LOMSUI.Adapter;
 using LOMSUI.Models;
 using static LOMSUI.Services.ApiService;
+using Android.Views;
+using AndroidX.RecyclerView.Widget;
 
 namespace LOMSUI
 {
     [Activity(Label = "Facebook Live Streams")]
     public class LiveStreamActivity : Activity
     {
-        private ListView _listView;
-        private FacebookLiveService _facebookLiveService = new FacebookLiveService();
+        private RecyclerView _recyclerView;
+        private TextView _txtNoLiveStreams;
+        private LiveStreamAdapter _adapter;
+        private List<LiveStreamModel> _liveStreams = new List<LiveStreamModel>();
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_live_stream);
 
-            _listView = FindViewById<ListView>(Resource.Id.listView);
-            await LoadLiveStreamsAsync();
+            _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
+            _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);
+
+            _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
+            await LoadLiveStreams();
         }
 
-        private async Task LoadLiveStreamsAsync()   
+        private async Task LoadLiveStreams()
         {
-            List<LiveVideo> liveStreams = await _facebookLiveService.GetLiveStreamsAsync();
-            if (liveStreams.Count == 0)
-            {
-                Toast.MakeText(this, "No live streams found.", ToastLength.Short).Show();
-                return;
-            }
+            var apiService = new ApiService();
+            _liveStreams = await apiService.GetAllLiveStreamsAsync();
 
-            var adapter = new LiveStreamAdapter(this, liveStreams);
-            _listView.Adapter = adapter;
-            _listView.ItemClick += (sender, e) =>
+            if (_liveStreams.Any())
             {
-                var stream = liveStreams[e.Position];
-                var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(stream.PermalinkUrl));
-                StartActivity(intent);
-            };
+                _adapter = new LiveStreamAdapter(_liveStreams, this);
+                _recyclerView.SetAdapter(_adapter);
+                _txtNoLiveStreams.Visibility = ViewStates.Gone;
+
+                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(_adapter, this));
+                itemTouchHelper.AttachToRecyclerView(_recyclerView);
+            }
+            else
+            {
+                _txtNoLiveStreams.Visibility = ViewStates.Visible;
+            }
         }
     }
+
 }

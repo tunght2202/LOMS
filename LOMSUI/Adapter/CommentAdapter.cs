@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Android.Views;
+﻿using Android.Views;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
+using Bumptech.Glide;
 using LOMSUI.Models;
+using System;
+using System.Collections.Generic;
 
 namespace LOMSUI.Adapter
 {
@@ -15,7 +16,7 @@ namespace LOMSUI.Adapter
 
         public CommentAdapter(List<CommentModel> comments)
         {
-            _comments = comments;
+            _comments = comments ?? new List<CommentModel>();
         }
 
         public override int ItemCount => _comments.Count;
@@ -25,11 +26,22 @@ namespace LOMSUI.Adapter
             if (holder is CommentViewHolder commentHolder)
             {
                 var comment = _comments[position];
-                commentHolder.TxtCustomerName.Text = comment.CustomerName;
-                commentHolder.TxtCommentContent.Text = comment.Content;
-                commentHolder.TxtCommentTime.Text = comment.CommentTime;
 
+                commentHolder.TxtCustomerName.Text = comment.CustomerName ?? "Khách hàng ẩn danh";
+                commentHolder.TxtCommentContent.Text = comment.Content;
+                commentHolder.TxtCommentTime.Text = comment.GetFormattedTime();
+
+                Glide.With(commentHolder.ItemView.Context)
+                     .Load(comment.AvatarUrl)
+                     .Placeholder(Resource.Drawable.loms)
+                     .Error(Resource.Drawable.mtrl_ic_error)
+                     .Into(commentHolder.ImgCustomerAvatar);
+
+                // Xóa sự kiện cũ trước khi gán sự kiện mới (tránh lặp sự kiện)
+                commentHolder.BtnCreateOrder.Click -= (s, e) => OnCreateOrder?.Invoke(comment);
                 commentHolder.BtnCreateOrder.Click += (s, e) => OnCreateOrder?.Invoke(comment);
+
+                commentHolder.BtnViewInfo.Click -= (s, e) => OnViewInfo?.Invoke(comment);
                 commentHolder.BtnViewInfo.Click += (s, e) => OnViewInfo?.Invoke(comment);
             }
         }
@@ -43,6 +55,7 @@ namespace LOMSUI.Adapter
 
     public class CommentViewHolder : RecyclerView.ViewHolder
     {
+        public ImageView ImgCustomerAvatar { get; }
         public TextView TxtCustomerName { get; }
         public TextView TxtCommentContent { get; }
         public TextView TxtCommentTime { get; }
@@ -51,6 +64,7 @@ namespace LOMSUI.Adapter
 
         public CommentViewHolder(View itemView) : base(itemView)
         {
+            ImgCustomerAvatar = itemView.FindViewById<ImageView>(Resource.Id.imgCustomerAvatar);
             TxtCustomerName = itemView.FindViewById<TextView>(Resource.Id.txtCustomerName);
             TxtCommentContent = itemView.FindViewById<TextView>(Resource.Id.txtCommentContent);
             TxtCommentTime = itemView.FindViewById<TextView>(Resource.Id.txtCommentTime);

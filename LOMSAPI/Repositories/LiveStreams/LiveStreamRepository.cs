@@ -1,8 +1,6 @@
 ﻿using System.Text.Json;
-using Azure.Core;
 using LOMSAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace LOMSAPI.Repositories.LiveStreams
 {
@@ -37,9 +35,18 @@ namespace LOMSAPI.Repositories.LiveStreams
             liveStream.StatusDelete = true;
             return await _context.SaveChangesAsync();
         }
+        // API 1: Lấy livestream từ DB
+        public async Task<IEnumerable<LiveStream>> GetAllLiveStreamsFromDb(string userId)
+        {
+            if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
+                throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
 
-        // Updated to take userId from token
-        public async Task<IEnumerable<LiveStream>> GetAllLiveStreams(string userId)
+            return await _context.LiveStreams
+                .Where(ls => ls.UserID == userId && !ls.StatusDelete)
+                .ToListAsync();
+        }
+        // API 2: Lấy livestream từ Facebook API
+        public async Task<IEnumerable<LiveStream>> GetAllLiveStreamsFromFacebook(string userId)
         {
             if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
                 throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
@@ -49,6 +56,12 @@ namespace LOMSAPI.Repositories.LiveStreams
 
             try
             {
+                // Lấy tất cả LivestreamID hiện có trong DB
+                var existingIds = await _context.LiveStreams
+                    .Where(ls => ls.UserID == userId)
+                    .Select(ls => ls.LivestreamID)
+                    .ToListAsync();
+
                 while (!string.IsNullOrEmpty(apiUrl))
                 {
                     HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
@@ -61,7 +74,17 @@ namespace LOMSAPI.Repositories.LiveStreams
                     }
 
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    liveStreams.AddRange(ParseLiveStreams(jsonResponse, userId)); // Pass userId
+                    var parsedLiveStreams = ParseLiveStreams(jsonResponse, userId);
+
+                    // Chỉ thêm các livestream chưa tồn tại trong DB
+                    foreach (var liveStream in parsedLiveStreams)
+                    {
+                        if (!existingIds.Contains(liveStream.LivestreamID))
+                        {
+                            liveStreams.Add(liveStream);
+                            existingIds.Add(liveStream.LivestreamID); // Cập nhật danh sách để tránh trùng lặp trong cùng request
+                        }
+                    }
 
                     using JsonDocument doc = JsonDocument.Parse(jsonResponse);
                     apiUrl = doc.RootElement.TryGetProperty("paging", out JsonElement paging) &&
@@ -69,16 +92,17 @@ namespace LOMSAPI.Repositories.LiveStreams
                             ? next.GetString() : null;
                 }
 
-                await SaveLiveStreamsToDb(liveStreams); // Uncommented to save to DB
-                return liveStreams;
+                // Lưu các livestream mới vào DB
+                await SaveLiveStreamsToDb(liveStreams);
+
+                return liveStreams; // Chỉ trả về các livestream mới
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error fetching live streams: {ex.Message}", ex);
+                throw new Exception($"Error fetching live streams from Facebook: {ex.Message}", ex);
             }
         }
-
-        // Updated to take userId from token
+       
         public async Task<LiveStream> GetLiveStreamById(string liveStreamId, string userId)
         {
             if (string.IsNullOrEmpty(liveStreamId))
@@ -178,14 +202,6 @@ namespace LOMSAPI.Repositories.LiveStreams
                 });
             }
             return liveStreams;
-        }
-
-        // Kept for reference but not used for UserID
-        private string pageIdFromPermalink(string permalinkUrl)
-        {
-            if (string.IsNullOrEmpty(permalinkUrl)) return null;
-            var parts = permalinkUrl.Split('/');
-            return parts.Length > 1 ? parts[1] : null;
         }
 
         private async Task SaveLiveStreamsToDb(List<LiveStream> liveStreams)

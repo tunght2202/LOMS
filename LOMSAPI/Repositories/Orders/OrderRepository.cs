@@ -97,7 +97,7 @@ namespace LOMSAPI.Repositories.Orders
                 {
                     LiveStreamCustomerID = orderModel.livestreamCustomerId,
                     OrderDate = DateTime.UtcNow,
-                    Status = "Pending",
+            //        Status = "Pending",
                     OrderDetails = new List<OrderDetail>() // Khởi tạo danh sách tránh lỗi null
                 };
 
@@ -129,7 +129,7 @@ namespace LOMSAPI.Repositories.Orders
             {
                 OrderID = order.OrderID,
                 OrderDate = order.OrderDate,
-                Status = order.Status,
+             //   Status = order.Status,
                 OrderDetails = order.OrderDetails?.Select(od => new OrderDetailModel
                 {
                     OrderDetailId = od.OrderDetailID,
