@@ -1,4 +1,5 @@
-﻿using LOMSAPI.Models;
+﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace LOMSAPI.Repositories.Users
@@ -11,5 +12,9 @@ namespace LOMSAPI.Repositories.Users
         Task<bool> RequestPasswordResetAsync(ForgotPasswordModel model);
         Task<bool> ResetPasswordAsync(ResetPasswordModel model);
         Task<bool> VerifyOtpAsync(VerifyOtpModel model);
+        Task<User> GetUserProfile(string UserId);
+        Task<bool> UpdateUserProfile(User user, UpdateUserProfileModel model);
+        
+
     }
 }
