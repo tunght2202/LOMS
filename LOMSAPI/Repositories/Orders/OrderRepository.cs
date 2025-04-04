@@ -115,6 +115,8 @@ namespace LOMSAPI.Repositories.Orders
         }
 
 
+        // Thanh Tùng
+        // Get order by livestream cuatomer id
         public async Task<GetOrderDetailByOrderModel> GetOrderByLivestreamCustomerId(int livestreamCustomerId)
         {
             var order = await _context.Orders.Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.LiveStreamCustomerID == livestreamCustomerId);
@@ -140,6 +142,8 @@ namespace LOMSAPI.Repositories.Orders
             return result;
         }
 
+        // Thanh Tùng
+        // Get order by livestream id
         public async Task<IEnumerable<OrderModel>> GetOrderByLivestreamId(string livestreamId)
         {
             var orders = await _context.Orders
@@ -157,6 +161,147 @@ namespace LOMSAPI.Repositories.Orders
                 return orders;
             }
             throw new Exception("not exit order");
+        }
+
+        // Thanh Tùng
+        // Update quantity in order detail 
+        public async Task<int> UpdateOrderDetail(int orderDetailId, int quantity)
+        {
+            var orderDetail = await _context.OrderDetails.FirstOrDefaultAsync(od => od.OrderDetailID == orderDetailId);
+            if (orderDetail == null)
+            {
+                throw new Exception("Chi tiết đơn hàng không tồn tại");
+            }
+
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == orderDetail.ProductID);
+            if (product == null)
+            {
+                throw new Exception("Sản phẩm không tồn tại");
+            }
+
+            orderDetail.Quantity = quantity;
+            orderDetail.Price = product.Price * quantity;
+
+            return await _context.SaveChangesAsync();
+        }
+
+        // Thanh Tùng
+        // Delete order detail by order detail id
+        public async Task<int> DeleteOrderDetail(int orderDetailId)
+        {
+            var orderDetail = await _context.OrderDetails.FirstOrDefaultAsync(od => od.OrderDetailID == orderDetailId);
+            if (orderDetail == null)
+            {
+                throw new Exception("Chi tiết đơn hàng không tồn tại");
+            }
+
+            _context.OrderDetails.Remove(orderDetail);
+            return await _context.SaveChangesAsync();
+        }
+
+        // Thanh Tùng
+        // Get order by user id
+        public async Task<IEnumerable<OrderModel>> GetOrderByUserId(string userId)
+        {
+            var orders = await _context.Orders
+                            .Where(o => o.LiveStreamCustomer.LiveStream.UserID.Equals(userId)) // Lọc theo LiveStreamID
+                            .Select(o => new OrderModel()
+                            {
+                                OrderID = o.OrderID,
+                                OrderDate = o.OrderDate,
+                                Status = o.Status,
+                                LiveStreamCustomerID = o.LiveStreamCustomerID
+                            })
+                            .ToListAsync();
+            if (orders.Any())
+            {
+                return orders;
+            }
+            throw new Exception("not exit order");
+        }
+
+        // Thanh Tùng
+        // Get order by status and livestreamid
+        public async Task<IEnumerable<OrderModel>> GetOrdersByStatusByLivestreamId(string livestreamId, string status)
+        {
+            var getOrder = await GetOrderByLivestreamId(livestreamId);
+            var orders =  getOrder.Where(x => x.Status.Equals(status)).ToList();
+            if (orders.Any())
+            {
+                return orders;
+            }
+            throw new Exception("not exit order");
+
+        }
+
+        // Thanh Tùng
+        // Get order by status and user id
+        public async Task<IEnumerable<OrderModel>> GetOrdersByStatusByUserId(string userId, string status)
+        {
+            var getOrder = await GetOrderByUserId(userId);
+            var orders = getOrder.Where(x => x.Status.Equals(status)).ToList();
+            if (orders.Any())
+            {
+                return orders;
+            }
+            throw new Exception("not exit order");
+        }
+
+        // Thanh Tùng
+        // Get order by id
+        public async Task<OrderModel> GetOrdersById(int orderId)
+        {
+            var orders = await _context.Orders.FirstOrDefaultAsync(x => x.OrderID == orderId);
+            if (orders == null )
+            {
+                throw new Exception("not exit order");
+
+            }
+
+            var result = new OrderModel()
+            {
+                OrderID = orders.OrderID,
+                OrderDate = orders.OrderDate,
+                Status = orders.Status,
+                LiveStreamCustomerID = orders.LiveStreamCustomerID
+            };
+            return result;
+
+        }
+
+        // Thanh Tùng
+        // Update order status by order id
+        public async Task<bool> UpdateOrderStatus(int orderId, string newStatus)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(x => x.OrderID == orderId);
+            if (order == null)
+            {
+                throw new Exception("not exit order");
+
+            }
+
+            order.Status = newStatus;
+            var result =  await _context.SaveChangesAsync();
+            if(result <= 0)
+            {
+                return false;
+            }
+            return true;
+        }
+        // Thanh Tùng
+        // Get all orders
+        public async Task<IEnumerable<OrderModel>> GetOrders()
+        {
+            return await _context.Orders
+                .Select(o => new OrderModel()
+                {
+                    OrderID = o.OrderID,
+                    OrderDate = o.OrderDate,
+                    Status = o.Status,
+                    LiveStreamCustomerID = o.LiveStreamCustomerID
+                })
+                 .ToListAsync();
+
         }
     }
 }

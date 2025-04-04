@@ -9,7 +9,7 @@ namespace LOMSAPI.Data.Entities
         [Key]
         public int OrderID { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
-        public string Status { get; set; } // Pending, Confirmed, Shipped, Delivered
+        public string Status { get; set; } // Pending, Confirmed, Shipped, Delivered 
         public Shipping Shipping { get; set; }
         public ICollection<OrderDetail> OrderDetails { get; set; }
         public ICollection<Payment> Payments { get; set; }
