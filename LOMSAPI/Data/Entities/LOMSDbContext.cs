@@ -12,9 +12,6 @@ namespace LOMSAPI.Data.Entities
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<OrderDetail> OrderDetails { get; set; }
-        public DbSet<Payment> Payments { get; set; }
-        public DbSet<Shipping> Shippings { get; set; }
         public DbSet<LiveStream> LiveStreams { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<ListProduct> ListProducts { get; set; }
@@ -41,18 +38,6 @@ namespace LOMSAPI.Data.Entities
                .WithMany(u => u.LiveStreams)
                .HasForeignKey(ls => ls.UserID)
                .OnDelete(DeleteBehavior.Restrict); 
-
-            builder.Entity<OrderDetail>()
-                .HasOne(od => od.Order)
-                .WithMany(o => o.OrderDetails)
-                .HasForeignKey(od => od.OrderID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<OrderDetail>()
-                .HasOne(od => od.Product)
-                .WithMany(p => p.OrderDetails)
-                .HasForeignKey(od => od.ProductID)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<ProductListProduct>()
                 .HasOne(plp => plp.Product)
@@ -85,9 +70,15 @@ namespace LOMSAPI.Data.Entities
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Order>()
-                .HasOne(o => o.LiveStreamCustomer)
-                .WithOne(lc => lc.Order) 
-                .HasForeignKey<Order>(o => o.LiveStreamCustomerID)
+                .HasOne(o => o.Comment)
+                .WithOne(c => c.Order) 
+                .HasForeignKey<Order>(o => o.CommentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Order>()
+                .HasOne(o => o.Product)
+                .WithMany(p => p.Orders) 
+                .HasForeignKey(o => o.ProductID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
@@ -102,16 +93,6 @@ namespace LOMSAPI.Data.Entities
                 .HasForeignKey(c => c.LiveStreamCustomerID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<Payment>()
-                .HasOne(pm => pm.Order)
-                .WithMany(o => o.Payments)
-                .HasForeignKey(pm => pm.OrderID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Order>()
-                .HasOne(o => o.Shipping)
-                .WithOne(s => s.Order)
-                .HasForeignKey<Shipping>(s => s.OrderID);
         }
     }
 }

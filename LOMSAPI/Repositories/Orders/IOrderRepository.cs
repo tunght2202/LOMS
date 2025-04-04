@@ -12,10 +12,10 @@ namespace LOMSAPI.Repositories.Orders
         Task<IEnumerable<OrderModel>> GetOrderByUserId(string userId);
         Task<int> UpdateOrderDetail(int orderDetailId, int quantity);
         Task<int> DeleteOrderDetail(int orderDetailId);
-        Task<IEnumerable<OrderModel>> GetOrdersByStatusByLivestreamId(string livestreamId, string status);
-        Task<IEnumerable<OrderModel>> GetOrdersByStatusByUserId(string userId, string status);
+        Task<IEnumerable<OrderModel>> GetOrdersByStatusByLivestreamId(string livestreamId, OrderStatus status);
+        Task<IEnumerable<OrderModel>> GetOrdersByStatusByUserId(string userId, OrderStatus status);
         Task<OrderModel> GetOrdersById(int orderId);
         Task<IEnumerable<OrderModel>> GetOrders();
-        Task<bool> UpdateOrderStatus(int orderId, string newStatus);
+        Task<bool> UpdateOrderStatus(int orderId, OrderStatus newStatus);
     }
 }
