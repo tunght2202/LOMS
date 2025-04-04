@@ -11,6 +11,7 @@ using LOMSAPI.Repositories.Users;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
@@ -20,11 +21,13 @@ namespace LOMSAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-
+        private readonly UserManager<User> _userManager;
         public AuthController(UserManager<User> userManager, IDistributedCache cache, IConfiguration config
             ,IUserRepository userRepository)
         {
+            _userManager = userManager;
             _userRepository = userRepository;
+
         }
         // Thanh Tùng
         // Login 
@@ -92,10 +95,25 @@ namespace LOMSAPI.Controllers
 
             return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
         }
-        //[HttpGet("user-profile")]
-        //public async Task<IActionResult> GetUserProfile(int userId)
-        //{
+        [HttpGet("user-profile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        //}
+            User user =  await _userRepository.GetUserProfile(userId);
+            if (user == null) return NotFound();
+
+            return Ok(user);
+        }
+        [HttpPut("update-userProfile")]
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateUserProfileModel model)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return BadRequest("Không tìm thấy user");
+            var result = await _userRepository.UpdateUserProfile(user, model);
+            if (!result) return BadRequest("Lỗi trong quá trình sửa thông tin"); 
+            return Ok(new { message = "Thông tin đã sửa thành công." });
+        }
     }
 }

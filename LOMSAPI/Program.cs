@@ -80,7 +80,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger eShop Solution", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger LOMS Solution", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
