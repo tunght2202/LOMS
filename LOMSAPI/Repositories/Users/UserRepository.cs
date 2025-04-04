@@ -13,6 +13,7 @@ using LOMSAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.AspNetCore.Http.HttpResults;
 namespace LOMSAPI.Repositories.Users
 {
     public class UserRepository : IUserRepository
@@ -22,6 +23,7 @@ namespace LOMSAPI.Repositories.Users
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly CloudinaryService _cloudinaryService;
+         
         public UserRepository(UserManager<User> userManager, SignInManager<User> signInManager
             , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService)
         {
@@ -60,6 +62,7 @@ namespace LOMSAPI.Repositories.Users
 
         public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image)
         {
+            if(_userManager.FindByEmailAsync(model.Email) != null) return false;
             string imageUrl = await _cloudinaryService.UploadImageAsync(image);
             var user = new User
             {
@@ -205,6 +208,48 @@ namespace LOMSAPI.Repositories.Users
 
             mailMessage.To.Add(toEmail);
             await smtpClient.SendMailAsync(mailMessage);
+        }
+
+        public async Task<User> GetUserProfile(string UserId)
+        {
+            User user = await _userManager.FindByIdAsync(UserId);
+            return user;
+        }
+
+        public async Task<bool> UpdateUserProfile(User user, UpdateUserProfileModel model)
+        {
+            string otpCode;
+            if (model.UserName != null) user.UserName = model.UserName;
+            if (model.Email != null) user.Email = model.Email;
+            var userExist = await _userManager.FindByEmailAsync(model.Email);
+            if (userExist == null)
+            {
+                otpCode = new Random().Next(100000, 999999).ToString();
+                await SendEmailAsync(user.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                await _cache.SetStringAsync($"OTP_UPDATE_{model.Email}", otpCode, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+                await _cache.SetStringAsync("UPDATE_EMAIL", model.Email, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+            }
+            else
+            {
+                return false;
+            }
+            if (model.Password != null) {
+                var passwordHasher = new PasswordHasher<User>();
+                user.PasswordHash = passwordHasher.HashPassword(user, model.Password);
+            }
+            if(model.PhoneNumber!= null) user.PhoneNumber = model.PhoneNumber;
+            if (model.FullName != null) user.FullName = model.FullName;
+            if (model.Address != null) user.Address = model.Address;
+            if (model.Gender != null) user.Sex = model.Gender;
+            if (model.Avatar != null) user.ImageURL = await _cloudinaryService.UploadImageAsync(model.Avatar);
+            return true;
+
         }
 
         
