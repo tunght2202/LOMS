@@ -8,7 +8,9 @@ namespace LOMSAPI.Data.Entities
         Pending,
         Confirmed,
         Shipped,
-        Delivered
+        Delivered,
+        Canceled,
+        Returned
     }
     [Table("Orders")]
     public class Order
@@ -16,7 +18,7 @@ namespace LOMSAPI.Data.Entities
         [Key]
         public int OrderID { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
-        public OrderStatus Status { get; set; } // Pending, Confirmed, Shipped, Delivered
+        public OrderStatus Status { get; set; } // Pending, Confirmed, Shipped, Delivered, Canceled, Returned
         public Shipping Shipping { get; set; }
         public ICollection<OrderDetail> OrderDetails { get; set; }
         public ICollection<Payment> Payments { get; set; }
