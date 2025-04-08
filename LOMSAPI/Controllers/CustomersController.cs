@@ -26,6 +26,15 @@ namespace LOMSAPI.Controllers
             return Ok(customer);
         }
         // Thanh Tùng
+        // Get customer by order ID 
+        [HttpGet("Order/{orderID}")]
+        public async Task<IActionResult> GetByOrderID(int orderID) 
+        {
+            var customer = await _customerRepository.GetCustomerByOrderIdAsync(orderID);
+            if (customer == null) { return BadRequest($"{orderID} not exit"); }
+            return Ok(customer);
+        }
+        // Thanh Tùng
         // Add customer by id and Facebook Name  
         [HttpPost("AddCustomer/{customerId}/{customerFacebookName}")]
         public async Task<IActionResult> AddCustomer(string customerId, string customerFacebookName)

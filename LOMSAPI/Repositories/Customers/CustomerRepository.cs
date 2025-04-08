@@ -87,5 +87,37 @@ namespace LOMSAPI.Repositories.Customers
             customer.PhoneNumber = customerUpdate.PhoneNumber;
             return await _context.SaveChangesAsync();
         }
+
+
+        public async Task<GetCustomerModel> GetCustomerByOrderIdAsync(int orderID)
+        {
+            var customerId = await _context.Orders
+                .Where(o => o.OrderID == orderID)
+                .Select(o => new
+                {
+                    customerID = o.Comment.LiveStreamCustomer.CustomerID
+                }
+                )
+                .FirstOrDefaultAsync();
+            var customer = await _context.Customers
+               .FirstOrDefaultAsync(c => c.CustomerID.Equals(customerId.customerID));
+            if (customer == null)
+            {
+                throw new Exception($"{customerId} was exit!");
+            }
+            var getCustomer = new GetCustomerModel()
+            {
+                CustomerID = customerId.customerID,
+                FacebookName = customer.FacebookName,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                Address = customer.Address,
+                PhoneNumber = customer.PhoneNumber,
+                FailedDeliveries = customer.FailedDeliveries,
+                SuccessfulDeliveries = customer.SuccessfulDeliveries
+
+            };
+            return getCustomer;
+        }
     }
 }

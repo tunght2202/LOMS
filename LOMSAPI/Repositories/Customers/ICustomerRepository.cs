@@ -9,5 +9,7 @@ namespace LOMSAPI.Repositories.Customers
         Task<int> AddLivestreamCustomer(string customerId, string livestreamId);
         Task<int> UpdateCustomer(string customerId, UpdateCustomerModel customerUpdate);
         Task<GetCustomerModel> GetCustomerById(string customerId);
+        Task<GetCustomerModel> GetCustomerByOrderIdAsync(int orderID);
+
     }
 }
