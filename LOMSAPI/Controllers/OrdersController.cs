@@ -25,19 +25,19 @@ namespace LOMSAPI.Controllers
             return Ok(orders);
         }
 
-        [HttpGet("user")]
-        public async Task<IActionResult> GetAllByUserId()
+        [HttpGet("user/{userID}")]
+        public async Task<IActionResult> GetAllByUserId(string userID)
         {
-            var orders = await _orderRepo.GetAllOrdersByUserIdAsync();
+            var orders = await _orderRepo.GetAllOrdersByUserIdAsync(userID);
             if (orders == null || !orders.Any())
                 return NotFound("No orders found for the user.");
             return Ok(orders);
         }
 
-        [HttpGet("livestream")]
-        public async Task<IActionResult> GetAllByLiveStreamId()
+        [HttpGet("livestream/{liveStreamID}")]
+        public async Task<IActionResult> GetAllByLiveStreamId(string liveStreamID)
         {
-            var orders = await _orderRepo.GetAllOrdersByLiveStreamIdAsync();
+            var orders = await _orderRepo.GetAllOrdersByLiveStreamIdAsync(liveStreamID);
             if (orders == null || !orders.Any())
                 return NotFound("No orders found for the livestream.");
             return Ok(orders);

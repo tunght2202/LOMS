@@ -49,18 +49,10 @@ namespace LOMSAPI.Repositories.Orders
             return orders.Select(o => MapToModel(o));
         }
 
-        public async Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync()
+        public async Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId)
         {
             var orders = await _context.Orders
-                .Where(o => o.CommentID != null) 
-                .ToListAsync();
-            return orders.Select(o => MapToModel(o));
-        }
-
-        public async Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync()
-        {
-            var orders = await _context.Orders
-                .Where(o => o.CommentID != null) 
+                .Where(o => o.Comment.LiveStreamCustomer.LivestreamID.Equals(liveStreamId)) 
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
@@ -72,6 +64,7 @@ namespace LOMSAPI.Repositories.Orders
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
+
         public async Task<IEnumerable<OrderModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID)
         {
             var orders = await _context.Orders
@@ -119,6 +112,14 @@ namespace LOMSAPI.Repositories.Orders
 
             order.Status = (OrderStatus)newStatus;
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync(string userID)
+        {
+            var orders = await _context.Orders
+                        .Where(o => o.CommentID.Equals(userID))
+                        .ToListAsync();
+            return orders.Select(o => MapToModel(o));
         }
 
     }
