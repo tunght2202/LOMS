@@ -97,7 +97,7 @@
 //                {
 //                    LiveStreamCustomerID = orderModel.livestreamCustomerId,
 //                    OrderDate = DateTime.UtcNow,
-//            //        Status = "Pending",
+//                    //        Status = "Pending",
 //                    OrderDetails = new List<OrderDetail>() // Khởi tạo danh sách tránh lỗi null
 //                };
 
@@ -253,7 +253,7 @@
 //        public async Task<OrderModel> GetOrdersById(int orderId)
 //        {
 //            var orders = await _context.Orders.FirstOrDefaultAsync(x => x.OrderID == orderId);
-//            if (orders == null )
+//            if (orders == null)
 //            {
 //                throw new Exception("not exit order");
 
@@ -282,8 +282,8 @@
 //            }
 
 //            order.Status = newStatus;
-//            var result =  await _context.SaveChangesAsync();
-//            if(result <= 0)
+//            var result = await _context.SaveChangesAsync();
+//            if (result <= 0)
 //            {
 //                return false;
 //            }
