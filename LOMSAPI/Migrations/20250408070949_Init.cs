@@ -121,6 +121,7 @@ namespace LOMSAPI.Migrations
                     StreamURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StreamTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StatusDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
