@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using LOMSUI.Models;
 using LOMSUI.Services;
 using LOMSUI.Activities;
+using LOMSUI;
 
 namespace LOMSUI
 {
@@ -70,7 +71,6 @@ namespace LOMSUI
             string email = _emailEditText.Text?.Trim();
             string password = _passwordEditText.Text.Trim();
 
-
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 Toast.MakeText(this, "Please enter email and password!", ToastLength.Short).Show();
@@ -80,10 +80,14 @@ namespace LOMSUI
             try
             {
                 var loginModel = new LoginModel { Email = email, Password = password };
-                var result = await _apiService.LoginAsync(loginModel);
+                string token = await _apiService.LoginAsync(loginModel);
 
-                if (result)
+                if (!string.IsNullOrEmpty(token))
                 {
+                    //Lưu token vào SharedPreferences
+                    var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+                    prefs.Edit().PutString("token", token).Apply();
+
                     Toast.MakeText(this, "Login successful!", ToastLength.Short).Show();
 
                     Intent intent = new Intent(this, typeof(LiveStreamActivity));
@@ -99,5 +103,20 @@ namespace LOMSUI
                 Toast.MakeText(this, "Error: " + ex.Message, ToastLength.Long).Show();
             }
         }
+
+
     }
+
 }
+
+/*Button btnLogout = FindViewById<Button>(Resource.Id.btnLogout);
+btnLogout.Click += (sender, e) =>
+{
+    var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+    prefs.Edit().Remove("token").Apply(); // Xóa token
+
+    Intent intent = new Intent(this, typeof(LoginActivity));
+    intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.NewTask);
+    StartActivity(intent);
+    Finish();
+};*/

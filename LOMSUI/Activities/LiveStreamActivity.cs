@@ -10,16 +10,19 @@ using LOMSUI.Models;
 using Android.Views;
 using AndroidX.RecyclerView.Widget;
 using System.Linq;
+using AndroidX.SwipeRefreshLayout.Widget;
 
 namespace LOMSUI
 {
     [Activity(Label = "Live Streams")]
     public class LiveStreamActivity : Activity
     {
+        private SwipeRefreshLayout _swipeRefreshLayout;
         private RecyclerView _recyclerView;
         private TextView _txtNoLiveStreams;
         private LiveStreamAdapter _adapter;
         private List<LiveStreamModel> _liveStreams = new List<LiveStreamModel>();
+        private ApiService _apiService;
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -28,18 +31,32 @@ namespace LOMSUI
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
             _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);
+            _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+                
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
+
+            // Khởi tạo ApiService và set token từ SharedPreferences
+            _apiService = new ApiService();
+            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+            string token = prefs.GetString("token", null);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetToken(token);
+            }
+
+            _swipeRefreshLayout.Refresh += async (s, e) =>
+            {
+                await LoadLiveStreams();
+                _swipeRefreshLayout.Refreshing = false;
+            };
 
             await LoadLiveStreams();
         }
 
         private async Task LoadLiveStreams()
         {
-            var apiService = new ApiService();
-
-            await apiService.GetLiveStreamsFromFaceBook();
-
-            _liveStreams = await apiService.GetAllLiveStreamsAsync();
+            _liveStreams = await _apiService.GetAllLiveStreams();
 
             RunOnUiThread(() =>
             {
@@ -56,8 +73,7 @@ namespace LOMSUI
                         },
                         onDeleteClick: async (livestream, position) =>
                         {
-                            var deleteService = new ApiService();
-                            bool success = await deleteService.DeleteLiveStreamAsync(livestream.LivestreamID);
+                            bool success = await _apiService.DeleteLiveStreamAsync(livestream.LivestreamID);
 
                             if (success)
                             {

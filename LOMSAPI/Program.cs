@@ -69,10 +69,10 @@ builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IListProductRepository, ListProductRepository>();
-//builder.Services.AddTransient<IOrderRepository, OrderRepository>();
+builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-//builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepository>();
+builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepository>();
 builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
