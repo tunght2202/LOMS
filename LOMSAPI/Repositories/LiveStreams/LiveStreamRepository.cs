@@ -106,7 +106,7 @@ namespace LOMSAPI.Repositories.LiveStreams
         {
             // Trong DB: "1" là LIVE, "2" là VOD
             string facebookStatus = facebookLiveStream.Status.ToUpper();
-            if (facebookStatus == "VOD" && existingLiveStream.Status != "LIVE")
+            if (facebookStatus == "VOD" && existingLiveStream.Status == "LIVE")
             {
                 existingLiveStream.Status = "VOD"; // Cập nhật thành VOD
                 await _context.SaveChangesAsync();
@@ -167,9 +167,17 @@ namespace LOMSAPI.Repositories.LiveStreams
             await _context.SaveChangesAsync();
         }
 
-        public Task<LiveStream> GetLiveStreamById(string liveStreamId, string userid)
+        public async Task<LiveStream> GetLiveStreamById(string liveStreamId, string userid)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(liveStreamId))
+                throw new ArgumentNullException(nameof(liveStreamId));
+            if (string.IsNullOrEmpty(userid) || !await _context.Users.AnyAsync(u => u.Id == userid))
+                throw new ArgumentException("Invalid or non-existent UserID", nameof(userid));
+            // Tìm kiếm trong DB
+            var liveStream = await _context.LiveStreams
+                .FirstOrDefaultAsync(ls => ls.LivestreamID == liveStreamId && ls.UserID == userid && !ls.StatusDelete);
+
+            return liveStream; // Trả về null nếu không tìm thấy
         }
-    }
+    }   
 }

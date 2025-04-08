@@ -90,11 +90,10 @@ namespace LOMSAPI.Controllers
         [HttpDelete("{liveStreamId}")]
         public async Task<IActionResult> DeleteLiveStream(string liveStreamId)
         {
-            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
+             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           // string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
-
             try
             {
                 // Check if the livestream exists and belongs to the user
