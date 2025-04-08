@@ -148,7 +148,7 @@ namespace LOMSAPI.Repositories.Orders
                                         {
                                             OrderID = o.OrderID,
                                             OrderDate = o.OrderDate,
-                                            Status = o.Status,
+                                            //Status = o.Status,
                                             LiveStreamCustomerID = o.LiveStreamCustomerID
                                         })
                                         .ToListAsync();

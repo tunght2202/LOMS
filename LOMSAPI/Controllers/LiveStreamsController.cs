@@ -18,8 +18,8 @@ namespace LOMSAPI.Controllers
         [HttpGet("allDb")]
         public async Task<IActionResult> GetAllLiveStreamsFromDb()
         {
-           // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-           string userId = "2347eaee-4ab1-4fec-aee3-19a6325cb494";
+           string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           //string userId = "2347eaee-4ab1-4fec-aee3-19a6325cb494";
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
 
