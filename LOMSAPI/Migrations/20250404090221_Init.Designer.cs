@@ -4,6 +4,7 @@ using LOMSAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LOMSAPI.Migrations
 {
     [DbContext(typeof(LOMSDbContext))]
-    partial class LOMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250404090221_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,33 +184,6 @@ namespace LOMSAPI.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderID");
-
-                    b.HasIndex("LiveStreamCustomerID")
-                        .IsUnique();
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("LOMSAPI.Data.Entities.OrderDetail", b =>
-                {
-                    b.Property<int>("OrderDetailID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderDetailID"));
-
-                    b.Property<int>("OrderID")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
 
                     b.Property<int>("ProductID")
                         .HasColumnType("int");
