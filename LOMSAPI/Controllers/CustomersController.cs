@@ -1,4 +1,5 @@
 ﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Models;
 using LOMSAPI.Repositories.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,19 @@ namespace LOMSAPI.Controllers
             if(result == 0)
             {
                 return BadRequest($"Can't add {customerFacebookName} customer!");
+            }
+
+            return Ok();
+        }
+        // Thanh Tùng
+        // Update customer by customerId
+        [HttpPut("UpdateCustomerByID/{customerId}")]
+        public async Task<IActionResult> UpdateCustomerByID(string customerId,[FromBody] UpdateCustomerModel customerUpdate)
+        {
+            var result = await _customerRepository.UpdateCustomer(customerId, customerUpdate);
+            if(result == 0)
+            {
+                return BadRequest($"Can't update customer!");
             }
 
             return Ok();

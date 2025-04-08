@@ -62,7 +62,8 @@ namespace LOMSAPI.Repositories.Users
 
         public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image)
         {
-            if(_userManager.FindByEmailAsync(model.Email) != null) return false;
+            var userExit = await _userManager.FindByNameAsync(model.UserName);
+            if (!(userExit == null)) return false;
             string imageUrl = await _cloudinaryService.UploadImageAsync(image);
             var user = new User
             {
