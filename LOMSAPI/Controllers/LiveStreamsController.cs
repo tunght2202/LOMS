@@ -18,7 +18,7 @@ namespace LOMSAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("allDb")]
-        public async Task<IActionResult> GetAllLiveStreamsFromDb()
+     /*   public async Task<IActionResult> GetAllLiveStreamsFromDb()
         {
            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
            string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
@@ -35,7 +35,7 @@ namespace LOMSAPI.Controllers
             {
                 return StatusCode(500, $"Error: {ex.Message}");
             }
-        }
+        }*/
         /// <summary>
         /// Api to get all livestreams from Facebook API
         /// </summary>
