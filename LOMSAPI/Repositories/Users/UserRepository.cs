@@ -62,8 +62,8 @@ namespace LOMSAPI.Repositories.Users
 
         public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image)
         {
-            var userExit = await _userManager.FindByNameAsync(model.UserName);
-            if (!(userExit == null)) return false;
+            User userExist = await _userManager.FindByEmailAsync(model.Email);
+            if (userExist != null) return false;
             string imageUrl = await _cloudinaryService.UploadImageAsync(image);
             var user = new User
             {
@@ -217,42 +217,130 @@ namespace LOMSAPI.Repositories.Users
             return user;
         }
 
-        public async Task<bool> UpdateUserProfile(User user, UpdateUserProfileModel model)
+        public async Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model)
         {
-            string otpCode;
-            if (model.UserName != null) user.UserName = model.UserName;
-            if (model.Email != null) user.Email = model.Email;
-            var userExist = await _userManager.FindByEmailAsync(model.Email);
-            if (userExist == null)
+            try
             {
-                otpCode = new Random().Next(100000, 999999).ToString();
-                await SendEmailAsync(user.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
-                await _cache.SetStringAsync($"OTP_UPDATE_{model.Email}", otpCode, new DistributedCacheEntryOptions
+                var userInfo = new User();
+                if (model.UserName != null)
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                });
-                await _cache.SetStringAsync("UPDATE_EMAIL", model.Email, new DistributedCacheEntryOptions
+                    user.UserName = model.UserName;
+                    userInfo.UserName = model.UserName;
+                }
+
+                if (model.Password != null)
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                });
+                    var passwordHasher = new PasswordHasher<User>();
+                    user.PasswordHash = passwordHasher.HashPassword(user, model.Password);
+                    userInfo.PasswordHash = passwordHasher.HashPassword(userInfo, model.Password);
+                }
+                if (model.PhoneNumber != null)
+                {
+                    user.PhoneNumber = model.PhoneNumber;
+                    userInfo.PhoneNumber = model.PhoneNumber;
+                }
+                if (model.FullName != null)
+                {
+                    user.FullName = model.FullName;
+                    userInfo.FullName = model.FullName;
+                }
+                if (model.Address != null)
+                {
+                    user.Address = model.Address;
+                    userInfo.Address = model.Address;
+                }
+                if (model.Gender != null)
+                {
+                    user.Sex = model.Gender;
+                    userInfo.Sex = model.Gender;
+                }
+                if (model.Avatar != null)
+                {
+                    user.ImageURL = await _cloudinaryService.UploadImageAsync(model.Avatar);
+                    userInfo.ImageURL = await _cloudinaryService.UploadImageAsync(model.Avatar);
+                }
+
+                if (model.Email == null)
+                {
+                    await _userManager.UpdateAsync(user);
+                }
+                else
+                {
+                    var otpCode = new Random().Next(100000, 999999).ToString();
+                    await SendEmailAsync(model.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _cache.SetStringAsync($"OTP_UPDATE_{model.Email}", otpCode, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("UPDATE_EMAIL", model.Email, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("USER_INFO_UPDATE", JsonConvert.SerializeObject(userInfo), new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                }
             }
-            else
+            catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return false;
             }
-            if (model.Password != null) {
-                var passwordHasher = new PasswordHasher<User>();
-                user.PasswordHash = passwordHasher.HashPassword(user, model.Password);
-            }
-            if(model.PhoneNumber!= null) user.PhoneNumber = model.PhoneNumber;
-            if (model.FullName != null) user.FullName = model.FullName;
-            if (model.Address != null) user.Address = model.Address;
-            if (model.Gender != null) user.Sex = model.Gender;
-            if (model.Avatar != null) user.ImageURL = await _cloudinaryService.UploadImageAsync(model.Avatar);
+            
             return true;
 
         }
 
-        
+        public async Task<bool> UpdateUserProfile(VerifyOtpModel model, User user)
+        {
+            var userEmail = await _cache.GetStringAsync("UPDATE_EMAIL");
+            var otpCode = await _cache.GetStringAsync($"OTP_UPDATE_{userEmail}");
+            if (otpCode == null || otpCode != model.OtpCode) return false;
+
+            var userInfoString = await _cache.GetStringAsync("USER_INFO_UPDATE");
+            if (string.IsNullOrEmpty(userInfoString)) return false;
+
+            var userInfo = JsonConvert.DeserializeObject<User>(userInfoString);
+            user.Email = userEmail;
+            if (userInfo.UserName != null)
+            {
+                user.UserName = userInfo.UserName;
+            }
+
+            if (userInfo.PasswordHash != null)
+            {
+                user.PasswordHash = userInfo.PasswordHash;
+            }
+            if (userInfo.PhoneNumber != null)
+            {
+                user.PhoneNumber = userInfo.PhoneNumber;
+            }
+            if (userInfo.FullName != null)
+            {
+                user.FullName = userInfo.FullName;
+            }
+            if (userInfo.Address != null)
+            {
+                user.Address = userInfo.Address;
+            }
+            if (userInfo.Sex != null)
+            {
+                user.Sex = userInfo.Sex;
+            }
+            if (userInfo.ImageURL != null)
+            {
+                user.ImageURL = userInfo.ImageURL;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
+
+            await _cache.RemoveAsync("USER_INFO_UPDATE");
+            await _cache.RemoveAsync($"OTP_UPDATE_{userEmail}");
+            await _cache.RemoveAsync("UPDATE_EMAIL");
+
+            return true;
+        }
     }
 }

@@ -105,15 +105,29 @@ namespace LOMSAPI.Controllers
 
             return Ok(user);
         }
-        [HttpPut("update-userProfile")]
-        public async Task<IActionResult> UpdateProfile([FromForm] UpdateUserProfileModel model)
+        [HttpPut("update-userProfile-request")]
+        public async Task<IActionResult> UpdateProfileRequest([FromForm] UpdateUserProfileModel model)
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             User user = await _userManager.FindByIdAsync(userId);
             if (user == null) return BadRequest("Không tìm thấy user");
-            var result = await _userRepository.UpdateUserProfile(user, model);
-            if (!result) return BadRequest("Lỗi trong quá trình sửa thông tin"); 
+            var result = await _userRepository.UpdateUserProfileRequest(user, model);
+            if (!result) return BadRequest("Lỗi trong quá trình sửa thông tin");
+            if (model.Email != null)
+            {
+                return Ok(new { message = "Vui lòng nhập mã xác thực email." });
+            }
             return Ok(new { message = "Thông tin đã sửa thành công." });
+        }
+        [HttpPut("update-userProfie")]
+        public async Task<IActionResult> UpdateProfile(VerifyOtpModel OTP)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = await _userManager.FindByIdAsync(userId);
+            var result = await _userRepository.UpdateUserProfile(OTP,user);
+            if (!result) return BadRequest("Mã OTP không hợp lệ hoặc đã hết hạn.");
+
+            return Ok(new { message = "Thông tin đã sửa thành công" });
         }
     }
 }
