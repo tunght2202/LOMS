@@ -5,17 +5,15 @@ namespace LOMSAPI.Repositories.Orders
 {
     public interface IOrderRepository
     {
-        Task<int> CreateOrderByProductCodeAuto(string productCode);
-        Task<int> CreateOrderDetail(OrderDetailAddModel orderModel);
-        Task<GetOrderDetailByOrderModel> GetOrderByLivestreamCustomerId(int livestreamCustomerId);
-        Task<IEnumerable<OrderModel>> GetOrderByLivestreamId(string livestreamId);
-        Task<IEnumerable<OrderModel>> GetOrderByUserId(string userId);
-        Task<int> UpdateOrderDetail(int orderDetailId, int quantity);
-        Task<int> DeleteOrderDetail(int orderDetailId);
-        Task<IEnumerable<OrderModel>> GetOrdersByStatusByLivestreamId(string livestreamId, OrderStatus status);
-        Task<IEnumerable<OrderModel>> GetOrdersByStatusByUserId(string userId, OrderStatus status);
-        Task<OrderModel> GetOrdersById(int orderId);
-        Task<IEnumerable<OrderModel>> GetOrders();
-        Task<bool> UpdateOrderStatus(int orderId, OrderStatus newStatus);
+        Task<IEnumerable<OrderModel>> GetAllOrdersAsync();
+        Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync();
+        Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync();
+        Task<IEnumerable<OrderModel>> GetOrdersByCustomerIdAsync(string customerId);
+        Task<IEnumerable<OrderModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID);
+        Task<OrderModel?> GetOrderByIdAsync(int orderId);
+        Task<bool> OrderExistsAsync(int orderId);
+        Task<int> AddOrderAsync(OrderModel order);
+        Task<int> UpdateOrderAsync(OrderModel order);
+        Task<int> UpdateStatusOrderAsync(int orderID, int newStatus);
     }
 }
