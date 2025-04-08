@@ -5,14 +5,8 @@ using LOMSUI.Models;
 using LOMSUI.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Android.Widget;
-using Android.Graphics;
-using AndroidX.Core.Content;
-using AndroidX.Core.View;
-using Android.Graphics.Drawables;
+using LOMSUI.Activities;
 
 namespace LOMSUI.Adapter
 {
@@ -21,12 +15,18 @@ namespace LOMSUI.Adapter
         private List<LiveStreamModel> _liveStreams;
         private Context _context;
         private ApiService _apiService;
+        private readonly Action<LiveStreamModel> _onViewClick;
+        private readonly Action<LiveStreamModel, int> _onDeleteClick;
 
-        public LiveStreamAdapter(List<LiveStreamModel> liveStreams, Context context)
+        public LiveStreamAdapter(List<LiveStreamModel> liveStreams, Context context,
+            Action<LiveStreamModel> onViewClick,
+            Action<LiveStreamModel, int> onDeleteClick)
         {
             _liveStreams = liveStreams;
             _context = context;
             _apiService = new ApiService();
+            _onViewClick = onViewClick;
+            _onDeleteClick = onDeleteClick;
         }
 
         public override int ItemCount => _liveStreams.Count;
@@ -40,28 +40,20 @@ namespace LOMSUI.Adapter
             viewHolder.Status.Text = $"{item.Status}";
             viewHolder.StartTime.Text = $"Start: {item.GetFormattedTime()}";
 
-            // Mở livestream trên Facebook khi click vào item
             viewHolder.ItemView.Click += (sender, e) =>
             {
                 var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(item.StreamURL));
                 _context.StartActivity(intent);
             };
 
-            // Xóa livestream khi bấm nút
-            viewHolder.BtnDelete.Click += async (sender, e) =>
+            viewHolder.BtnView.Click += (sender, e) =>
             {
-                bool success = await _apiService.DeleteLiveStreamAsync(item.LivestreamID);
-                if (success)
-                {
-                    Toast.MakeText(_context, "Đã xóa livestream", ToastLength.Short).Show();
-                    _liveStreams.RemoveAt(position);
-                    NotifyItemRemoved(position);
-                }
-                else
-                {
-                    Toast.MakeText(_context, "Xóa thất bại!", ToastLength.Short).Show();
-                }
+                Intent intent = new Intent(_context, typeof(CommentsActivity));
+                intent.PutExtra("LivestreamID", item.LivestreamID);
+                _context.StartActivity(intent);
             };
+
+            viewHolder.BtnDelete.Click += (sender, e) => _onDeleteClick?.Invoke(item, position);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -76,6 +68,7 @@ namespace LOMSUI.Adapter
             public TextView Status { get; private set; }
             public TextView StartTime { get; private set; }
             public Button BtnDelete { get; private set; }
+            public Button BtnView { get; private set; }
 
             public LiveStreamViewHolder(View itemView) : base(itemView)
             {
@@ -83,9 +76,8 @@ namespace LOMSUI.Adapter
                 Status = itemView.FindViewById<TextView>(Resource.Id.txtStreamStatus);
                 StartTime = itemView.FindViewById<TextView>(Resource.Id.txtStreamStartTime);
                 BtnDelete = itemView.FindViewById<Button>(Resource.Id.btnDeleteLiveStream);
+                BtnView = itemView.FindViewById<Button>(Resource.Id.viewURLStream);
             }
         }
     }
-
 }
-

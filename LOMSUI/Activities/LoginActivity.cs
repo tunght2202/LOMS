@@ -12,7 +12,7 @@ using LOMSUI.Activities;
 
 namespace LOMSUI
 {
-    [Activity(Label = "Login")]
+    [Activity(Label = "Login", MainLauncher = true)]
     public class LoginActivity : Activity
     {
         private EditText _emailEditText;
@@ -86,7 +86,7 @@ namespace LOMSUI
                 {
                     Toast.MakeText(this, "Login successful!", ToastLength.Short).Show();
 
-                    Intent intent = new Intent(this, typeof(CommentsActivity));
+                    Intent intent = new Intent(this, typeof(LiveStreamActivity));
                     StartActivity(intent);
                 }
                 else

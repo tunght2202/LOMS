@@ -98,7 +98,6 @@ namespace LOMSUI.Services
                         AvatarUrl = item.liveStreamCustomer?.customer?.imageURL?.ToString() ?? ""
                     });
 
-                    // Xử lý các bình luận nested từ "comments" -> "$values"
                     var nestedComments = item.liveStreamCustomer?.comments?["$values"];
                     if (nestedComments != null)
                     {

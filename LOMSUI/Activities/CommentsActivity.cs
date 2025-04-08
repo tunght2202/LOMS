@@ -21,12 +21,15 @@ namespace LOMSUI.Activities
         private CommentAdapter _commentAdapter;
         private ApiService _apiService;
         private List<CommentModel> _allComments;
+        private bool _isPolling = false;
+        private string _currentLiveStreamId = "";
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_comments);
 
+           
             _apiService = new ApiService();
             _allComments = new List<CommentModel>();
 
@@ -39,29 +42,82 @@ namespace LOMSUI.Activities
 
             recyclerViewComments.SetLayoutManager(new LinearLayoutManager(this));
 
-            btnFetchComments.Click += async (s, e) => await LoadComments();
+            _currentLiveStreamId = Intent.GetStringExtra("LivestreamID");
+            if (!string.IsNullOrEmpty(_currentLiveStreamId))
+            {
+                txtLiveStreamId.Text = _currentLiveStreamId;
+
+                _ = StartPollingComments();
+            }
+
+
+            btnFetchComments.Click += async (s, e) =>
+            {
+                _isPolling = false;
+                await Task.Delay(100);
+                await StartPollingComments();
+            };
+
             btnFilterByProduct.Click += (s, e) => FilterCommentsByProduct();
         }
 
-        private async Task LoadComments()
+
+        private async Task StartPollingComments()
         {
-            string liveStreamId = txtLiveStreamId.Text.Trim();
-            if (string.IsNullOrEmpty(liveStreamId))
+            _currentLiveStreamId = txtLiveStreamId.Text.Trim();
+
+            if (string.IsNullOrEmpty(_currentLiveStreamId))
             {
                 Toast.MakeText(this, "Vui lòng nhập ID Livestream", ToastLength.Short).Show();
                 return;
             }
 
-            _allComments = await _apiService.GetComments(liveStreamId);
-            UpdateCommentList(_allComments);
+            try
+            {
+                var initialComments = await _apiService.GetComments(_currentLiveStreamId);
+                if (initialComments != null)
+                {
+                    _allComments = initialComments;
+                    UpdateCommentList(_allComments);
+                }
+            }
+            catch (Exception ex)
+            {
+                Toast.MakeText(this, $"Lỗi khi tải bình luận ban đầu: {ex.Message}", ToastLength.Short).Show();
+            }
+
+            _isPolling = true;
+
+            while (_isPolling)
+            {
+                try
+                {
+                    var latestComments = await _apiService.GetComments(_currentLiveStreamId);
+
+                    if (latestComments != null &&
+                        (latestComments.Count != _allComments.Count ||
+                         latestComments.Any(c => !_allComments.Any(a => a.CommentID == c.CommentID))))
+                    {
+                        _allComments = latestComments;
+                        UpdateCommentList(_allComments);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    RunOnUiThread(() => Toast.MakeText(this, $"Lỗi khi tải bình luận: {ex.Message}", ToastLength.Short).Show());
+                }
+
+                await Task.Delay(4000); 
+            }
         }
+
 
         private void FilterCommentsByProduct()
         {
             string productCode = txtProductCode.Text.Trim();
             if (string.IsNullOrEmpty(productCode))
             {
-                UpdateCommentList(_allComments); // Hiển thị lại toàn bộ nếu không nhập mã
+                UpdateCommentList(_allComments);
             }
             else
             {
@@ -108,7 +164,11 @@ namespace LOMSUI.Activities
                 }
             });
         }
-
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _isPolling = false;
+        }
 
 
     }

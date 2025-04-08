@@ -23,24 +23,41 @@
             android:id="@+id/txtStreamStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-			android:background="#ff4d4d"
-            android:textSize="14sp"
+            android:background="#ff4d4d"
+            android:textSize="15sp"
             android:text="Trạng thái: Đang Live" />
 
 		<TextView
             android:id="@+id/txtStreamStartTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="15sp"
             android:text="Bắt đầu: 01-04-2025 10:00 AM" />
 	</LinearLayout>
 
-	<Button
-        android:id="@+id/btnDeleteLiveStream"
+	<LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Xóa"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="@android:color/holo_red_light"
-        android:textColor="@android:color/white"/>
+        android:orientation="vertical"
+        android:gravity="center">
+
+		<Button
+            android:id="@+id/viewURLStream"
+            android:layout_width="75dp"
+            android:layout_height="40dp"
+            android:textSize="12sp"
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:text="View"
+            android:textColor="@android:color/white" />
+		<Button
+            android:id="@+id/btnDeleteLiveStream"
+            android:layout_width="75dp"
+            android:layout_height="40dp"
+            android:textSize="12sp"
+            android:text="Xóa"
+            android:backgroundTint="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
+          />
+	</LinearLayout>
+
 </LinearLayout>
