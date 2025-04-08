@@ -6,8 +6,8 @@ namespace LOMSAPI.Repositories.Orders
     public interface IOrderRepository
     {
         Task<IEnumerable<OrderModel>> GetAllOrdersAsync();
-        Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync();
-        Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync();
+        Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync(string userID);
+        Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId);
         Task<IEnumerable<OrderModel>> GetOrdersByCustomerIdAsync(string customerId);
         Task<IEnumerable<OrderModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID);
         Task<OrderModel?> GetOrderByIdAsync(int orderId);
