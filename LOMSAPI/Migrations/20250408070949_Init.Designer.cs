@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LOMSAPI.Migrations
 {
     [DbContext(typeof(LOMSDbContext))]
-    [Migration("20250407161915_changeLiveStreamDB")]
-    partial class changeLiveStreamDB
+    [Migration("20250408070949_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
