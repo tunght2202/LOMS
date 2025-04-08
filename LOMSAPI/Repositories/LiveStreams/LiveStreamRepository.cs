@@ -102,13 +102,14 @@ namespace LOMSAPI.Repositories.LiveStreams
         }
 
         // Hàm mới để cập nhật trạng thái livestream
-        private void UpdateLiveStreamStatus(LiveStream existingLiveStream, LiveStream facebookLiveStream)
+        private async Task UpdateLiveStreamStatus(LiveStream existingLiveStream, LiveStream facebookLiveStream)
         {
             // Trong DB: "1" là LIVE, "2" là VOD
             string facebookStatus = facebookLiveStream.Status.ToUpper();
-            if (facebookStatus == "LIVE" && existingLiveStream.Status != "VOD")
+            if (facebookStatus == "VOD" && existingLiveStream.Status != "LIVE")
             {
                 existingLiveStream.Status = "VOD"; // Cập nhật thành VOD
+                await _context.SaveChangesAsync();
             }
           
         }
