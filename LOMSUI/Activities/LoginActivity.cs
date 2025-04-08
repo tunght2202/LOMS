@@ -12,7 +12,7 @@ using LOMSUI.Activities;
 
 namespace LOMSUI
 {
-    [Activity(Label = "Login", MainLauncher = true)]
+    [Activity(Label = "Login")]
     public class LoginActivity : Activity
     {
         private EditText _emailEditText;

@@ -13,6 +13,7 @@ namespace LOMSAPI.Repositories.Comments
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly IDistributedCache _cache;
+
         private readonly IConfiguration _configuration;
         private string ACCESS_TOKEN;
         public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache, IConfiguration configuration)
@@ -140,11 +141,11 @@ namespace LOMSAPI.Repositories.Comments
                     {
                         Console.WriteLine($"Lỗi khi lưu dữ liệu: {ex.InnerException?.Message}");
                     }
-                    
+
                 }
             }
 
-            return  comments;
+            return comments;
         }
 
 

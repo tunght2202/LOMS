@@ -35,6 +35,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Lấy"
+					android:backgroundTint="#00bfff"
                     android:layout_marginLeft="8dp"/>
 			</LinearLayout>
 
@@ -60,7 +61,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Lọc"
-					  android:visibility="gone"
+					android:backgroundTint="#00bfff"
+					android:visibility="gone"
                     android:layout_marginLeft="8dp"/>
 			</LinearLayout>
 
