@@ -102,7 +102,7 @@
 //                throw new Exception($"Error fetching live streams from Facebook: {ex.Message}", ex);
 //            }
 //        }
-       
+
 //        public async Task<LiveStream> GetLiveStreamById(string liveStreamId, string userId)
 //        {
 //            if (string.IsNullOrEmpty(liveStreamId))
@@ -149,7 +149,7 @@
 //                    StreamTitle = root.TryGetProperty("title", out JsonElement title) ? title.GetString() : "Untitled",
 //                    StreamURL = permalink != null ? $"https://www.facebook.com{permalink}" : "Unknown",
 //                    StartTime = DateTime.Parse(creationTimeElement.GetString().Replace("+0000", "Z")),
-                
+
 //                    //Status = status,
 //                    UserID = userId, // Use UserID from token
 //                    ListProductID = null,
@@ -194,7 +194,7 @@
 //                    StreamTitle = item.TryGetProperty("title", out JsonElement title) ? title.GetString() : "Untitled",
 //                    StreamURL = permalink != null ? $"https://www.facebook.com{permalink}" : "Unknown",
 //                    StartTime = DateTime.Parse(creationTimeElement.GetString().Replace("+0000", "Z")),
-                  
+
 //                    Status = status,
 //                    UserID = userId, // Use UserID from token
 //                    ListProductID = null,
