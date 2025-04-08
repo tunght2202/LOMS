@@ -22,7 +22,9 @@ namespace LOMSAPI.Repositories.Products
                 .Select(x => new ProductModel()
                 {
                     ProductID = x.ProductID,
+                    ProductCode = x.ProductCode,
                     Description = x.Description,
+                    UserID = x.UserID,
                     Name = x.Name,
                     Price = x.Price,
                     Stock = x.Stock,
@@ -94,6 +96,7 @@ namespace LOMSAPI.Repositories.Products
             {
                 Name = postProduct.Name,
                 UserID = postProduct.UserID,
+                ProductCode = postProduct.ProductCode,
                 ProductID = 0,
                 Price = postProduct.Price,
                 Description = postProduct.Description,

@@ -1,4 +1,5 @@
-﻿using LOMSAPI.Models;
+﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,48 +9,77 @@ namespace LOMSAPI.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly IOrderRepository _context;
+        private readonly IOrderRepository _orderRepo;
 
         public OrdersController(IOrderRepository context)
         {
-            _context = context;
-        }
-        // Thanh Tùng
-        // Add new Order Detail
-        [HttpPost("AddOrderDetail")]
-        public async Task<IActionResult> AddOrderDetail([FromForm] OrderDetailAddModel orderModel)
-        {
-            var result = await _context.CreateOrderDetail(orderModel);
-            if(result == null || result < 1)
-            {
-                return BadRequest("can create");
-            }
-            return Ok(result);
-        }
-        // Thanh Tùng
-        // Get order and order detail by livestream customer id
-        [HttpGet("GetOrderByLivestreamCustomerId/{livstreamCustomerId}")]
-        public async Task<IActionResult> GetOrderByLivestreamCustomerId(int livstreamCustomerId)
-        {
-            var result = await _context.GetOrderByLivestreamCustomerId(livstreamCustomerId);
-            if(result != null)
-            {
-                return Ok(result);
-            }
-            return BadRequest();
-        }
-        // Thanh Tùng
-        // Get order and order detail by livestream customer id
-        [HttpGet("GetOrderByLivestreamId/{livstreamId}")]
-        public async Task<IActionResult> GetOrderByLivestreamId(string livstreamId)
-        {
-            var result = await _context.GetOrderByLivestreamId(livstreamId);
-            if(result != null)
-            {
-                return Ok(result);
-            }
-            return BadRequest();
+            _orderRepo = context;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var orders = await _orderRepo.GetAllOrdersAsync();
+            if(orders == null || !orders.Any())
+                return NotFound("No orders found.");
+            return Ok(orders);
+        }
+
+        [HttpGet("user")]
+        public async Task<IActionResult> GetAllByUserId()
+        {
+            var orders = await _orderRepo.GetAllOrdersByUserIdAsync();
+            if (orders == null || !orders.Any())
+                return NotFound("No orders found for the user.");
+            return Ok(orders);
+        }
+
+        [HttpGet("livestream")]
+        public async Task<IActionResult> GetAllByLiveStreamId()
+        {
+            var orders = await _orderRepo.GetAllOrdersByLiveStreamIdAsync();
+            if (orders == null || !orders.Any())
+                return NotFound("No orders found for the livestream.");
+            return Ok(orders);
+        }
+
+        [HttpGet("customer/{customerId}")]
+        public async Task<IActionResult> GetByCustomerId(string customerId)
+        {
+            var orders = await _orderRepo.GetOrdersByCustomerIdAsync(customerId);
+            if (orders == null || !orders.Any())
+                return NotFound($"No orders found for customer ID: {customerId}");
+            return Ok(orders);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var order = await _orderRepo.GetOrderByIdAsync(id);
+            if (order == null) return NotFound();
+            return Ok(order);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(OrderModel model)
+        {
+            var orderId = await _orderRepo.AddOrderAsync(model);
+            return CreatedAtAction(nameof(GetById), new { id = orderId }, model);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, OrderModel model)
+        {
+            if (id != model.OrderID) return BadRequest();
+            var result = await _orderRepo.UpdateOrderAsync(model);
+            return result > 0 ? Ok() : NotFound("Can't update this order");
+        }
+
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] int status)
+        {
+            var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
+            return result > 0 ? Ok() : NotFound("Can;t update status of this order");
+        }
     }
 }
