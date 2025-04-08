@@ -13,8 +13,9 @@ namespace LOMSAPI.Repositories.Users
         Task<bool> ResetPasswordAsync(ResetPasswordModel model);
         Task<bool> VerifyOtpAsync(VerifyOtpModel model);
         Task<User> GetUserProfile(string UserId);
-        Task<bool> UpdateUserProfile(User user, UpdateUserProfileModel model);
-        
+        Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model);
+        Task<bool> UpdateUserProfile(VerifyOtpModel model, User user);
+
 
     }
 }
