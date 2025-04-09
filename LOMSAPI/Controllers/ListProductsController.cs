@@ -87,7 +87,7 @@ namespace LOMSAPI.Controllers
         }
 
         // Thanh Tùng
-        // Get List Product into list product 
+        // Add product into list product
         [HttpPost("AddMoreProductIntoListProduct/{listProductId}")]
         public async Task<IActionResult> AddMoreProductIntoListProduct(int listProductId,[FromBody] List<int> listProduct)
         {
@@ -95,6 +95,19 @@ namespace LOMSAPI.Controllers
             if (result == 0)
             {
                 return BadRequest("Can't create list product");
+            }
+            return Ok("Add successfull");
+        }
+
+        // Thanh Tùng
+        // Add list product into live stream
+        [HttpPut("AddListProductInToLiveStream/listProductID/{listProductId}/liveStreamID/{liveStreamID}")]
+        public async Task<IActionResult> AddListProductInToLiveStream(int listProductId, string liveStreamID)
+        {
+            var result = await _context.AddListProductInToLiveStream(listProductId, liveStreamID);
+            if (result == 0)
+            {
+                return BadRequest("Can't add list product into livestream");
             }
             return Ok("Add successfull");
         }

@@ -119,5 +119,63 @@ namespace LOMSAPI.Repositories.Customers
             };
             return getCustomer;
         }
+
+        public async Task<IEnumerable<GetCustomerModel>> GetCustomersByUserIdAsync(string userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id.Equals(userId));
+            if (user == null)
+            {
+                throw new Exception($"{userId} was exit!");
+            }
+            var customers = await _context.LiveStreamsCustomers
+                .Where(lc => lc.LiveStream.UserID.Equals(userId))
+                .Include(cs => cs.Customer)
+                .Select(c => new GetCustomerModel()
+                {
+                    CustomerID = c.CustomerID,
+                    FacebookName = c.Customer.FacebookName,
+                    FullName = c.Customer.FullName,
+                    Email = c.Customer.Email,
+                    Address = c.Customer.Address,
+                    PhoneNumber = c.Customer.PhoneNumber,
+                    FailedDeliveries = c.Customer.FailedDeliveries,
+                    SuccessfulDeliveries = c.Customer.SuccessfulDeliveries
+                })
+                .ToListAsync();
+            if(customers == null)
+            {
+                throw new Exception($"No customers found for user {userId}");
+            }
+            return customers;
+        }
+
+        public async Task<IEnumerable<GetCustomerModel>> GetCustomersByLiveStreamIdAsync(string liveStreamId)
+        {
+            var liveStream = await _context.LiveStreams
+                .FirstOrDefaultAsync(x => x.LivestreamID.Equals(liveStreamId));
+            if (liveStream == null)
+            {
+                throw new Exception($"{liveStream} was exit!");
+            }
+            var customers = await _context.LiveStreamsCustomers
+                .Where(lc => lc.LivestreamID.Equals(liveStreamId))
+                .Select(c => new GetCustomerModel()
+                {
+                    CustomerID = c.CustomerID,
+                    FacebookName = c.Customer.FacebookName,
+                    FullName = c.Customer.FullName,
+                    Email = c.Customer.Email,
+                    Address = c.Customer.Address,
+                    PhoneNumber = c.Customer.PhoneNumber,
+                    FailedDeliveries = c.Customer.FailedDeliveries,
+                    SuccessfulDeliveries = c.Customer.SuccessfulDeliveries
+                })
+                .ToListAsync();
+            if (customers == null)
+            {
+                throw new Exception($"No customers found for liveStream {liveStreamId}");
+            }
+            return customers;
+        }
     }
 }
