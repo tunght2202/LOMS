@@ -2,8 +2,11 @@
 using Azure.Core;
 using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
+using LOMSAPI.Repositories.ListProducts;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace LOMSAPI.Repositories.Orders
 {
@@ -11,10 +14,14 @@ namespace LOMSAPI.Repositories.Orders
     {
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
-        public OrderRepository(LOMSDbContext context, HttpClient httpClient)
+        private readonly IListProductRepository _listProductRepository;
+
+        public OrderRepository(LOMSDbContext context, HttpClient httpClient
+            , IListProductRepository listProductRepository)
         {
             _context = context;
             _httpClient = httpClient;
+            _listProductRepository = listProductRepository;
         }
 
         private OrderModel MapToModel(Order order)
@@ -52,7 +59,7 @@ namespace LOMSAPI.Repositories.Orders
         public async Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId)
         {
             var orders = await _context.Orders
-                .Where(o => o.Comment.LiveStreamCustomer.LivestreamID.Equals(liveStreamId)) 
+                .Where(o => o.Comment.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
@@ -120,6 +127,62 @@ namespace LOMSAPI.Repositories.Orders
                         .Where(o => o.CommentID.Equals(userID))
                         .ToListAsync();
             return orders.Select(o => MapToModel(o));
+        }
+
+        // Kiểm tra thời gian order xem có bị trùng nhau không
+        // gủi messager
+        // cộng trừ trong kho 
+        // update số lượng sản phẩm trong order thì update luôn số lương sản phẩm trong stock
+
+        public async Task<int> CreateOrderFromComments(int listProductID, string liveStreamId)
+        {
+            if(listProductID <= 0 || listProductID == null)
+            {
+                throw new ArgumentException("Invalid ListProductID");
+            }
+            var liveStream = await _context.LiveStreams
+                .FirstOrDefaultAsync(l => l.LivestreamID.Equals(liveStreamId));
+            if (liveStream == null)
+            {
+                throw new ArgumentException("Invalid LiveStreamID");
+            }
+            var products = await _listProductRepository.GetProductListProductById(listProductID);
+            var productCodeToId = products.ToDictionary(p => p.ProductCode.ToLower(), p => p.ProductID);
+            var comments = await _context.Comments
+                .Where(c => c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
+                .ToListAsync();
+            var result = new List<Order>();
+            var regex = new Regex(@"(?<code>\w+)\s*(?:[xX]?\s*)(?<qty>\d+)", RegexOptions.IgnoreCase);
+            // (?< code >\w +)   // Nhóm "code": Mã sản phẩm (chữ + số)
+            //\s *               // Khoảng trắng (có thể có)
+            //(?: [xX] ?\s *)    // Nhóm không bắt (non-capturing): có hoặc không có 'x' hoặc 'X', sau đó khoảng trắng
+            //(?< qty >\d +)     // Nhóm "qty": Số lượng sản phẩm
+            foreach (var comment in comments.OrderBy(c => c.CommentTime))
+            {
+                var match = regex.Match(comment.Content);
+                if (match.Success)
+                {
+                    string code = match.Groups["code"].Value.ToLower();
+                    int quantity = int.Parse(match.Groups["qty"].Value);
+
+                    if (productCodeToId.TryGetValue(code, out int productId))
+                    {
+                        result.Add(new Order
+                        {
+                            ProductID = productId,
+                            Quantity = quantity,
+                            CommentID = comment.CommentID,
+                            OrderDate = comment.CommentTime
+                        });
+                    }
+                }
+            }
+            if (result.Count > 0)
+            {
+                await _context.Orders.AddRangeAsync(result);
+                return await _context.SaveChangesAsync(); ;
+            }
+            return 0;
         }
 
     }
