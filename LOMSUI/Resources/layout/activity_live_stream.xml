@@ -3,22 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:padding="16dp">
 
-     <TextView
-        android:id="@+id/tvTitle"
+	<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="List Live Stream"
-        android:textSize="24sp"
+        android:text="Live Stream"
+        android:textSize="22sp"
+		android:textColor="@android:color/black"
         android:textStyle="bold"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:paddingBottom="40dp"
-        android:textColor="#333"/>
-    <ListView
-        android:id="@+id/listView"
+        android:layout_gravity="center"/>
+
+	<androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewLiveStreams"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"/>
+
+	<TextView
+        android:id="@+id/txtNoLiveStreams"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Không có livestream nào!"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>

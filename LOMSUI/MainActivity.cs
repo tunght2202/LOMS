@@ -11,9 +11,7 @@ namespace LOMSUI
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.addnewproduct);
-
-            
+            SetContentView(Resource.Layout.activity_live_stream);
         }
     }
 }

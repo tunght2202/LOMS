@@ -11,6 +11,7 @@ using LOMSAPI.Repositories.Users;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
@@ -20,12 +21,16 @@ namespace LOMSAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-
+        private readonly UserManager<User> _userManager;
         public AuthController(UserManager<User> userManager, IDistributedCache cache, IConfiguration config
             ,IUserRepository userRepository)
         {
+            _userManager = userManager;
             _userRepository = userRepository;
+
         }
+        // Thanh Tùng
+        // Login 
         [HttpPost("login-account-request")]
         [AllowAnonymous]
         public async Task<IActionResult> Authenticate([FromBody] Models.LoginRequest loginRequest)
@@ -42,11 +47,11 @@ namespace LOMSAPI.Controllers
 
         [HttpPost("register-account-request")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterRequest([FromBody] RegisterRequestModel model)
+        public async Task<IActionResult> RegisterRequest([FromForm] RegisterRequestModel model, IFormFile Avatar)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var result = await _userRepository.RegisterRequestAsync(model);
+            var result = await _userRepository.RegisterRequestAsync(model, Avatar);
             if (!result) return BadRequest("Lỗi trong quá trình đăng ký.");
 
             return Ok(new { message = "Vui lòng kiểm tra email để nhập mã xác thực." });
@@ -89,6 +94,40 @@ namespace LOMSAPI.Controllers
             if (!result) return BadRequest("Mã OTP không hợp lệ hoặc đã hết hạn.");
 
             return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
+        }
+        [HttpGet("user-profile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            User user =  await _userRepository.GetUserProfile(userId);
+            if (user == null) return NotFound();
+
+            return Ok(user);
+        }
+        [HttpPut("update-userProfile-request")]
+        public async Task<IActionResult> UpdateProfileRequest([FromForm] UpdateUserProfileModel model)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return BadRequest("Không tìm thấy user");
+            var result = await _userRepository.UpdateUserProfileRequest(user, model);
+            if (!result) return BadRequest("Lỗi trong quá trình sửa thông tin");
+            if (model.Email != null)
+            {
+                return Ok(new { message = "Vui lòng nhập mã xác thực email." });
+            }
+            return Ok(new { message = "Thông tin đã sửa thành công." });
+        }
+        [HttpPut("update-userProfie")]
+        public async Task<IActionResult> UpdateProfile(VerifyOtpModel OTP)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = await _userManager.FindByIdAsync(userId);
+            var result = await _userRepository.UpdateUserProfile(OTP,user);
+            if (!result) return BadRequest("Mã OTP không hợp lệ hoặc đã hết hạn.");
+
+            return Ok(new { message = "Thông tin đã sửa thành công" });
         }
     }
 }

@@ -29,6 +29,24 @@ namespace LOMSAPI.Repositories.Customers
             return _context.SaveChanges();
         }
 
+        public async Task<int> AddLivestreamCustomer(string customerId, string livestreamId)
+        {
+            var livestreamCustomer = await _context.LiveStreamsCustomers
+                .FirstOrDefaultAsync(c => c.CustomerID.Equals(customerId) && c.LivestreamID.Equals(livestreamId));
+            if (livestreamCustomer != null)
+            {
+                throw new Exception($"this livestream customer was exit!");
+            }
+            var newLivestreamCustomer = new LiveStreamCustomer()
+            {
+                CustomerID = customerId,
+                LivestreamID = livestreamId
+            };
+
+            await _context.LiveStreamsCustomers.AddAsync(newLivestreamCustomer);
+            return _context.SaveChanges();
+        }
+
         public async Task<GetCustomerModel> GetCustomerById(string customerId)
         {
             var customer = await _context.Customers
@@ -68,6 +86,38 @@ namespace LOMSAPI.Repositories.Customers
             customer.Address = customerUpdate.Address;
             customer.PhoneNumber = customerUpdate.PhoneNumber;
             return await _context.SaveChangesAsync();
+        }
+
+
+        public async Task<GetCustomerModel> GetCustomerByOrderIdAsync(int orderID)
+        {
+            var customerId = await _context.Orders
+                .Where(o => o.OrderID == orderID)
+                .Select(o => new
+                {
+                    customerID = o.Comment.LiveStreamCustomer.CustomerID
+                }
+                )
+                .FirstOrDefaultAsync();
+            var customer = await _context.Customers
+               .FirstOrDefaultAsync(c => c.CustomerID.Equals(customerId.customerID));
+            if (customer == null)
+            {
+                throw new Exception($"{customerId} was exit!");
+            }
+            var getCustomer = new GetCustomerModel()
+            {
+                CustomerID = customerId.customerID,
+                FacebookName = customer.FacebookName,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                Address = customer.Address,
+                PhoneNumber = customer.PhoneNumber,
+                FailedDeliveries = customer.FailedDeliveries,
+                SuccessfulDeliveries = customer.SuccessfulDeliveries
+
+            };
+            return getCustomer;
         }
     }
 }

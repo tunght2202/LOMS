@@ -15,7 +15,9 @@ using LOMSAPI.Repositories.Users;
 using LOMSAPI.Repositories.Customers;
 using LOMSAPI.Repositories.Comments;
 using LOMSAPI.Repositories.ListProducts;
-
+using LOMSAPI.Repositories.Orders;
+using LOMSAPI.Repositories.LiveStreams;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,12 +69,18 @@ builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IListProductRepository, ListProductRepository>();
+builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-
+builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepository>();
+builder.Services.AddSingleton<CloudinaryService>();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger eShop Solution", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger LOMS Solution", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

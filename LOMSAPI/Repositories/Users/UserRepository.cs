@@ -9,6 +9,11 @@ using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using LOMSAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
+using Microsoft.AspNetCore.Http.HttpResults;
 namespace LOMSAPI.Repositories.Users
 {
     public class UserRepository : IUserRepository
@@ -17,13 +22,16 @@ namespace LOMSAPI.Repositories.Users
         private readonly SignInManager<User> _signInManager;
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
+        private readonly CloudinaryService _cloudinaryService;
+         
         public UserRepository(UserManager<User> userManager, SignInManager<User> signInManager
-            , IConfiguration config, IDistributedCache cache)
+            , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = config;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _cloudinaryService = cloudinaryService;
         }
         public async Task<string> Authencate(LoginRequest loginRequest)
         {
@@ -38,6 +46,7 @@ namespace LOMSAPI.Repositories.Users
             {
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name,user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
@@ -51,14 +60,22 @@ namespace LOMSAPI.Repositories.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model)
+        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image)
         {
+            User userExist = await _userManager.FindByEmailAsync(model.Email);
+            if (userExist != null) return false;
+            string imageUrl = await _cloudinaryService.UploadImageAsync(image);
             var user = new User
             {
                 UserName = model.UserName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
-                EmailConfirmed = false
+                EmailConfirmed = false,
+                FullName = model.FullName,
+                ImageURL = imageUrl,
+                Address = model.Address,
+                Sex = model.Gender,
+                
             };
 
             var passwordHasher = new PasswordHasher<User>();
@@ -102,7 +119,11 @@ namespace LOMSAPI.Repositories.Users
                 Email = userEmail,
                 PhoneNumber = userInfo.PhoneNumber,
                 EmailConfirmed = true,
-                PasswordHash = userInfo.PasswordHash
+                PasswordHash = userInfo.PasswordHash,
+                FullName = userInfo.FullName,
+                ImageURL = userInfo.ImageURL,
+                Address = userInfo.Address,
+                Sex = userInfo.Sex,
             };
 
             var result = await _userManager.CreateAsync(newUser);
@@ -190,6 +211,136 @@ namespace LOMSAPI.Repositories.Users
             await smtpClient.SendMailAsync(mailMessage);
         }
 
-        
+        public async Task<User> GetUserProfile(string UserId)
+        {
+            User user = await _userManager.FindByIdAsync(UserId);
+            return user;
+        }
+
+        public async Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model)
+        {
+            try
+            {
+                var userInfo = new User();
+                if (model.UserName != null)
+                {
+                    user.UserName = model.UserName;
+                    userInfo.UserName = model.UserName;
+                }
+
+                if (model.Password != null)
+                {
+                    var passwordHasher = new PasswordHasher<User>();
+                    user.PasswordHash = passwordHasher.HashPassword(user, model.Password);
+                    userInfo.PasswordHash = passwordHasher.HashPassword(userInfo, model.Password);
+                }
+                if (model.PhoneNumber != null)
+                {
+                    user.PhoneNumber = model.PhoneNumber;
+                    userInfo.PhoneNumber = model.PhoneNumber;
+                }
+                if (model.FullName != null)
+                {
+                    user.FullName = model.FullName;
+                    userInfo.FullName = model.FullName;
+                }
+                if (model.Address != null)
+                {
+                    user.Address = model.Address;
+                    userInfo.Address = model.Address;
+                }
+                if (model.Gender != null)
+                {
+                    user.Sex = model.Gender;
+                    userInfo.Sex = model.Gender;
+                }
+                if (model.Avatar != null)
+                {
+                    user.ImageURL = await _cloudinaryService.UploadImageAsync(model.Avatar);
+                    userInfo.ImageURL = await _cloudinaryService.UploadImageAsync(model.Avatar);
+                }
+
+                if (model.Email == null)
+                {
+                    await _userManager.UpdateAsync(user);
+                }
+                else
+                {
+                    var otpCode = new Random().Next(100000, 999999).ToString();
+                    await SendEmailAsync(model.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _cache.SetStringAsync($"OTP_UPDATE_{model.Email}", otpCode, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("UPDATE_EMAIL", model.Email, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("USER_INFO_UPDATE", JsonConvert.SerializeObject(userInfo), new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+            
+            return true;
+
+        }
+
+        public async Task<bool> UpdateUserProfile(VerifyOtpModel model, User user)
+        {
+            var userEmail = await _cache.GetStringAsync("UPDATE_EMAIL");
+            var otpCode = await _cache.GetStringAsync($"OTP_UPDATE_{userEmail}");
+            if (otpCode == null || otpCode != model.OtpCode) return false;
+
+            var userInfoString = await _cache.GetStringAsync("USER_INFO_UPDATE");
+            if (string.IsNullOrEmpty(userInfoString)) return false;
+
+            var userInfo = JsonConvert.DeserializeObject<User>(userInfoString);
+            user.Email = userEmail;
+            if (userInfo.UserName != null)
+            {
+                user.UserName = userInfo.UserName;
+            }
+
+            if (userInfo.PasswordHash != null)
+            {
+                user.PasswordHash = userInfo.PasswordHash;
+            }
+            if (userInfo.PhoneNumber != null)
+            {
+                user.PhoneNumber = userInfo.PhoneNumber;
+            }
+            if (userInfo.FullName != null)
+            {
+                user.FullName = userInfo.FullName;
+            }
+            if (userInfo.Address != null)
+            {
+                user.Address = userInfo.Address;
+            }
+            if (userInfo.Sex != null)
+            {
+                user.Sex = userInfo.Sex;
+            }
+            if (userInfo.ImageURL != null)
+            {
+                user.ImageURL = userInfo.ImageURL;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
+
+            await _cache.RemoveAsync("USER_INFO_UPDATE");
+            await _cache.RemoveAsync($"OTP_UPDATE_{userEmail}");
+            await _cache.RemoveAsync("UPDATE_EMAIL");
+
+            return true;
+        }
     }
 }
