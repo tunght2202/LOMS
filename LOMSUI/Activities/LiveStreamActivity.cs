@@ -57,7 +57,7 @@ namespace LOMSUI
         {
             if (item.ItemId == Android.Resource.Id.Home)
             {
-                Finish(); // Quay lại trang trước
+                Finish(); 
                 return true;
             }
             return base.OnOptionsItemSelected(item);

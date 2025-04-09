@@ -46,12 +46,16 @@ namespace LOMSUI.Adapter
                 _context.StartActivity(intent);
             };
 
-            viewHolder.BtnView.Click += (sender, e) =>
+            viewHolder.BtnViewDetail.Click += (sender, e) =>
             {
-                Intent intent = new Intent(_context, typeof(CommentsActivity));
-                intent.PutExtra("LivestreamID", item.LivestreamID);
+                Intent intent = new Intent(_context, typeof(LiveStreamDetailActivity));
+                intent.PutExtra("LiveStreamID", item.LivestreamID);
+                intent.PutExtra("Title", item.StreamTitle);
+                intent.PutExtra("Status", item.Status);
+                intent.PutExtra("StartTime", item.GetFormattedTime());
                 _context.StartActivity(intent);
             };
+
 
             viewHolder.BtnDelete.Click += (sender, e) => _onDeleteClick?.Invoke(item, position);
         }
@@ -68,7 +72,7 @@ namespace LOMSUI.Adapter
             public TextView Status { get; private set; }
             public TextView StartTime { get; private set; }
             public Button BtnDelete { get; private set; }
-            public Button BtnView { get; private set; }
+            public Button BtnViewDetail { get; private set; }
 
             public LiveStreamViewHolder(View itemView) : base(itemView)
             {
@@ -76,7 +80,7 @@ namespace LOMSUI.Adapter
                 Status = itemView.FindViewById<TextView>(Resource.Id.txtStreamStatus);
                 StartTime = itemView.FindViewById<TextView>(Resource.Id.txtStreamStartTime);
                 BtnDelete = itemView.FindViewById<Button>(Resource.Id.btnDeleteLiveStream);
-                BtnView = itemView.FindViewById<Button>(Resource.Id.viewURLStream);
+                BtnViewDetail = itemView.FindViewById<Button>(Resource.Id.viewDetailLive);
             }
         }
     }

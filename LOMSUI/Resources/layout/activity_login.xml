@@ -2,61 +2,77 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="20dp"
     android:orientation="vertical"
-    android:gravity="center"
     android:background="@android:color/white">
 
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00a880"
+        android:layout_marginBottom="40dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
-	<ImageView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginBottom="30dp"
-		android:src="@drawable/logos"/>
+		<ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+            android:src="@drawable/logo_loms" />
+
+	</LinearLayout>
 
 	<TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:textSize="24sp"
+        android:textSize="26sp"
         android:textStyle="bold"
         android:layout_gravity="center"
         android:paddingBottom="20dp"
         android:textColor="#333"/>
 
-	<EditText
-        android:id="@+id/etEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:padding="10dp" />
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:paddingHorizontal="20sp">
+		<EditText
+			android:id="@+id/etEmail"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:hint="Email"
+			android:inputType="textEmailAddress"
+			android:padding="10dp" />
 
-	<EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="10dp" />
+		<EditText
+			android:id="@+id/etPassword"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:hint="Password"
+			android:inputType="textPassword"
+			android:padding="10dp" />
+	</LinearLayout>
+
 
 	<LinearLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
+        android:layout_gravity="center"
         android:layout_marginTop="16dp">
 
 		<Button
-		   android:id="@+id/btnLogin"
-		   android:layout_width="0dp"
-		   android:layout_height="wrap_content"
-		   android:layout_marginRight="20dp"
-		   android:layout_weight="1"
-		   android:backgroundTint="#00bfff"
-		   android:text="Login"
-		   android:textColor="#FFFFFF" />
+            android:id="@+id/btnLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:backgroundTint="#00bfff"
+            android:text="Login"
+            android:textColor="#FFFFFF" />
 
 		<Button
             android:id="@+id/btnRegister"

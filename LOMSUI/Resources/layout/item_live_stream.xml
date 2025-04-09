@@ -42,8 +42,8 @@
         android:gravity="center">
 
 		<Button
-            android:id="@+id/viewURLStream"
-            android:layout_width="75dp"
+            android:id="@+id/viewDetailLive"
+            android:layout_width="85dp"
             android:layout_height="40dp"
             android:textSize="12sp"
             android:backgroundTint="@android:color/holo_blue_dark"
@@ -51,7 +51,7 @@
             android:textColor="@android:color/white" />
 		<Button
             android:id="@+id/btnDeleteLiveStream"
-            android:layout_width="75dp"
+            android:layout_width="85dp"
             android:layout_height="40dp"
             android:textSize="12sp"
             android:text="Delete"

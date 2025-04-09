@@ -306,5 +306,20 @@ namespace LOMSUI.Services
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<List<CustomerModel>> GetCustomersByLiveStreamIdAsync(string liveStreamID)
+        {
+            var url = $"{BASE_URLL}/Customers/LiveStream/{liveStreamID}";
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<CustomerModel>>(json);
+            }
+
+            throw new Exception($"Unable to load customer list: {response.StatusCode} - {response.ReasonPhrase}");
+        }
+
+
     }
 }

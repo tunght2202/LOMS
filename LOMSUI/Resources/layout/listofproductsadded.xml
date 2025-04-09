@@ -58,7 +58,7 @@
         android:orientation="horizontal"
         android:paddingTop="8dp"
         android:paddingLeft="8dp"
-        android:marginBottom="8dp">
+        android:layout_marginBottom="8dp">
 
         <TextView
             android:id="@+id/sttHeaderTextView"
