@@ -59,7 +59,9 @@ namespace LOMSAPI.Repositories.Customers
             {
                 CustomerID = customerId,
                 FacebookName = customer.FacebookName,
+
                 FullName = customer.FullName,
+                ImageURL = customer.ImageURL,
                 Email = customer.Email,
                 Address = customer.Address,
                 PhoneNumber = customer.PhoneNumber,

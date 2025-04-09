@@ -259,5 +259,25 @@ namespace LOMSUI.Services
             }
             return false;
         }
+
+        public async Task<CustomerModel> GetCustomerByIdAsync(string customerId)
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URLL}/Customers/GetCustomerById/{customerId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<CustomerModel>(content);
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateCustomerAsync(string customerId, CustomerModel customer)
+        {
+            var json = JsonConvert.SerializeObject(customer);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"{BASE_URLL}/Customers/UpdateCustomerByID/{customerId}", content);
+            return response.IsSuccessStatusCode;
+        }
+
     }
 }

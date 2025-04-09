@@ -26,7 +26,6 @@ namespace LOMSUI
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_login);
 
-            // Find UI elements
             _emailEditText = FindViewById<EditText>(Resource.Id.etEmail);
             _passwordEditText = FindViewById<EditText>(Resource.Id.etPassword);
             _loginButton = FindViewById<Button>(Resource.Id.btnLogin);

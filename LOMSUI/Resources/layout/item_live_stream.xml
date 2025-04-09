@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="Tiêu đề livestream" />
+            android:text="Title livestream" />
 
 		<TextView
             android:id="@+id/txtStreamStatus"
@@ -25,14 +25,14 @@
             android:layout_height="wrap_content"
             android:background="#ff4d4d"
             android:textSize="12sp"
-            android:text="Trạng thái: Đang Live" />
+            android:text="Status: Live" />
 
 		<TextView
             android:id="@+id/txtStreamStartTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp"
-            android:text="Bắt đầu: 01-04-2025 10:00 AM" />
+            android:text="Start: 01-04-2025 10:00 AM" />
 	</LinearLayout>
 
 	<LinearLayout
@@ -54,7 +54,7 @@
             android:layout_width="75dp"
             android:layout_height="40dp"
             android:textSize="12sp"
-            android:text="Xóa"
+            android:text="Delete"
             android:backgroundTint="@android:color/holo_red_light"
             android:textColor="@android:color/white"
           />

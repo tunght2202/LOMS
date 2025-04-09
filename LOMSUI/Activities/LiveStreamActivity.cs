@@ -53,7 +53,15 @@ namespace LOMSUI
 
             await LoadLiveStreams();
         }
-
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == Android.Resource.Id.Home)
+            {
+                Finish(); // Quay lại trang trước
+                return true;
+            }
+            return base.OnOptionsItemSelected(item);
+        }
         private async Task LoadLiveStreams()
         {
             _liveStreams = await _apiService.GetAllLiveStreams();
@@ -77,13 +85,13 @@ namespace LOMSUI
 
                             if (success)
                             {
-                                Toast.MakeText(this, "Đã xóa livestream", ToastLength.Short).Show();
+                                Toast.MakeText(this, "Live stream deleted", ToastLength.Short).Show();
                                 _liveStreams.RemoveAt(position);
                                 _adapter.NotifyItemRemoved(position);
                             }
                             else
                             {
-                                Toast.MakeText(this, "Xóa thất bại!", ToastLength.Short).Show();
+                                Toast.MakeText(this, "Delete failure!", ToastLength.Short).Show();
                             }
                         });
 

@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
@@ -29,7 +30,7 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_comments);
 
-           
+
             _apiService = new ApiService();
             _allComments = new List<CommentModel>();
 
@@ -68,7 +69,7 @@ namespace LOMSUI.Activities
 
             if (string.IsNullOrEmpty(_currentLiveStreamId))
             {
-                Toast.MakeText(this, "Vui lòng nhập ID Livestream", ToastLength.Short).Show();
+                Toast.MakeText(this, "Please enter Livestream ID", ToastLength.Short).Show();
                 return;
             }
 
@@ -83,7 +84,7 @@ namespace LOMSUI.Activities
             }
             catch (Exception ex)
             {
-                Toast.MakeText(this, $"Lỗi khi tải bình luận ban đầu: {ex.Message}", ToastLength.Short).Show();
+                Toast.MakeText(this, $"Error loading initial comment: {ex.Message}", ToastLength.Short).Show();
             }
 
             _isPolling = true;
@@ -104,10 +105,10 @@ namespace LOMSUI.Activities
                 }
                 catch (Exception ex)
                 {
-                    RunOnUiThread(() => Toast.MakeText(this, $"Lỗi khi tải bình luận: {ex.Message}", ToastLength.Short).Show());
+                    RunOnUiThread(() => Toast.MakeText(this, $"Error loading comments: {ex.Message}", ToastLength.Short).Show());
                 }
 
-                await Task.Delay(4000); 
+                await Task.Delay(4000);
             }
         }
 
@@ -136,12 +137,12 @@ namespace LOMSUI.Activities
                 {
                     recyclerViewComments.Visibility = Android.Views.ViewStates.Gone;
                     txtNoComments.Visibility = Android.Views.ViewStates.Visible;
-                    txtNoComments.Text = "Không có bình luận nào!";
+                    txtNoComments.Text = "No comments!";
 
                     txtProductCode.Visibility = Android.Views.ViewStates.Gone;
                     btnFilterByProduct.Visibility = Android.Views.ViewStates.Gone;
 
-                    Toast.MakeText(this, "Không có bình luận nào!", ToastLength.Short).Show();
+                    Toast.MakeText(this, "No comments!", ToastLength.Short).Show();
                 }
                 else
                 {
@@ -154,13 +155,25 @@ namespace LOMSUI.Activities
                     txtProductCode.Visibility = Android.Views.ViewStates.Visible;
                     btnFilterByProduct.Visibility = Android.Views.ViewStates.Visible;
 
-                    Toast.MakeText(this, $"Tổng số bình luận: {comments.Count}", ToastLength.Short).Show();
+                    Toast.MakeText(this, $"Total comments: {comments.Count}", ToastLength.Short).Show();
 
                     _commentAdapter.OnCreateOrder += comment =>
-                        Toast.MakeText(this, $"Tạo đơn cho: {comment.CustomerName}", ToastLength.Short).Show();
+                        Toast.MakeText(this, $"Create Order: {comment.CustomerName}", ToastLength.Short).Show();
 
                     _commentAdapter.OnViewInfo += comment =>
-                        Toast.MakeText(this, $"Xem thông tin: {comment.CustomerName}", ToastLength.Short).Show();
+                    {
+                        if (!string.IsNullOrEmpty(comment.CustomerID))
+                        {
+                            Intent intent = new Intent(this, typeof(CustomerInfoActivity));
+                            intent.PutExtra("CustomerID", comment.CustomerID);
+                            StartActivity(intent);
+                        }
+                        else
+                        {
+                            Toast.MakeText(this, "CustomerID not found!", ToastLength.Short).Show();
+                        }
+                    };
+
                 }
             });
         }
