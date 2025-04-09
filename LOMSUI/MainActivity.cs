@@ -1,3 +1,7 @@
+using Android.App;
+using Android.OS;
+using Android.Content;
+
 namespace LOMSUI
 {
     [Activity(Label = "@string/app_name", MainLauncher = true)]
