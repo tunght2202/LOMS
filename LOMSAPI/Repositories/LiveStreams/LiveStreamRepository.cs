@@ -118,7 +118,7 @@ namespace LOMSAPI.Repositories.LiveStreams
                 existingLiveStream.Status = "VOD"; // Cập nhật thành VOD
                 await _context.SaveChangesAsync();
             }
-          
+
         }
 
         // Điều chỉnh ParseLiveStreams để gán status đúng định dạng

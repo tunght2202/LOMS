@@ -67,6 +67,16 @@ namespace LOMSAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = orderId }, model);
         }
 
+
+        [HttpPost("CreateOrderFromComments/ListProductID/{listProductID}/LiveStreamID/{liveStreamId}")]
+        public async Task<IActionResult> CreateOrderFromComments(int listProductID, string liveStreamId)
+        {
+            if (listProductID == null) return BadRequest("listProductID is null");
+            if (liveStreamId == null) return BadRequest("liveStreamId is null");
+            var result = await _orderRepo.CreateOrderFromComments(listProductID, liveStreamId);
+            return result > 0 ? Ok() : NotFound("Can't create this order");
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, OrderModel model)
         {

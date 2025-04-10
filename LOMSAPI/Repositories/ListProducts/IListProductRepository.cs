@@ -13,6 +13,7 @@ namespace LOMSAPI.Repositories.ListProducts
         Task<IEnumerable<ProductModel>> GetProductListProductById(int listProductId);
         Task<int> AddNewListProduct(string listProductName);
         Task<int> AddProductIntoListProduct(int listProductId, List<int> listProduct);
+        Task<int> AddListProductInToLiveStream(int listProductId, string liveStreamId);
         Task<int> DeleteProductOutListProduct(int listProductId, List<int> listProductIds);
         Task<int> DeleteListProduct(int listProductId);
  

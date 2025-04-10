@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff">
+
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00a880"
+        android:padding="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/headerContentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/backButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/backarrow"
+                android:layout_marginRight="8dp"/>
+
+            <TextView
+                android:id="@+id/lomsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LOMS"
+                android:textSize="20sp"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:gravity="left" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/productListTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Danh Sách Sản Phẩm"
+            android:textSize="18sp"
+            android:textColor="#000"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/productHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingLeft="8dp"
+        >
+
+        <TextView
+            android:id="@+id/sttHeaderTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="STT"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:gravity="left" />
+
+        <TextView
+            android:id="@+id/productNameHeaderTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="Tên Sản Phẩm"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:gravity="left" />
+
+        <TextView
+            android:id="@+id/imageHeaderTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ảnh"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:gravity="left" />
+
+        <TextView
+            android:id="@+id/priceHeaderTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="Giá"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:gravity="left"
+            android:layout_marginRight="4dp" />
+
+        <TextView
+            android:id="@+id/quantityHeaderTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="Số lượng"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:gravity="left" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/productsListView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp"
+        android:padding="8dp"/>
+
+	<LinearLayout
+    android:id="@+id/buttonLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+		<Button
+			android:id="@+id/currentListButton"
+			android:layout_width="0dp"
+			android:layout_height="60dp" android:layout_weight="1"
+			android:text="Danh sách bán hàng hiện tại"
+			android:backgroundTint="#3CB371"
+			android:textColor="#fff"
+			android:layout_marginLeft="8dp" />
+
+		<Button
+			android:id="@+id/createSaleListButton"
+			android:layout_width="0dp"
+			android:layout_height="60dp" android:layout_weight="1"
+			android:text="Tạo danh sách bán hàng"
+			android:backgroundTint="#3CB371"
+			android:textColor="#fff"
+			android:layout_marginLeft="8dp" />
+
+	</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomNavigationLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#8FBC8F">
+
+    </LinearLayout>
+
+</LinearLayout>
