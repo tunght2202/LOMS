@@ -1,17 +1,22 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
+using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LOMSAPI.Repositories.Products
 {
     public class ProductRepository : IProductRepository
     {
         private readonly LOMSDbContext _context;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public ProductRepository(LOMSDbContext context)
+        public ProductRepository(LOMSDbContext context
+            , CloudinaryService cloudinaryService)
         {
             _context = context;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<IEnumerable<ProductModel>> GetAllProducts()
@@ -90,8 +95,13 @@ namespace LOMSAPI.Repositories.Products
             return productList;
         }
 
-        public async Task<int> AddProduct(ProductModel postProduct)
+        public async Task<int> AddProduct(ProductModel postProduct, IFormFile imge)
         {
+            if (postProduct == null)
+            {
+                throw new Exception("Product can't null");
+            }
+            string imageUrl = await _cloudinaryService.UploadImageAsync(imge);
             var product = new Product()
             {
                 Name = postProduct.Name,
@@ -101,7 +111,8 @@ namespace LOMSAPI.Repositories.Products
                 Price = postProduct.Price,
                 Description = postProduct.Description,
                 Stock = postProduct.Stock,
-                Status = postProduct.Status
+                Status = postProduct.Status,
+                ImageURL = imageUrl
             };
             await _context.Products.AddAsync(product);
             return await _context.SaveChangesAsync();
