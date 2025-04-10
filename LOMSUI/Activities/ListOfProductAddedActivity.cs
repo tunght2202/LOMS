@@ -8,7 +8,7 @@ using LOMSUI.Models;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "ListOfProductAddedActivity",MainLauncher =true)]
+    [Activity(Label = "ListOfProductAddedActivity", MainLauncher =true)]
     public class ListOfProductAddedActivity : Activity
     {
         private ListView productsListView;
