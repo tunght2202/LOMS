@@ -13,7 +13,7 @@ using AndroidX.RecyclerView.Widget;
 
 namespace LOMSUI
 {
-    [Activity(Label = "Live Streams", MainLauncher = true)]
+    [Activity(Label = "Live Streams")]
     public class LiveStreamActivity : Activity
     {
         private RecyclerView _recyclerView;
