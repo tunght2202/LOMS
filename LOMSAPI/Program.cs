@@ -72,7 +72,7 @@ builder.Services.AddTransient<IListProductRepository, ListProductRepository>();
 builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepostitory>();
+builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepository>();
 builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
