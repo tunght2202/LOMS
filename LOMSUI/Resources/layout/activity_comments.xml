@@ -15,7 +15,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-			<!-- LiveStream ID Input and Button -->
 			<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -27,7 +26,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Nhập ID Livestream"
+                    android:hint="Enter ID Livestream"
                     android:inputType="text"/>
 
 				<Button
@@ -39,7 +38,6 @@
                     android:layout_marginLeft="8dp"/>
 			</LinearLayout>
 
-			<!-- Product Code Input and Button -->
 			<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,14 +51,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
 					  android:visibility="gone"
-                    android:hint="Nhập mã sản phẩm"
+                    android:hint="Enter product code"
                     android:inputType="text"/>
 
 				<Button
                     android:id="@+id/btnFilterByProductCode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lọc"
+                    android:text="Filter"
 					android:backgroundTint="#00bfff"
 					android:visibility="gone"
                     android:layout_marginLeft="8dp"/>
@@ -70,7 +68,7 @@
                 android:id="@+id/txtNoComments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Không có bình luận nào!"
+                android:text="No Comments!"
                 android:textSize="16sp"
                 android:gravity="center"
                 android:visibility="gone"

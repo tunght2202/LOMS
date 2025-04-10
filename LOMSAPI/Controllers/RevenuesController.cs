@@ -36,7 +36,7 @@ namespace LOMSAPI.Controllers
         /// API tính doanh thu của một phiên livestream theo Livestream ID.
         /// </summary>
         [HttpGet("livestream-revenue/{livestreamId}")]
-        public async Task<IActionResult> GetRevenueByLivestreamId(int livestreamId)
+        public async Task<IActionResult> GetRevenueByLivestreamId(string livestreamId)
         {
             var revenue = await _revenueRepository.GetRevenueByLivestreamId(livestreamId);
             return Ok(new { LiveStreamRevenue = revenue });

@@ -17,24 +17,24 @@ namespace LOMSAPI.Controllers
         /// Api to get all livestreams from database
         /// </summary>
         /// <returns></returns>
-        [HttpGet("allDb")]
+
+    //    [HttpGet("allDb")]
      /*   public async Task<IActionResult> GetAllLiveStreamsFromDb()
         {
            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
            //string userId = "2347eaee-4ab1-4fec-aee3-19a6325cb494";
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
-
-            try
-            {
-                var liveStreams = await _liveStreamRepositories.GetAllLiveStreamsFromDb(userId);
-                return Ok(liveStreams);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }*/
+               try
+               {
+                   var liveStreams = await _liveStreamRepositories.GetAllLiveStreamsFromDb(userId);
+                   return Ok(liveStreams);
+               }
+               catch (Exception ex)
+               {
+                   return StatusCode(500, $"Error: {ex.Message}");
+               }
+           }*/
         /// <summary>
         /// Api to get all livestreams from Facebook API
         /// </summary>
@@ -42,8 +42,10 @@ namespace LOMSAPI.Controllers
         [HttpGet("facebook")] // Lấy từ Facebook API
         public async Task<IActionResult> GetAllLiveStreamsFromFacebook()
         {
-            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
+
+             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           // string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
+
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
 
@@ -89,11 +91,11 @@ namespace LOMSAPI.Controllers
         [HttpDelete("{liveStreamId}")]
         public async Task<IActionResult> DeleteLiveStream(string liveStreamId)
         {
-            // string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
+
+             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           // string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
-
             try
             {
                 // Check if the livestream exists and belongs to the user
