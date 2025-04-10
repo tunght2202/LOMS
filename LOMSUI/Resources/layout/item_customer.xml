@@ -36,6 +36,14 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="#000000" />
+			<TextView
+			  android:id="@+id/txtCustomerPhone"
+			  android:layout_width="wrap_content"
+			  android:layout_height="wrap_content"
+			  android:text="Phone : 0376245217"
+			  android:textStyle="bold"
+			  android:textSize="12sp"
+			  android:textColor="#453F3F" />
 <!--
 			<TextView
                 android:id="@+id/txtOrderSummary"

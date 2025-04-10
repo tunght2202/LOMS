@@ -39,7 +39,6 @@ namespace LOMSUI
             bool rememberMe = prefs.GetBoolean("rememberMe", false);
             emailList = prefs.GetStringSet("emailList", new HashSet<string>()).ToList();
 
-            // Gợi ý email
             var adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleDropDownItem1Line, emailList);
             _emailEditText.Adapter = adapter;
 
