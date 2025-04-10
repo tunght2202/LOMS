@@ -9,67 +9,91 @@ using System.Threading.Tasks;
 using LOMSUI.Models;
 using LOMSUI.Services;
 using LOMSUI.Activities;
+using LOMSUI;
 
 namespace LOMSUI
 {
-    [Activity(Label = "Login")]
+    [Activity(Label = "Login", MainLauncher = true)]
     public class LoginActivity : Activity
     {
-        private EditText _emailEditText;
+        private AutoCompleteTextView _emailEditText;
         private EditText _passwordEditText;
         private Button _loginButton;
+        private Button _registerButton;
+        private CheckBox cbRememberMe;
         private readonly ApiService _apiService = new ApiService();
+        private List<string> emailList;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_login);
 
-            // Find UI elements
-            _emailEditText = FindViewById<EditText>(Resource.Id.etEmail);
+            _emailEditText = FindViewById<AutoCompleteTextView>(Resource.Id.etEmail);
             _passwordEditText = FindViewById<EditText>(Resource.Id.etPassword);
             _loginButton = FindViewById<Button>(Resource.Id.btnLogin);
+            _registerButton = FindViewById<Button>(Resource.Id.btnRegister);
+            cbRememberMe = FindViewById<CheckBox>(Resource.Id.cbRememberMe);
 
-            if (_emailEditText == null || _passwordEditText == null || _loginButton == null)
+            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+            bool rememberMe = prefs.GetBoolean("rememberMe", false);
+            emailList = prefs.GetStringSet("emailList", new HashSet<string>()).ToList();
+
+            var adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleDropDownItem1Line, emailList);
+            _emailEditText.Adapter = adapter;
+
+            if (rememberMe)
             {
-                Log.Error("LoginActivity", "Error: One or more UI elements not found!");
-                Toast.MakeText(this, "Error loading UI components!", ToastLength.Long).Show();
-                return;
+                _emailEditText.Text = prefs.GetString("email", string.Empty);
+                _passwordEditText.Text = prefs.GetString("password", string.Empty);
+                cbRememberMe.Checked = true;
             }
 
-            TextView forgotPasswordTextView = FindViewById<TextView>(Resource.Id.tvForgotPassword);
+            _emailEditText.ItemClick += (s, e) =>
+            {
+                string selectedEmail = emailList[e.Position];
+                string savedEmail = prefs.GetString("email", "");
 
-            if (forgotPasswordTextView == null)
-            {
-                Log.Error("LoginActivity", "Error: Forgot Password UI element not found!");
-            }
-            else
-            {
-                forgotPasswordTextView.Click += (sender, e) =>
+                if (selectedEmail == savedEmail && prefs.GetBoolean("rememberMe", false))
                 {
-                    Log.Info("LoginActivity", "Forgot Password clicked!");
-                    Intent intent = new Intent(this, typeof(ForgotPasswordActivity));
-                    StartActivity(intent);
-                };
-            }
-            // Attach event listeners
-            _loginButton.Click += LoginButton_Click;
-            _passwordEditText.EditorAction += (sender, e) =>
-            {
-                if (e.ActionId == Android.Views.InputMethods.ImeAction.Done)
+                    _passwordEditText.Text = prefs.GetString("password", "");
+                    cbRememberMe.Checked = true;
+                }
+                else
                 {
-                    _loginButton.PerformClick(); 
+                    _passwordEditText.Text = "";
+                    cbRememberMe.Checked = false;
                 }
             };
 
+            TextView forgotPasswordTextView = FindViewById<TextView>(Resource.Id.tvForgotPassword);
+            if (forgotPasswordTextView != null)
+            {
+                forgotPasswordTextView.Click += (sender, e) =>
+                {
+                    StartActivity(new Intent(this, typeof(ForgotPasswordActivity)));
+                };
+            }
 
+            _loginButton.Click += LoginButton_Click;
+            _registerButton.Click += (s, e) =>
+            {
+                StartActivity(new Intent(this, typeof(RegisterActivity)));
+            };
+
+            _passwordEditText.EditorAction += (s, e) =>
+            {
+                if (e.ActionId == Android.Views.InputMethods.ImeAction.Done)
+                {
+                    _loginButton.PerformClick();
+                }
+            };
         }
 
         private async void LoginButton_Click(object sender, EventArgs e)
         {
             string email = _emailEditText.Text?.Trim();
-            string password = _passwordEditText.Text.Trim();
-
+            string password = _passwordEditText.Text?.Trim();
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
@@ -80,14 +104,38 @@ namespace LOMSUI
             try
             {
                 var loginModel = new LoginModel { Email = email, Password = password };
-                var result = await _apiService.LoginAsync(loginModel);
+                string token = await _apiService.LoginAsync(loginModel);
 
-                if (result)
+                if (!string.IsNullOrEmpty(token))
                 {
-                    Toast.MakeText(this, "Login successful!", ToastLength.Short).Show();
+                    var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+                    var editor = prefs.Edit();
 
-                    Intent intent = new Intent(this, typeof(CommentsActivity));
-                    StartActivity(intent);
+                    editor.PutString("token", token);
+
+                    if (cbRememberMe.Checked)
+                    {
+                        editor.PutBoolean("rememberMe", true);
+                        editor.PutString("email", email);
+                        editor.PutString("password", password);
+
+                        var updatedEmailSet = prefs.GetStringSet("emailList", new HashSet<string>()).ToList();
+                        if (!updatedEmailSet.Contains(email))
+                            updatedEmailSet.Add(email);
+
+                        editor.PutStringSet("emailList", updatedEmailSet.ToHashSet());
+                    }
+                    else
+                    {
+                        editor.Remove("rememberMe");
+                        editor.Remove("email");
+                        editor.Remove("password");
+                    }
+
+                    editor.Apply();
+
+                    Toast.MakeText(this, "Login successful!", ToastLength.Short).Show();
+                    StartActivity(new Intent(this, typeof(LiveStreamActivity)));
                 }
                 else
                 {
@@ -100,4 +148,17 @@ namespace LOMSUI
             }
         }
     }
+
 }
+
+/*Button btnLogout = FindViewById<Button>(Resource.Id.btnLogout);
+btnLogout.Click += (sender, e) =>
+{
+    var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+    prefs.Edit().Remove("token").Apply(); // Xóa token
+
+    Intent intent = new Intent(this, typeof(LoginActivity));
+    intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.NewTask);
+    StartActivity(intent);
+    Finish();
+};*/

@@ -1,72 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="4dp"
-    android:layout_margin="6dp">
-
-	<!-- Ảnh đại diện -->
-	<ImageView
-        android:id="@+id/imgCustomerAvatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="6dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/loms"
-        android:background="@android:color/darker_gray"
-        android:layout_gravity="center_vertical"
-        android:contentDescription="Ảnh đại diện"/>
+	android:layout_margin="8dp"
+    card_view:cardCornerRadius="16dp">
 
 	<LinearLayout
-        android:layout_width="wrap_content"
-        android:background="#cfc9c9"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:padding="4dp"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-		<TextView
-            android:id="@+id/txtCustomerName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên khách hàng"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"/>
-
-		<TextView
-            android:id="@+id/txtCommentContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nội dung bình luận"
-            android:textColor="@android:color/black"/>
-
-		<TextView
-            android:id="@+id/txtCommentTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1 phút trước"
-            android:textSize="12sp"
-			android:textColor="@android:color/black"/>
-
+		<ImageView
+            android:id="@+id/imgCustomerAvatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="12dp"
+            android:scaleType="centerCrop"
+			android:layout_gravity="center"
+            android:src="@drawable/logos"
+            android:contentDescription="Ảnh đại diện" />
 
 		<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp">
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+			<TextView
+                android:id="@+id/txtCustomerName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên khách hàng"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+			<TextView
+                android:id="@+id/txtCommentContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Content"
+				android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+
+			<TextView
+                android:id="@+id/txtCommentTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cập nhật: 2 phút trước"
+                android:textSize="12sp"
+                android:textColor="#444444"
+                android:layout_marginTop="2dp" />
+		</LinearLayout>
+
+		<LinearLayout
+            android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
 
 			<Button
                 android:id="@+id/btnCreateOrder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tạo đơn"/>
+                android:text="Tạo đơn"
+                android:textSize="12sp"
+                android:backgroundTint="#4CAF50"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="6dp" />
 
 			<Button
                 android:id="@+id/btnViewInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thông tin"/>
+                android:text="Thông tin"
+                android:textSize="12sp"
+                android:backgroundTint="#2196F3"
+                android:textColor="@android:color/white" />
 		</LinearLayout>
 	</LinearLayout>
-</LinearLayout>
+</androidx.cardview.widget.CardView>
