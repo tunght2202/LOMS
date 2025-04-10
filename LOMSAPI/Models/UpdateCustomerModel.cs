@@ -4,7 +4,7 @@ namespace LOMSAPI.Models
 {
     public class UpdateCustomerModel
     {
-        public int FacebookName { get; set; }
+        public string? FacebookName { get; set; }
 
         public string? FullName { get; set; }
 

@@ -32,17 +32,17 @@ namespace LOMSUI
         private async Task VerifyOtpAsync()
         {
             string otp = _otpEditText.Text.Trim();
-            if (!ValidateInput(otp, "Vui lòng nhập mã OTP!")) return;
+            if (!ValidateInput(otp, "Please enter OTP code!")) return;
 
             var request = new VerifyOtpModel { Email = _email, Otp = otp };
             if (await _apiService.VerifyOtpAsync(request))
             {
-                ShowToast("OTP hợp lệ! Vui lòng nhập mật khẩu mới.");
+                ShowToast("Valid OTP! Please enter new password.");
                 NavigateToActivity<ResetPasswordActivity>("email", _email, "otp", otp);
             }
             else
             {
-                ShowToast("Mã OTP không hợp lệ hoặc đã hết hạn.");
+                ShowToast("OTP code is invalid or expired.");
             }
         }
 
