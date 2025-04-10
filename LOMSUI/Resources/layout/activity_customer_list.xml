@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:orientation="vertical"
+    android:padding="16dp">
+
+		<TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Danh sách khách hàng"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+			<androidx.recyclerview.widget.RecyclerView
+				android:id="@+id/recyclerViewCustomers"
+		        android:layout_width="match_parent"
+		        android:layout_height="0dp"
+		        android:layout_weight="1"
+		        android:scrollbars="vertical"/>
+		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+		<TextView
+            android:id="@+id/txtNoCustomers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Không có khách hàng nào!"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+</LinearLayout>

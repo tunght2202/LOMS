@@ -16,7 +16,7 @@ namespace LOMSAPI.Repositories.ListProducts
         public async Task<IEnumerable<ListProductModel>> GetAllListProduct()
         {
             var listProduct = await _context.ListProducts
-                .Select(x=>new ListProductModel()
+                .Select(x => new ListProductModel()
                 {
                     ListProductId = x.ListProductId,
                     ListProductName = x.ListProductName
@@ -28,7 +28,7 @@ namespace LOMSAPI.Repositories.ListProducts
         {
             var listProduct = await _context.ListProducts
                 .Where(x => x.ListProductName.ToLower().Contains(listProductName.ToLower()))
-                .Select( x => new ListProductModel()
+                .Select(x => new ListProductModel()
                 {
                     ListProductId = x.ListProductId,
                     ListProductName = x.ListProductName
@@ -78,7 +78,7 @@ namespace LOMSAPI.Repositories.ListProducts
 
         public async Task<int> AddNewListProduct(string listProductName)
         {
-            if(listProductName == null)
+            if (listProductName == null)
             {
                 throw new Exception("List product name can't null");
             }
@@ -125,7 +125,7 @@ namespace LOMSAPI.Repositories.ListProducts
                     ProductID = item
                 };
                 listproductlistproduct.Add(productListProduct);
-                
+
             }
             await _context.AddRangeAsync(listproductlistproduct);
             return await _context.SaveChangesAsync();
@@ -146,7 +146,7 @@ namespace LOMSAPI.Repositories.ListProducts
                     .FirstOrDefaultAsync(x => x.ListProductID == listProductId && x.ProductID == item);
                 listProductListProduct.Add(productListProduct);
             }
-             _context.ProductListProducts.RemoveRange(listProductListProduct);
+            _context.ProductListProducts.RemoveRange(listProductListProduct);
             return await _context.SaveChangesAsync();
         }
 
@@ -166,6 +166,27 @@ namespace LOMSAPI.Repositories.ListProducts
             return await _context.SaveChangesAsync();
         }
 
+        public async Task<int> AddListProductInToLiveStream(int listProductId, string liveStreamId)
+        {
+            var liveStream = await _context.LiveStreams
+                .FirstOrDefaultAsync(x => x.LivestreamID.Equals(liveStreamId));
 
+            if (liveStream == null)
+            {
+                throw new Exception("This live stream does not exist.");
+            }
+
+            var listProduct = await _context.ListProducts
+                .FirstOrDefaultAsync(lp => lp.ListProductId == listProductId);
+
+            if (listProduct == null)
+            {
+                throw new Exception("ListProductID does not exist.");
+            }
+
+            liveStream.ListProductID = listProductId;
+            var result = await _context.SaveChangesAsync();
+            return result;
+        }
     }
 }

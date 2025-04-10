@@ -1,4 +1,4 @@
-using Android.App;
+﻿using Android.App;
 using Android.OS;
 using Android.Widget;
 using Android.Content;
@@ -7,19 +7,22 @@ using System.Threading.Tasks;
 using LOMSUI.Services;
 using LOMSUI.Adapter;
 using LOMSUI.Models;
-using static LOMSUI.Services.ApiService;
 using Android.Views;
 using AndroidX.RecyclerView.Widget;
+using System.Linq;
+using AndroidX.SwipeRefreshLayout.Widget;
 
 namespace LOMSUI
 {
     [Activity(Label = "Live Streams")]
     public class LiveStreamActivity : Activity
     {
+        private SwipeRefreshLayout _swipeRefreshLayout;
         private RecyclerView _recyclerView;
         private TextView _txtNoLiveStreams;
         private LiveStreamAdapter _adapter;
         private List<LiveStreamModel> _liveStreams = new List<LiveStreamModel>();
+        private ApiService _apiService;
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -28,27 +31,70 @@ namespace LOMSUI
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
             _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);
-
+            _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+                
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
+
+            // Khởi tạo ApiService và set token từ SharedPreferences
+            _apiService = new ApiService();
+            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+            string token = prefs.GetString("token", null);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetToken(token);
+            }
+
+            _swipeRefreshLayout.Refresh += async (s, e) =>
+            {
+                await LoadLiveStreams();
+                _swipeRefreshLayout.Refreshing = false;
+            };
+
             await LoadLiveStreams();
-
         }
-
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == Android.Resource.Id.Home)
+            {
+                Finish(); 
+                return true;
+            }
+            return base.OnOptionsItemSelected(item);
+        }
         private async Task LoadLiveStreams()
         {
-            var apiService = new ApiService();
-
-            var facebookResponse = await apiService.GetLiveStreamsFromFaceBook();
-
-            //await Task.Delay(1000);
-
-            _liveStreams = await apiService.GetAllLiveStreamsAsync();
+            _liveStreams = await _apiService.GetAllLiveStreams();
 
             RunOnUiThread(() =>
             {
                 if (_liveStreams.Any())
                 {
-                    _adapter = new LiveStreamAdapter(_liveStreams, this);
+                    _adapter = new LiveStreamAdapter(
+                        _liveStreams,
+                        this,
+                        onViewClick: livestream =>
+                        {
+                            Intent intent = new Intent(this, typeof(LOMSUI.Activities.CommentsActivity));
+                            intent.PutExtra("LivestreamID", livestream.LivestreamID);
+                            StartActivity(intent);
+                        },
+                        onDeleteClick: async (livestream, position) =>
+                        {
+                            bool success = await _apiService.DeleteLiveStreamAsync(livestream.LivestreamID);
+
+                            if (success)
+                            {
+                                Toast.MakeText(this, "Live stream deleted", ToastLength.Short).Show();
+                                _liveStreams.RemoveAt(position);
+                                _adapter.NotifyItemRemoved(position);
+                            }
+                            else
+                            {
+                                Toast.MakeText(this, "Delete failure!", ToastLength.Short).Show();
+                            }
+                        });
+
                     _recyclerView.SetAdapter(_adapter);
                     _txtNoLiveStreams.Visibility = ViewStates.Gone;
                 }
@@ -58,7 +104,5 @@ namespace LOMSUI
                 }
             });
         }
-
     }
-
 }
