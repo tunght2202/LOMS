@@ -19,8 +19,8 @@
 				android:layout_width="100dp"
 				android:layout_height="100dp"
 				android:layout_gravity="center"
-				android:layout_marginTop="30dp"
-				android:layout_marginBottom="30dp"
+				android:layout_marginTop="20dp"
+				android:layout_marginBottom="20dp"
 				android:src="@drawable/logo_loms" />
 
 		</LinearLayout>
@@ -127,24 +127,6 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp" />
 			</LinearLayout>
-
-			<TextView
-                android:id="@+id/txtSuccessfulDeliveries"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Successful Deliveries: "
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginTop="10dp" />
-
-			<TextView
-                android:id="@+id/txtFailedDeliveries"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Failed Deliveries: "
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginTop="20dp" />
 
 			<Button
                 android:id="@+id/btnSaveInfo"
