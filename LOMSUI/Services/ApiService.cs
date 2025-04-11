@@ -319,6 +319,32 @@ namespace LOMSUI.Services
             throw new Exception($"Unable to load customer list: {response.StatusCode} - {response.ReasonPhrase}");
         }
 
+        public async Task<List<CustomerModel>> GetCustomersByUserIdAsync(string userId)
+        {
+            try
+            {
+                var url = $"{BASE_URLL}/Customers/User/{userId}";
+                var response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var customers = JsonConvert.DeserializeObject<List<CustomerModel>>(json);
+                    return customers ?? new List<CustomerModel>();
+                }
+                else
+                {
+                    return new List<CustomerModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi gọi API GetCustomersByUserIdAsync: {ex.Message}");
+                return new List<CustomerModel>();
+            }
+        }
+
+
         public async Task<List<OrderModel>> GetOrdersByCustomerIdAsync(string customerId)
         {
             try

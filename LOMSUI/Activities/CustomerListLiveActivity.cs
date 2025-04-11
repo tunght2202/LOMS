@@ -1,26 +1,32 @@
-﻿using Android.Content;
+﻿using Android.App;
+using Android.Content;
+using Android.OS;
+using Android.Widget;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
 using LOMSUI.Adapter;
 using LOMSUI.Models;
 using LOMSUI.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LOMSUI.Activities
 {
-
-    [Activity(Label = "CustomerList")]
-    public class CustomerListActivity : Activity
+    [Activity(Label = "Customer List")]
+    public class CustomerListLiveActivity : Activity
     {
         private RecyclerView _recyclerView;
         private TextView _txtNoCustomers;
         private CustomerAdapter _adapter;
         private List<CustomerModel> _customers = new List<CustomerModel>();
-        private string userId;
+        private string _liveStreamID;
         private SwipeRefreshLayout _swipeRefreshLayout;
 
-        protected override async void OnCreate(Bundle? savedInstanceState)
-        {
 
+        protected override async void OnCreate(Bundle savedInstanceState)
+        {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_customer_list);
 
@@ -30,12 +36,11 @@ namespace LOMSUI.Activities
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            userId = prefs.GetString("userID", "");
+            _liveStreamID = Intent.GetStringExtra("LiveStreamID");
 
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(_liveStreamID))
             {
-                Toast.MakeText(this, "Missing userID!", ToastLength.Short).Show();
+                Toast.MakeText(this, "Missing LiveStreamID!", ToastLength.Short).Show();
                 Finish();
                 return;
             }
@@ -52,7 +57,7 @@ namespace LOMSUI.Activities
             try
             {
                 var apiService = new ApiService();
-                _customers = await apiService.GetCustomersByUserIdAsync(userId);
+                _customers = await apiService.GetCustomersByLiveStreamIdAsync(_liveStreamID);
 
                 RunOnUiThread(() =>
                 {
@@ -80,5 +85,4 @@ namespace LOMSUI.Activities
             }
         }
     }
-
 }

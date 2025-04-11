@@ -10,6 +10,8 @@ using LOMSUI.Models;
 using LOMSUI.Services;
 using LOMSUI.Activities;
 using LOMSUI;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace LOMSUI
 {
@@ -108,10 +110,17 @@ namespace LOMSUI
 
                 if (!string.IsNullOrEmpty(token))
                 {
+
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(token);
+                    string userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+
                     var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
                     var editor = prefs.Edit();
-
                     editor.PutString("token", token);
+                    editor.PutString("userID", userId);
+
 
                     if (cbRememberMe.Checked)
                     {
@@ -135,7 +144,7 @@ namespace LOMSUI
                     editor.Apply();
 
                     Toast.MakeText(this, "Login successful!", ToastLength.Short).Show();
-                    StartActivity(new Intent(this, typeof(LiveStreamActivity)));
+                    StartActivity(new Intent(this, typeof(HomePageActivity)));
                 }
                 else
                 {
@@ -150,15 +159,3 @@ namespace LOMSUI
     }
 
 }
-
-/*Button btnLogout = FindViewById<Button>(Resource.Id.btnLogout);
-btnLogout.Click += (sender, e) =>
-{
-    var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-    prefs.Edit().Remove("token").Apply(); // Xóa token
-
-    Intent intent = new Intent(this, typeof(LoginActivity));
-    intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.NewTask);
-    StartActivity(intent);
-    Finish();
-};*/

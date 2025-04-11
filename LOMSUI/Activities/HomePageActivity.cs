@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Widget;
 using LOMSUI.Models; // Thêm namespace cho HomePageModel
@@ -45,7 +46,6 @@ namespace LOMSUI.Activities
             homePageModel = new HomePageModel();
             homePageModel.LoadData();
 
-            // Hiển thị dữ liệu từ HomePageModel lên view
             appNameTextView.Text = "LOMS Application";
             revenueValueTextView.Text = homePageModel.Revenue.ToString("N0") + " vnd";
             orderValueTextView.Text = homePageModel.OrderCount.ToString();
@@ -67,12 +67,14 @@ namespace LOMSUI.Activities
 
             khachHangLayout.Click += (sender, e) =>
             {
-                
+                Intent intent = new Intent(this, typeof(CustomerListActivity));
+                StartActivity(intent);
             };
 
             menuLayout.Click += (sender, e) =>
             {
-                
+                Intent intent = new Intent(this, typeof(MenuActivity));
+                StartActivity(intent);
             };
         }
     }
