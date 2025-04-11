@@ -11,7 +11,7 @@ namespace LOMSUI
     public class LiveStreamDetailActivity : Activity
     {
         private TextView _txtTitle, _txtStatus, _txtStartTime;
-        private Button _btnViewComments, _btnViewCustomers;
+        private Button _btnViewComments, _btnViewCustomers, _btnViewOrders;
 
         private string _liveStreamId;
         private string _title;
@@ -29,6 +29,7 @@ namespace LOMSUI
             _txtStartTime = FindViewById<TextView>(Resource.Id.txtLiveStartTime);
             _btnViewComments = FindViewById<Button>(Resource.Id.btnViewComments);
             _btnViewCustomers = FindViewById<Button>(Resource.Id.btnViewCustomers);
+            _btnViewOrders = FindViewById<Button>(Resource.Id.btnViewOrders);
 
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");
             _title = Intent.GetStringExtra("Title");
@@ -49,6 +50,13 @@ namespace LOMSUI
             _btnViewCustomers.Click += (s, e) =>
             {
                 var intent = new Intent(this, typeof(CustomerListActivity));
+                intent.PutExtra("LiveStreamID", _liveStreamId);
+                StartActivity(intent);
+            };
+
+            _btnViewOrders.Click += (s, e) =>
+            {
+                var intent = new Intent(this, typeof(OrdersInLiveActivity));
                 intent.PutExtra("LiveStreamID", _liveStreamId);
                 StartActivity(intent);
             };

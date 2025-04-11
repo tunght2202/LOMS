@@ -36,9 +36,7 @@ namespace LOMSUI.Adapter
                      .Placeholder(Resource.Drawable.logos)
                      .Into(customerHolder.ImgAvatar);
 
-                // Bind data
                 customerHolder.TxtCustomerName.Text = string.IsNullOrEmpty(customer.FullName) ? customer.FacebookName : customer.FullName;
-                customerHolder.TxtCustomerPhone.Text = string.IsNullOrEmpty(customer.PhoneNumber) ? customer.PhoneNumber : customer.PhoneNumber;
                // int totalOrders = customer.SuccessfulDeliveries + customer.FailedDeliveries;
                 //customerHolder.TxtOrderSummary.Text = $"Tổng đơn: {totalOrders} ({customer.SuccessfulDeliveries} thành công, {customer.FailedDeliveries} thất bại)";
 
@@ -56,7 +54,6 @@ namespace LOMSUI.Adapter
         {
             public ImageView ImgAvatar { get; }
             public TextView TxtCustomerName { get; }
-            public TextView TxtCustomerPhone { get; }
             //public TextView TxtOrderSummary { get; }
             public Button BtnViewDetail { get; }
 
@@ -64,7 +61,6 @@ namespace LOMSUI.Adapter
             {
                 ImgAvatar = itemView.FindViewById<ImageView>(Resource.Id.imgAvatar);
                 TxtCustomerName = itemView.FindViewById<TextView>(Resource.Id.txtCustomerName);
-                TxtCustomerPhone = itemView.FindViewById<TextView>(Resource.Id.txtCustomerPhone);
                 //TxtOrderSummary = itemView.FindViewById<TextView>(Resource.Id.txtOrderSummary);
                 BtnViewDetail = itemView.FindViewById<Button>(Resource.Id.btnViewDetail);
             }
