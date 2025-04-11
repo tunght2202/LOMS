@@ -30,10 +30,23 @@ namespace LOMSAPI.Repositories.Orders
             {
                 OrderID = order.OrderID,
                 OrderDate = order.OrderDate,
-                Status = order.Status,
+                Status = order.Status.ToString(),
                 Quantity = order.Quantity,
                 ProductID = order.ProductID,
-                CommentID = order.CommentID
+                CommentID = order.CommentID,
+                Product = new ProductModel()
+                {
+                    ProductID = order.ProductID,
+                    ProductCode = order.Product.ProductCode,
+                    Description = order.Product.Description,
+                    UserID = order.Product.UserID,
+                    Name = order.Product.Name,
+                    ImageURL = order.Product.ImageURL,
+                    Price = order.Product.Price,
+                    Stock = order.Product.Stock,
+                    Status = order.Product.Status
+
+                }
             };
         }
 
@@ -43,7 +56,7 @@ namespace LOMSAPI.Repositories.Orders
             {
                 OrderID = model.OrderID,
                 OrderDate = model.OrderDate,
-                Status = model.Status,
+                Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), model.Status),
                 Quantity = model.Quantity,
                 ProductID = model.ProductID,
                 CommentID = model.CommentID
@@ -52,13 +65,13 @@ namespace LOMSAPI.Repositories.Orders
 
         public async Task<IEnumerable<OrderModel>> GetAllOrdersAsync()
         {
-            var orders = await _context.Orders.ToListAsync();
+            var orders = await _context.Orders.Include(o => o.Product).ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
 
         public async Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId)
         {
-            var orders = await _context.Orders
+            var orders = await _context.Orders.Include(o => o.Product)
                 .Where(o => o.Comment.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
@@ -67,6 +80,7 @@ namespace LOMSAPI.Repositories.Orders
         public async Task<IEnumerable<OrderModel>> GetOrdersByCustomerIdAsync(string customerId)
         {
             var orders = await _context.Orders
+                .Include(o => o.Product)
                 .Where(o => o.Comment.LiveStreamCustomer.CustomerID.Equals(customerId))
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
@@ -74,14 +88,16 @@ namespace LOMSAPI.Repositories.Orders
 
         public async Task<IEnumerable<OrderModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID)
         {
-            var orders = await _context.Orders
+            var orders = await _context.Orders.Include(o => o.Product)
                 .Where(o => o.Comment.LiveStreamCustomerID == liveStreamCustomerID)
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
         public async Task<OrderModel?> GetOrderByIdAsync(int orderId)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderID == orderId);
+            var order = await _context.Orders
+                .Include(o => o.Product)
+                .FirstOrDefaultAsync(o => o.OrderID == orderId);
             return order != null ? MapToModel(order) : null;
         }
 
@@ -105,7 +121,7 @@ namespace LOMSAPI.Repositories.Orders
             if (existing == null) return 0;
 
             existing.OrderDate = orderModel.OrderDate;
-            existing.Status = orderModel.Status;
+            existing.Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), orderModel.Status);
             existing.Quantity = orderModel.Quantity;
             existing.ProductID = orderModel.ProductID;
             existing.CommentID = orderModel.CommentID;
@@ -125,6 +141,7 @@ namespace LOMSAPI.Repositories.Orders
         public async Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync(string userID)
         {
             var orders = await _context.Orders
+                        .Include(o => o.Product)
                         .Where(o => o.CommentID.Equals(userID))
                         .ToListAsync();
             return orders.Select(o => MapToModel(o));

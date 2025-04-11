@@ -55,7 +55,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Add new product 
         [HttpPost]
-        public async Task<ActionResult> AddProduct([FromForm] ProductModel product,IFormFile image)
+        public async Task<ActionResult> AddProduct([FromForm] PostProductModel product,IFormFile image)
         {
             var result = await _productRepository.AddProduct(product, image);
             if (result == 1)
@@ -68,7 +68,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Update product by ID 
         [HttpPut("updateProduct/{id}")]
-        public async Task<ActionResult> UpdateProduct(int id,[FromForm] UpdateProductModel product)
+        public async Task<ActionResult> UpdateProduct(int id,[FromForm] PutProductModel product)
         {
             var result = await _productRepository.UpdateProduct(id,product);
             if (result == 1)
