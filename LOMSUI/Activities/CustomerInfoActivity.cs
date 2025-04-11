@@ -1,4 +1,5 @@
-﻿using Android.Views;
+﻿using Android.Content;
+using Android.Views;
 using Bumptech.Glide;
 using LOMSUI.Models;
 using LOMSUI.Services;
@@ -12,6 +13,7 @@ namespace LOMSUI.Activities
         private TextView _txtFacebookName;
         private EditText _etFullName, _etEmail, _etPhone, _etAddress;
         private Button _btnSave;
+        private TextView txtOrderHistory;
         private ApiService _apiService = new ApiService();
         private string _customerId;
         private CustomerModel _customer;
@@ -58,8 +60,17 @@ namespace LOMSUI.Activities
             _etPhone = FindViewById<EditText>(Resource.Id.etPhoneNumber);
             _etAddress = FindViewById<EditText>(Resource.Id.etAddress);
             _btnSave = FindViewById<Button>(Resource.Id.btnSaveInfo);
+            txtOrderHistory = FindViewById<TextView>(Resource.Id.txtOrderHistory);
+
 
             _btnSave.Click += async (s, e) => await SaveCustomerInfo();
+
+            txtOrderHistory.Click += (s, e) =>
+            {
+                var intent = new Intent(this, typeof(OrderHistoryActivity));
+                intent.PutExtra("customerId", _customer.CustomerID);
+                StartActivity(intent);
+            };
         }
 
         private void LoadCustomer(CustomerModel c)
