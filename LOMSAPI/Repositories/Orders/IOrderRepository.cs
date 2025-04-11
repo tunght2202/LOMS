@@ -5,7 +5,7 @@ namespace LOMSAPI.Repositories.Orders
 {
     public interface IOrderRepository
     {
-        Task<int> CreateOrderFromComments(int listProductID, string liveStreamId);
+        Task<int> CreateOrderFromComments(string liveStreamId);
         Task<IEnumerable<OrderModel>> GetAllOrdersAsync();
         Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync(string userID);
         Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId);

@@ -1,37 +1,61 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
+using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LOMSAPI.Repositories.Products
 {
     public class ProductRepository : IProductRepository
     {
         private readonly LOMSDbContext _context;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public ProductRepository(LOMSDbContext context)
+        public ProductRepository(LOMSDbContext context
+            , CloudinaryService cloudinaryService)
         {
             _context = context;
+            _cloudinaryService = cloudinaryService;
         }
 
+        private ProductModel MapToModel(Product product)
+        {
+            return new ProductModel
+            {
+                ProductID = product.ProductID,
+                ProductCode = product.ProductCode,
+                Description = product.Description,
+                UserID = product.UserID,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                ImageURL = product.ImageURL
+            };
+        }
+
+        private Product MapToEntity(ProductModel product)
+        {
+            return new Product
+            {
+                ProductID = product.ProductID,
+                ProductCode = product.ProductCode,
+                Description = product.Description,
+                UserID = product.UserID,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+                ImageURL = product.ImageURL
+            };
+        }
         public async Task<IEnumerable<ProductModel>> GetAllProducts()
         {
             var listProduct = await _context.Products.ToListAsync();
 
-            var getProductList = listProduct
-                .Select(x => new ProductModel()
-                {
-                    ProductID = x.ProductID,
-                    ProductCode = x.ProductCode,
-                    Description = x.Description,
-                    UserID = x.UserID,
-                    Name = x.Name,
-                    Price = x.Price,
-                    Stock = x.Stock,
-                    Status = x.Status
-                })
-                .ToList();
-            return getProductList;
+            var getProductList = listProduct.ToList();
+            return getProductList.Select(x => MapToModel(x));
         }
 
         public async Task<ProductModel> GetProductById(int id)
@@ -39,17 +63,8 @@ namespace LOMSAPI.Repositories.Products
             var getProduct = await _context.Products.FindAsync(id);
             if (getProduct == null) { throw new Exception($"This id {id} invite "); }
 
-            var product = new ProductModel()
-            {
-                ProductID = getProduct.ProductID,
-                Price = getProduct.Price,
-                Stock = getProduct.Stock,
-                Description = getProduct.Description,
-                Name = getProduct.Name,
-                Status = getProduct.Status
-
-            };
-            return product;
+            var productModel = MapToModel(getProduct);
+            return productModel;
         }
 
         public async Task<IEnumerable<ProductModel>> GetAllProductsByName(string name)
@@ -58,15 +73,7 @@ namespace LOMSAPI.Repositories.Products
                 .Where(p => p.Name.ToLower().Contains(name.ToLower()))
                 .ToListAsync();
 
-            var getProductModels = getProducts.Select(x => new ProductModel()
-            {
-                ProductID = x.ProductID,
-                Name = x.Name,
-                Price = x.Price,
-                Description = x.Description,
-                Stock = x.Stock,
-                Status = x.Status
-            }).ToList();
+            var getProductModels = getProducts.Select(x => MapToModel(x)).ToList();
             return getProductModels;
         }
 
@@ -78,36 +85,34 @@ namespace LOMSAPI.Repositories.Products
             var getProductByUser = await _context.Products
                 .Where( p => p.UserID == userId)
                 .ToListAsync();
-            var productList =  getProductByUser.Select(x => new ProductModel()
-            {
-                ProductID = x.ProductID,
-                Name = x.Name,
-                Price = x.Price,
-                Description = x.Description,
-                Stock = x.Stock,
-                Status = x.Status
-            }).ToList();
+            var productList =  getProductByUser.Select(x => MapToModel(x)).ToList();
             return productList;
         }
 
-        public async Task<int> AddProduct(ProductModel postProduct)
+        public async Task<int> AddProduct(PostProductModel postProduct, IFormFile imge)
         {
+            if (postProduct == null)
+            {
+                throw new Exception("Product can't null");
+            }
+            string imageUrl = await _cloudinaryService.UploadImageAsync(imge);
+            postProduct.ImageURL = imageUrl;
             var product = new Product()
             {
-                Name = postProduct.Name,
-                UserID = postProduct.UserID,
                 ProductCode = postProduct.ProductCode,
-                ProductID = 0,
-                Price = postProduct.Price,
                 Description = postProduct.Description,
+                UserID = postProduct.UserID,
+                Name = postProduct.Name,
+                Price = postProduct.Price,
                 Stock = postProduct.Stock,
-                Status = postProduct.Status
+                Status = postProduct.Status,
+                ImageURL = postProduct.ImageURL
             };
             await _context.Products.AddAsync(product);
             return await _context.SaveChangesAsync();
 
         }
-        public async Task<int> UpdateProduct(int productId, UpdateProductModel product)
+        public async Task<int> UpdateProduct(int productId, PutProductModel product)
         {
             var productById = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == productId);
             if (productById == null)
@@ -119,6 +124,7 @@ namespace LOMSAPI.Repositories.Products
             productById.Price = product.Price;
             productById.Description = product.Description;
             productById.Stock = product.Stock;
+            productById.ImageURL = product.ImageURL;
 
             return await _context.SaveChangesAsync();
         }
