@@ -14,7 +14,7 @@ namespace LOMSUI.Models
         public int Quantity { get; set; }
         public int ProductID { get; set; }
         public string CommentID { get; set; }
-        public decimal ProductPrice { get; set; }
+        public ProductModel Product { get; set; }
 
     }
 
