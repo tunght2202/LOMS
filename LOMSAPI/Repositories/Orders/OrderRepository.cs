@@ -129,11 +129,31 @@ namespace LOMSAPI.Repositories.Orders
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> UpdateStatusOrderAsync(int orderId, int newStatus)
+        public async Task<int> UpdateStatusOrderAsync(int orderId, OrderStatus newStatus)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null) return 0;
-
+            if(newStatus < order.Status)
+            {
+                throw new Exception("Can't change status");
+                return 0;
+            }
+            if (order.Status == OrderStatus.Canceled)
+            {
+                throw new Exception("Can't change status");
+                return 0;
+            }
+            var getProduct = await _context.Products
+                .FirstOrDefaultAsync(p => p.ProductID == order.ProductID);
+            if (getProduct == null)
+            {
+                throw new Exception($"This id {order.ProductID} invite ");
+            }
+            if(newStatus == OrderStatus.Canceled || newStatus == OrderStatus.Returned)
+            {
+                getProduct.Stock += order.Quantity;
+            }
+           
             order.Status = (OrderStatus)newStatus;
             return await _context.SaveChangesAsync();
         }
