@@ -15,6 +15,6 @@ namespace LOMSAPI.Repositories.Orders
         Task<bool> OrderExistsAsync(int orderId);
         Task<int> AddOrderAsync(OrderModel order);
         Task<int> UpdateOrderAsync(OrderModel order);
-        Task<int> UpdateStatusOrderAsync(int orderID, int newStatus);
+        Task<int> UpdateStatusOrderAsync(int orderID, OrderStatus newStatus);
     }
 }

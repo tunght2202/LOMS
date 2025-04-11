@@ -84,8 +84,8 @@ namespace LOMSAPI.Controllers
             return result > 0 ? Ok() : NotFound("Can't update this order");
         }
 
-        [HttpPatch("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] int status)
+        [HttpPut("status/{id}")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromForm] OrderStatus status)
         {
             var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
             return result > 0 ? Ok() : NotFound("Can;t update status of this order");
