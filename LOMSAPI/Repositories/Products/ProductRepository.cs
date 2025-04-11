@@ -124,7 +124,7 @@ namespace LOMSAPI.Repositories.Products
             productById.Price = product.Price;
             productById.Description = product.Description;
             productById.Stock = product.Stock;
-            productById.ImageURL = product.I;
+            productById.ImageURL = product.ImageURL;
 
             return await _context.SaveChangesAsync();
         }

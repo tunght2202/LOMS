@@ -55,7 +55,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Add new product 
         [HttpPost]
-        public async Task<ActionResult> AddProduct([FromForm] ProductModel product,IFormFile image)
+        public async Task<ActionResult> AddProduct([FromForm] PostProductModel product,IFormFile image)
         {
             var result = await _productRepository.AddProduct(product, image);
             if (result == 1)

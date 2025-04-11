@@ -11,5 +11,6 @@ namespace LOMSAPI.Models
         public int Quantity { get; set; }
         public int ProductID { get; set; }
         public string? CommentID { get; set; }
+        public ProductModel Product { get; set; }
     }
 }
