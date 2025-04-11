@@ -68,7 +68,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Update product by ID 
         [HttpPut("updateProduct/{id}")]
-        public async Task<ActionResult> UpdateProduct(int id,[FromForm] UpdateProductModel product)
+        public async Task<ActionResult> UpdateProduct(int id,[FromForm] PutProductModel product)
         {
             var result = await _productRepository.UpdateProduct(id,product);
             if (result == 1)

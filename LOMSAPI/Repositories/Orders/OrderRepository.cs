@@ -30,7 +30,7 @@ namespace LOMSAPI.Repositories.Orders
             {
                 OrderID = order.OrderID,
                 OrderDate = order.OrderDate,
-                Status = order.Status,
+                Status = order.Status.ToString(),
                 Quantity = order.Quantity,
                 ProductID = order.ProductID,
                 CommentID = order.CommentID
@@ -43,7 +43,7 @@ namespace LOMSAPI.Repositories.Orders
             {
                 OrderID = model.OrderID,
                 OrderDate = model.OrderDate,
-                Status = model.Status,
+                Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), model.Status),
                 Quantity = model.Quantity,
                 ProductID = model.ProductID,
                 CommentID = model.CommentID
