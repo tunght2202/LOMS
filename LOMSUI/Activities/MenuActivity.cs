@@ -2,7 +2,9 @@
 using Android.Content;
 using Android.OS;
 using Android.Widget;
+using Bumptech.Glide;
 using LOMSUI.Models;
+using LOMSUI.Services;
 using System;
 
 namespace LOMSUI.Activities
@@ -10,7 +12,7 @@ namespace LOMSUI.Activities
     [Activity(Label = "Menu")]
     public class MenuActivity : Activity
     {
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.menu);
@@ -18,6 +20,8 @@ namespace LOMSUI.Activities
             // Lấy các view từ layout
             TextView userNameTextView = FindViewById<TextView>(Resource.Id.userNameTextView);
             TextView emailTextView = FindViewById<TextView>(Resource.Id.emailTextView);
+            ImageView ImageView = FindViewById<ImageView>(Resource.Id.profileImageView);
+            LinearLayout userInfoSection = FindViewById<LinearLayout>(Resource.Id.userInfoSection);
             Button logoutButton = FindViewById<Button>(Resource.Id.logout_button);
             LinearLayout productListLayout = FindViewById<LinearLayout>(Resource.Id.productListLayout);
             LinearLayout orderManagementLayout = FindViewById<LinearLayout>(Resource.Id.orderManagementLayout);
@@ -33,14 +37,40 @@ namespace LOMSUI.Activities
             LinearLayout productsLayout = FindViewById<LinearLayout>(Resource.Id.productsLayout);
             LinearLayout customersLayout = FindViewById<LinearLayout>(Resource.Id.customersLayout);
 
-            MenuModel menuModel = new MenuModel
-            {
-                UserName = "Nguyễn Văn A",
-                Email = "ANV1995@gmail.com"
-            };
+            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+            string token = prefs.GetString("token", null);
 
-            userNameTextView.Text = menuModel.UserName;
-            emailTextView.Text = menuModel.Email;
+            if (!string.IsNullOrEmpty(token))
+            {
+                try
+                {
+                    var apiService = new ApiService();
+                    var user = await apiService.GetUserProfileAsync(token); 
+
+                    if (user != null)
+                    {
+                        userNameTextView.Text = user.UserName;
+                        emailTextView.Text = user.Email;
+
+                        if (!string.IsNullOrEmpty(user.ImageUrl))
+                        {
+                            Glide.With(this)
+                                 .Load(user.ImageUrl)
+                                 .Into(ImageView);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Toast.MakeText(this, "Error loading user information: " + ex.Message, ToastLength.Long).Show();
+                }
+            }
+
+            userInfoSection.Click += (s, e) =>
+            {
+                Intent intent = new Intent(this, typeof(UserInfoActivity));
+                StartActivity(intent);
+            };
 
             logoutButton.Click += (sender, e) =>
             {

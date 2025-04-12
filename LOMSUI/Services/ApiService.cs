@@ -99,6 +99,24 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<UserModels> GetUserProfileAsync(string token)
+        {
+            string url = $"{BASE_URL}/user-profile";
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<UserModels>(json);
+            }
+            else
+            {
+                throw new Exception("Unable to get user information");
+            }
+        }
+
+
         private async Task<bool> SendPostRequestAsync(string endpoint, object model, string checkMessage = null)
         {
             try
@@ -381,6 +399,48 @@ namespace LOMSUI.Services
         }
 
 
+
+        public async Task<string> UpdateUserProfileRequestAsync(UserModels model, string token)
+        {
+            var content = new MultipartFormDataContent();
+
+            if (!string.IsNullOrEmpty(model.UserName))
+                content.Add(new StringContent(model.UserName), "UserName");
+
+            if (!string.IsNullOrEmpty(model.PhoneNumber))
+                content.Add(new StringContent(model.PhoneNumber), "PhoneNumber");
+
+            if (!string.IsNullOrEmpty(model.Email))
+                content.Add(new StringContent(model.Email), "Email");
+
+            if (!string.IsNullOrEmpty(model.Address))
+                content.Add(new StringContent(model.Address), "Address");
+
+            if (!string.IsNullOrEmpty(model.Gender))
+                content.Add(new StringContent(model.Gender), "Gender");
+
+            if (!string.IsNullOrEmpty(model.Password))
+                content.Add(new StringContent(model.Password), "Password");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfile-request", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            return responseContent;
+        }
+
+
+        public async Task<string> VerifyOtpAndUpdateProfileAsync(VerifyOtpModel otpModel, string token)
+        {
+            var json = JsonConvert.SerializeObject(otpModel);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfie", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            return responseContent;
+        }
 
     }
 }
