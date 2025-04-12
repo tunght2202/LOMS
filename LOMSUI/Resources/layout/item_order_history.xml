@@ -36,6 +36,13 @@
                 android:textSize="14sp" />
 
 			<TextView
+			   android:id="@+id/txtOrderQuantity"
+			   android:layout_width="wrap_content"
+			   android:layout_height="wrap_content"
+			   android:text="Quantity: 2" />
+
+
+			<TextView
                 android:id="@+id/txtTotalPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

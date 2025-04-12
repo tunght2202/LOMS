@@ -49,7 +49,7 @@ namespace LOMSUI
 
             _btnViewCustomers.Click += (s, e) =>
             {
-                var intent = new Intent(this, typeof(CustomerListActivity));
+                var intent = new Intent(this, typeof(CustomerListLiveActivity));
                 intent.PutExtra("LiveStreamID", _liveStreamId);
                 StartActivity(intent);
             };
