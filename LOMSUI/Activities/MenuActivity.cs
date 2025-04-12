@@ -21,6 +21,7 @@ namespace LOMSUI.Activities
             Button logoutButton = FindViewById<Button>(Resource.Id.logout_button);
             LinearLayout productListLayout = FindViewById<LinearLayout>(Resource.Id.productListLayout);
             LinearLayout orderManagementLayout = FindViewById<LinearLayout>(Resource.Id.orderManagementLayout);
+            LinearLayout liveManagement = FindViewById<LinearLayout>(Resource.Id.LiveManagement);
             LinearLayout helpLayout = FindViewById<LinearLayout>(Resource.Id.helpLinearLayout);
             LinearLayout aboutLayout = FindViewById<LinearLayout>(Resource.Id.aboutLinearLayout);
             LinearLayout fanpageLinkLayout = FindViewById<LinearLayout>(Resource.Id.fanpageLinkLayout);
@@ -43,10 +44,13 @@ namespace LOMSUI.Activities
 
             logoutButton.Click += (sender, e) =>
             {
-               
-                Intent intent = new Intent(this, typeof(MainActivity)); 
+                var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+                prefs.Edit().Remove("token").Apply(); 
+
+                Intent intent = new Intent(this, typeof(LoginActivity));
+                intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.NewTask);
                 StartActivity(intent);
-                Finish(); 
+                Finish();
             };
 
             productListLayout.Click += (sender, e) =>
@@ -58,6 +62,12 @@ namespace LOMSUI.Activities
             {
                
                 Toast.MakeText(this, "Quản lý đơn hàng", ToastLength.Short).Show();
+            };
+
+            liveManagement.Click += (sender, e) =>
+            {
+                Intent intent = new Intent(this, typeof(LiveStreamActivity));
+                StartActivity(intent);
             };
 
             helpLayout.Click += (sender, e) =>

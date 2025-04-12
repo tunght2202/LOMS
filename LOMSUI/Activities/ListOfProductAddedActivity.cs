@@ -56,7 +56,7 @@ namespace LOMSUI.Activities
             {
                 // Xử lý sự kiện click cho nút "Tạo danh sách bán hàng"
                 Toast.MakeText(this, "Tạo danh sách bán hàng", ToastLength.Short).Show();
-            };
+            }; 
 
             // Xử lý sự kiện click cho nút back
             backButton.Click += (sender, e) =>

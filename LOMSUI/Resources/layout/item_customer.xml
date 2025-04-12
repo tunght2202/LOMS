@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="15dp"
     android:elevation="4dp"
     android:radius="12dp">
 
@@ -36,23 +36,7 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="#000000" />
-			<TextView
-			  android:id="@+id/txtCustomerPhone"
-			  android:layout_width="wrap_content"
-			  android:layout_height="wrap_content"
-			  android:text="Phone : 0376245217"
-			  android:textStyle="bold"
-			  android:textSize="12sp"
-			  android:textColor="#453F3F" />
-<!--
-			<TextView
-                android:id="@+id/txtOrderSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tổng đơn: 5 (3 thành công, 2 thất bại)"
-                android:textSize="14sp"
-                android:textColor="#555555"
-                android:layout_marginTop="4dp"/>-->
+
 		</LinearLayout>
 
 		<Button

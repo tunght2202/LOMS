@@ -151,7 +151,6 @@ namespace LOMSUI.Services
                     {
                         try
                         {
-                            // Thêm bình luận top-level (bình luận gốc)
                             comments.Add(new CommentModel
                             {
                                 CommentID = item.commentID?.ToString() ?? "",
@@ -319,6 +318,68 @@ namespace LOMSUI.Services
 
             throw new Exception($"Unable to load customer list: {response.StatusCode} - {response.ReasonPhrase}");
         }
+
+        public async Task<List<CustomerModel>> GetCustomersByUserIdAsync(string userId)
+        {
+            try
+            {
+                var url = $"{BASE_URLL}/Customers/User/{userId}";
+                var response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var customers = JsonConvert.DeserializeObject<List<CustomerModel>>(json);
+                    return customers ?? new List<CustomerModel>();
+                }
+                else
+                {
+                    return new List<CustomerModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi gọi API GetCustomersByUserIdAsync: {ex.Message}");
+                return new List<CustomerModel>();
+            }
+        }
+
+
+        public async Task<List<OrderModel>> GetOrdersByCustomerIdAsync(string customerId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/Orders/customer/{customerId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var orders = JsonConvert.DeserializeObject<List<OrderModel>>(json);
+                    return orders ?? new List<OrderModel>();
+                }
+                else
+                {
+                    return new List<OrderModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when calling API to get orders: {ex.Message}");
+                return new List<OrderModel>();
+            }
+        }
+
+        public async Task<List<OrderModel>> GetOrdersByLiveStreamIdAsync(string liveStreamId)
+        {
+            var url = $"{BASE_URLL}/Orders/livestream/{liveStreamId}";
+            var response = await _httpClient.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<OrderModel>>(json);
+        }
+
 
 
     }
