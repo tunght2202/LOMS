@@ -132,18 +132,19 @@ namespace LOMSAPI.Repositories.Customers
             var customers = await _context.LiveStreamsCustomers
                 .Where(lc => lc.LiveStream.UserID.Equals(userId))
                 .Include(cs => cs.Customer)
-                .Select(c => new GetCustomerModel()
-                {
-                    CustomerID = c.CustomerID,
-                    FacebookName = c.Customer.FacebookName,
-                    ImageURL = c.Customer.ImageURL,
-                    FullName = c.Customer.FullName,
-                    Email = c.Customer.Email,
-                    Address = c.Customer.Address,
-                    PhoneNumber = c.Customer.PhoneNumber,
-                    FailedDeliveries = c.Customer.FailedDeliveries,
-                    SuccessfulDeliveries = c.Customer.SuccessfulDeliveries
-                })
+                               .Select(c => new GetCustomerModel()
+                               {
+                                   CustomerID = c.CustomerID,
+                                   FacebookName = c.Customer.FacebookName,
+                                   FullName = c.Customer.FullName,
+                                   Email = c.Customer.Email,
+                                   Address = c.Customer.Address,
+                                   PhoneNumber = c.Customer.PhoneNumber,
+                                   FailedDeliveries = c.Customer.FailedDeliveries,
+                                   SuccessfulDeliveries = c.Customer.SuccessfulDeliveries
+                               })
+                .GroupBy(ct => ct.CustomerID)
+                .Select(cus => cus.FirstOrDefault())
                 .ToListAsync();
             if(customers == null)
             {
