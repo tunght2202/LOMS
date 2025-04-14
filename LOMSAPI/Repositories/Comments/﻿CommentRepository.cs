@@ -22,7 +22,7 @@ namespace LOMSAPI.Repositories.Comments
             _httpClient = httpClient;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _configuration = configuration;
-            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token không được cấu hình.");
+            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token not configured.");
         }
 
 
@@ -30,7 +30,7 @@ namespace LOMSAPI.Repositories.Comments
         {
             //string liveStreamId = ExtractLiveStreamId(LiveStreamURL);
             if (string.IsNullOrEmpty(LiveStreamId))
-                throw new ArgumentException("Không thể lấy LiveStream ID từ URL");
+                throw new ArgumentException("Unable to get LiveStream ID from URL");
             await _cache.SetStringAsync("Livestream_Id", LiveStreamId, new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
@@ -40,7 +40,7 @@ namespace LOMSAPI.Repositories.Comments
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
-                throw new Exception($"Lỗi khi gọi API: {response.StatusCode}");
+                throw new Exception($"Error calling API: {response.StatusCode}");
 
             string jsonResponse = await response.Content.ReadAsStringAsync();
             return await ParseCommentsAsync(jsonResponse, LiveStreamId);
@@ -92,7 +92,7 @@ namespace LOMSAPI.Repositories.Comments
                     // Kiểm tra nếu có dữ liệu bị null
                     if (string.IsNullOrEmpty(commentID) || string.IsNullOrEmpty(customerID) || string.IsNullOrEmpty(content))
                     {
-                        Console.WriteLine("Dữ liệu comment bị thiếu! Bỏ qua comment này.");
+                        Console.WriteLine("Comment data is missing! Ignore this comment.");
                         continue;
                     }
 
@@ -139,7 +139,7 @@ namespace LOMSAPI.Repositories.Comments
                     }
                     catch (DbUpdateException ex)
                     {
-                        Console.WriteLine($"Lỗi khi lưu dữ liệu: {ex.InnerException?.Message}");
+                        Console.WriteLine($"Error saving data: {ex.InnerException?.Message}");
                     }
 
                 }

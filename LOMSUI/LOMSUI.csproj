@@ -14,6 +14,14 @@
     -->
 		<TrimMode>full</TrimMode>
 	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugSymbols>False</DebugSymbols>
+    <AndroidKeyStore>False</AndroidKeyStore>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AndroidKeyStore>False</AndroidKeyStore>
+    <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
+  </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="glidex.forms" Version="2.1.1.648" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
