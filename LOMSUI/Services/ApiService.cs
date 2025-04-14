@@ -430,16 +430,27 @@ namespace LOMSUI.Services
         }
 
 
-        public async Task<string> VerifyOtpAndUpdateProfileAsync(VerifyOtpModel otpModel, string token)
+        public async Task<bool> VerifyOtpAndUpdateProfileAsync(VerifyOtpModel otpModel, string token)
         {
-            var json = JsonConvert.SerializeObject(otpModel);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            try
+            {
+                var json = JsonConvert.SerializeObject(otpModel);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfie", content);
-            var responseContent = await response.Content.ReadAsStringAsync();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfie", content);
 
-            return responseContent;
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                var jsonResponse = JsonConvert.DeserializeObject<dynamic>(responseContent);
+
+                return jsonResponse != null && jsonResponse.success;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in VerifyOtpAndUpdateProfileAsync: {ex.Message}");
+                return false;
+            }
         }
 
     }

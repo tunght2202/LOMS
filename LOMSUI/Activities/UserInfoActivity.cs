@@ -124,7 +124,7 @@ namespace LOMSUI.Activities
                 if (result.Contains("authentication code"))
                 {
                     Toast.MakeText(this, "OTP code sent to email, please verify.", ToastLength.Long).Show();
-                    var intent = new Intent(this, typeof(VerifyOtpActivity));
+                    var intent = new Intent(this, typeof(VerifyOtpUpdateUserActivity));
                     intent.PutExtra("email", email); 
                     StartActivity(intent);
                 }
