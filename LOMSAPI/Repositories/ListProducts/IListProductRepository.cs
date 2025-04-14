@@ -16,7 +16,5 @@ namespace LOMSAPI.Repositories.ListProducts
         Task<int> AddListProductInToLiveStream(int listProductId, string liveStreamId);
         Task<int> DeleteProductOutListProduct(int listProductId, List<int> listProductIds);
         Task<int> DeleteListProduct(int listProductId);
- 
-
     }
 }

@@ -14,9 +14,19 @@
     -->
 		<TrimMode>full</TrimMode>
 	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugSymbols>False</DebugSymbols>
+    <AndroidKeyStore>False</AndroidKeyStore>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AndroidKeyStore>False</AndroidKeyStore>
+    <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
+  </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="glidex.forms" Version="2.1.1.648" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.8.0" />
+		<PackageReference Include="Xamarin.AndroidX.CardView" Version="1.0.0.10" />
 		<PackageReference Include="Xamarin.AndroidX.SwipeRefreshLayout" Version="1.1.0.4" />
 		<PackageReference Include="Xamarin.FFImageLoading" Version="2.4.11.982" />
 		<PackageReference Include="Xamarin.FFImageLoading.Transformations" Version="2.4.11.982" />
