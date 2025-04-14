@@ -1,11 +1,13 @@
 ﻿using System.Security.Claims;
 using LOMSAPI.Repositories.LiveStreams;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class LiveStreamsController : ControllerBase
     {
         private readonly ILiveStreamRepostitory _liveStreamRepositories;
