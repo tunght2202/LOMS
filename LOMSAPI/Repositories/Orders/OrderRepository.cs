@@ -30,10 +30,23 @@ namespace LOMSAPI.Repositories.Orders
             {
                 OrderID = order.OrderID,
                 OrderDate = order.OrderDate,
-                Status = order.Status,
+                Status = order.Status.ToString(),
                 Quantity = order.Quantity,
                 ProductID = order.ProductID,
-                CommentID = order.CommentID
+                CommentID = order.CommentID,
+                Product = new ProductModel()
+                {
+                    ProductID = order.ProductID,
+                    ProductCode = order.Product.ProductCode,
+                    Description = order.Product.Description,
+                    UserID = order.Product.UserID,
+                    Name = order.Product.Name,
+                    ImageURL = order.Product.ImageURL,
+                    Price = order.Product.Price,
+                    Stock = order.Product.Stock,
+                    Status = order.Product.Status
+
+                }
             };
         }
 
@@ -43,7 +56,7 @@ namespace LOMSAPI.Repositories.Orders
             {
                 OrderID = model.OrderID,
                 OrderDate = model.OrderDate,
-                Status = model.Status,
+                Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), model.Status),
                 Quantity = model.Quantity,
                 ProductID = model.ProductID,
                 CommentID = model.CommentID
@@ -52,13 +65,13 @@ namespace LOMSAPI.Repositories.Orders
 
         public async Task<IEnumerable<OrderModel>> GetAllOrdersAsync()
         {
-            var orders = await _context.Orders.ToListAsync();
+            var orders = await _context.Orders.Include(o => o.Product).ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
 
         public async Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId)
         {
-            var orders = await _context.Orders
+            var orders = await _context.Orders.Include(o => o.Product)
                 .Where(o => o.Comment.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
@@ -67,6 +80,7 @@ namespace LOMSAPI.Repositories.Orders
         public async Task<IEnumerable<OrderModel>> GetOrdersByCustomerIdAsync(string customerId)
         {
             var orders = await _context.Orders
+                .Include(o => o.Product)
                 .Where(o => o.Comment.LiveStreamCustomer.CustomerID.Equals(customerId))
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
@@ -74,14 +88,16 @@ namespace LOMSAPI.Repositories.Orders
 
         public async Task<IEnumerable<OrderModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID)
         {
-            var orders = await _context.Orders
+            var orders = await _context.Orders.Include(o => o.Product)
                 .Where(o => o.Comment.LiveStreamCustomerID == liveStreamCustomerID)
                 .ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
         public async Task<OrderModel?> GetOrderByIdAsync(int orderId)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderID == orderId);
+            var order = await _context.Orders
+                .Include(o => o.Product)
+                .FirstOrDefaultAsync(o => o.OrderID == orderId);
             return order != null ? MapToModel(order) : null;
         }
 
@@ -89,9 +105,10 @@ namespace LOMSAPI.Repositories.Orders
         {
             return await _context.Orders.AnyAsync(o => o.OrderID == orderId);
         }
-
+        // order thủ công 
         public async Task<int> AddOrderAsync(OrderModel orderModel)
         {
+            orderModel.OrderDate = DateTime.Now;
             var order = MapToEntity(orderModel);
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
@@ -104,7 +121,7 @@ namespace LOMSAPI.Repositories.Orders
             if (existing == null) return 0;
 
             existing.OrderDate = orderModel.OrderDate;
-            existing.Status = orderModel.Status;
+            existing.Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), orderModel.Status);
             existing.Quantity = orderModel.Quantity;
             existing.ProductID = orderModel.ProductID;
             existing.CommentID = orderModel.CommentID;
@@ -112,11 +129,31 @@ namespace LOMSAPI.Repositories.Orders
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> UpdateStatusOrderAsync(int orderId, int newStatus)
+        public async Task<int> UpdateStatusOrderAsync(int orderId, OrderStatus newStatus)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null) return 0;
-
+            if(newStatus < order.Status)
+            {
+                throw new Exception("Can't change status");
+                return 0;
+            }
+            if (order.Status == OrderStatus.Canceled)
+            {
+                throw new Exception("Can't change status");
+                return 0;
+            }
+            var getProduct = await _context.Products
+                .FirstOrDefaultAsync(p => p.ProductID == order.ProductID);
+            if (getProduct == null)
+            {
+                throw new Exception($"This id {order.ProductID} invite ");
+            }
+            if(newStatus == OrderStatus.Canceled || newStatus == OrderStatus.Returned)
+            {
+                getProduct.Stock += order.Quantity;
+            }
+           
             order.Status = (OrderStatus)newStatus;
             return await _context.SaveChangesAsync();
         }
@@ -124,6 +161,7 @@ namespace LOMSAPI.Repositories.Orders
         public async Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync(string userID)
         {
             var orders = await _context.Orders
+                        .Include(o => o.Product)
                         .Where(o => o.CommentID.Equals(userID))
                         .ToListAsync();
             return orders.Select(o => MapToModel(o));
@@ -134,56 +172,135 @@ namespace LOMSAPI.Repositories.Orders
         // cộng trừ trong kho 
         // update số lượng sản phẩm trong order thì update luôn số lương sản phẩm trong stock
 
-        public async Task<int> CreateOrderFromComments(int listProductID, string liveStreamId)
+        public async Task<int> CreateOrderFromComments(string liveStreamId)
         {
-            if(listProductID <= 0 || listProductID == null)
+            try
             {
-                throw new ArgumentException("Invalid ListProductID");
-            }
-            var liveStream = await _context.LiveStreams
-                .FirstOrDefaultAsync(l => l.LivestreamID.Equals(liveStreamId));
-            if (liveStream == null)
-            {
-                throw new ArgumentException("Invalid LiveStreamID");
-            }
-            var products = await _listProductRepository.GetProductListProductById(listProductID);
-            var productCodeToId = products.ToDictionary(p => p.ProductCode.ToLower(), p => p.ProductID);
-            var comments = await _context.Comments
-                .Where(c => c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
-                .ToListAsync();
-            var result = new List<Order>();
-            var regex = new Regex(@"(?<code>\w+)\s*(?:[xX]?\s*)(?<qty>\d+)", RegexOptions.IgnoreCase);
-            // (?< code >\w +)   // Nhóm "code": Mã sản phẩm (chữ + số)
-            //\s *               // Khoảng trắng (có thể có)
-            //(?: [xX] ?\s *)    // Nhóm không bắt (non-capturing): có hoặc không có 'x' hoặc 'X', sau đó khoảng trắng
-            //(?< qty >\d +)     // Nhóm "qty": Số lượng sản phẩm
-            foreach (var comment in comments.OrderBy(c => c.CommentTime))
-            {
-                var match = regex.Match(comment.Content);
-                if (match.Success)
+
+                var liveStream = await _context.LiveStreams
+                    .FirstOrDefaultAsync(l => l.LivestreamID.Equals(liveStreamId));
+
+                if (liveStream == null)
                 {
-                    string code = match.Groups["code"].Value.ToLower();
-                    int quantity = int.Parse(match.Groups["qty"].Value);
-
-                    if (productCodeToId.TryGetValue(code, out int productId))
-                    {
-                        result.Add(new Order
-                        {
-                            ProductID = productId,
-                            Quantity = quantity,
-                            CommentID = comment.CommentID,
-                            OrderDate = comment.CommentTime
-                        });
-                    }
+                    throw new ArgumentException("Invalid LiveStreamID");
                 }
-            }
-            if (result.Count > 0)
-            {
-                await _context.Orders.AddRangeAsync(result);
-                return await _context.SaveChangesAsync(); ;
-            }
-            return 0;
-        }
+                if (liveStream.ListProductID == null)
+                {
+                    throw new ArgumentException("Invalid ListProductID");
+                }
 
+                var listProductID = liveStream.ListProductID.Value;
+
+                var products = await _listProductRepository.GetProductListProductById(listProductID);
+                var productCodeToId = products.ToDictionary(p => p.ProductCode.ToLower(), p => p.ProductID);
+                var order = await _context.Orders
+                    .Include(o => o.Comment)
+                    .ThenInclude(c => c.LiveStreamCustomer)
+                    .Where(o => o.Comment.LiveStreamCustomer.LivestreamID == liveStreamId)
+                    .OrderByDescending(o => o.OrderDate)
+                    .FirstOrDefaultAsync();
+                var comments = new List<Comment>();
+                if (order == null)
+                {
+                    comments = await _context.Comments
+                    .Where(c => c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
+                    .ToListAsync();
+                }
+                else
+                {
+                    comments = await _context.Comments
+                    .Where(c => (c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
+                    && (c.CommentTime >= order.Comment.CommentTime))
+                    .ToListAsync();
+                }
+                // produccode xnumber prr 3, prt, 
+                var result = 0;
+                var regex = new Regex(@"\b(?<code>[a-zA-Z]+\d*)\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
+
+                foreach (var comment in comments.OrderBy(c => c.CommentTime))
+                {
+                    if (order == null)
+                    {
+                        var match = regex.Match(comment.Content);
+                        if (match.Success)
+                        {
+                            string code = match.Groups["code"].Value.ToLower();
+                            int quantity = int.Parse(match.Groups["qty"].Value);
+
+                            if (productCodeToId.TryGetValue(code, out int productId))
+                            {
+                                var product = await _context.Products.FindAsync(productId);
+                                if (product != null)
+                                {
+                                    product.Stock -= quantity;
+                                    if (product.Stock < 0)
+                                    {
+                                        continue;
+                                    }
+                                }
+                                var newOrder = new Order
+                                {
+                                    ProductID = productId,
+                                    Quantity = quantity,
+                                    CommentID = comment.CommentID,
+                                    OrderDate = comment.CommentTime
+                                };
+
+                                await _context.Orders.AddAsync(newOrder);
+                                result += await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (comment.CommentID != order.CommentID)
+                        {
+                            var match = regex.Match(comment.Content);
+                            if (match.Success)
+                            {
+                                string code = match.Groups["code"].Value.ToLower();
+                                int quantity = 1;
+                                if (match.Groups["qty"].Success)
+                                {
+                                    quantity = int.Parse(match.Groups["qty"].Value);
+                                }
+
+                                if (productCodeToId.TryGetValue(code, out int productId))
+                                {
+                                    var product = await _context.Products.FindAsync(productId);
+                                    if (product != null)
+                                    {
+                                        
+                                        if (product.Stock < quantity)
+                                        {
+                                            continue;
+                                        }
+                                        product.Stock -= quantity;
+                                    }
+                                    var newOrder = new Order
+                                    {
+                                        ProductID = productId,
+                                        Quantity = quantity,
+                                        CommentID = comment.CommentID,
+                                        OrderDate = comment.CommentTime
+                                    };
+
+                                    await _context.Orders.AddAsync(newOrder);
+                                    result += await _context.SaveChangesAsync();
+                                }
+                            }
+                        }
+                    }
+
+                }
+                
+                    return result ;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return 0;
+            }
+        }
     }
 }

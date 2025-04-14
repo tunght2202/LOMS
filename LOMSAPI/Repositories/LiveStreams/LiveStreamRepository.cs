@@ -49,7 +49,11 @@ namespace LOMSAPI.Repositories.LiveStreams
                 var existingLiveStreams = await _context.LiveStreams
                     .Where(ls => ls.UserID == userId && !ls.StatusDelete)
                     .ToListAsync();
-
+                // Lấy tất cả LivestreamID hiện có trong DB (bao gồm cả đã xóa và chưa xóa)
+                var allExistingIds = await _context.LiveStreams
+                    .Where(ls => ls.UserID == userId)
+                    .Select(ls => ls.LivestreamID)
+                    .ToListAsync();
                 var existingIds = existingLiveStreams.Select(ls => ls.LivestreamID).ToList();
 
                 while (!string.IsNullOrEmpty(apiUrl))
@@ -65,21 +69,24 @@ namespace LOMSAPI.Repositories.LiveStreams
 
                     string jsonResponse = await response.Content.ReadAsStringAsync();
                     var parsedLiveStreams = ParseLiveStreams(jsonResponse, userId);
-
                     foreach (var liveStream in parsedLiveStreams)
                     {
-                        // Kiểm tra xem livestream đã tồn tại trong DB chưa
-                        var existingLiveStream = existingLiveStreams.FirstOrDefault(ls => ls.LivestreamID == liveStream.LivestreamID);
-                        if (existingLiveStream != null)
+                        // Kiểm tra xem livestream đã tồn tại trong DB chưa (dù xóa hay chưa xóa)
+                        if (allExistingIds.Contains(liveStream.LivestreamID))
                         {
-                            // Nếu đã tồn tại, cập nhật trạng thái nếu cần
-                            UpdateLiveStreamStatus(existingLiveStream, liveStream);
+                            // Nếu đã tồn tại và chưa bị xóa, cập nhật trạng thái
+                            var existingLiveStream = existingLiveStreams.FirstOrDefault(ls => ls.LivestreamID == liveStream.LivestreamID);
+                            if (existingLiveStream != null)
+                            {
+                                UpdateLiveStreamStatus(existingLiveStream, liveStream);
+                            }
+                            // Nếu đã bị xóa (StatusDelete = true), bỏ qua và không thêm lại
                         }
-                        else if (!existingIds.Contains(liveStream.LivestreamID))
+                        else
                         {
-                            // Nếu chưa tồn tại, thêm mới
+                            // Nếu chưa tồn tại trong DB, thêm mới
                             liveStreamsFromFacebook.Add(liveStream);
-                            existingIds.Add(liveStream.LivestreamID);
+                            allExistingIds.Add(liveStream.LivestreamID);
                         }
                     }
 

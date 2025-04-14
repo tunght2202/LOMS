@@ -1,4 +1,5 @@
-﻿using Android.Views;
+﻿using Android.Content;
+using Android.Views;
 using Bumptech.Glide;
 using LOMSUI.Models;
 using LOMSUI.Services;
@@ -9,9 +10,10 @@ namespace LOMSUI.Activities
     public class CustomerInfoActivity : Activity
     {
         private ImageView _imgAvatar;
-        private TextView _txtFacebookName, _txtSuccess, _txtFailed;
+        private TextView _txtFacebookName;
         private EditText _etFullName, _etEmail, _etPhone, _etAddress;
         private Button _btnSave;
+        private TextView txtOrderHistory;
         private ApiService _apiService = new ApiService();
         private string _customerId;
         private CustomerModel _customer;
@@ -53,15 +55,22 @@ namespace LOMSUI.Activities
         {
             _imgAvatar = FindViewById<ImageView>(Resource.Id.imgAvatar);
             _txtFacebookName = FindViewById<TextView>(Resource.Id.txtFacebookName);
-            _txtSuccess = FindViewById<TextView>(Resource.Id.txtSuccessfulDeliveries);
-            _txtFailed = FindViewById<TextView>(Resource.Id.txtFailedDeliveries);
             _etFullName = FindViewById<EditText>(Resource.Id.etFullName);
             _etEmail = FindViewById<EditText>(Resource.Id.etEmail);
             _etPhone = FindViewById<EditText>(Resource.Id.etPhoneNumber);
             _etAddress = FindViewById<EditText>(Resource.Id.etAddress);
             _btnSave = FindViewById<Button>(Resource.Id.btnSaveInfo);
+            txtOrderHistory = FindViewById<TextView>(Resource.Id.txtOrderHistory);
+
 
             _btnSave.Click += async (s, e) => await SaveCustomerInfo();
+
+            txtOrderHistory.Click += (s, e) =>
+            {
+                var intent = new Intent(this, typeof(OrderHistoryActivity));
+                intent.PutExtra("customerId", _customer.CustomerID);
+                StartActivity(intent);
+            };
         }
 
         private void LoadCustomer(CustomerModel c)
@@ -71,8 +80,6 @@ namespace LOMSUI.Activities
             _etEmail.Text = c.Email;
             _etPhone.Text = c.PhoneNumber;
             _etAddress.Text = c.Address;
-            _txtSuccess.Text = $"Successful Deliveries: {c.SuccessfulDeliveries}";
-            _txtFailed.Text = $"Failed Deliveries: {c.FailedDeliveries}";
 
             Glide.With(this).Load(c.ImageURL).Into(_imgAvatar);
         }

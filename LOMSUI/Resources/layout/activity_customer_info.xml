@@ -5,31 +5,41 @@
 
 	<LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+		android:layout_height="wrap_content"
         android:orientation="vertical">
 		
-		<LinearLayout
+		  <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#00a880"
-        android:layout_marginBottom="10dp"
         android:gravity="center">
 
-			<ImageView
-				android:layout_width="100dp"
-				android:layout_height="100dp"
-				android:layout_gravity="center"
-				android:layout_marginTop="30dp"
-				android:layout_marginBottom="30dp"
-				android:src="@drawable/logo_loms" />
-
-		</LinearLayout>
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/logo_loms" />
+    </LinearLayout>
 		
 		<LinearLayout
 		   android:layout_width="match_parent"
 		   android:layout_height="wrap_content"
 		   android:orientation="vertical"
 		   android:padding="20dp" >
+			
+			    <TextView
+                android:id="@+id/txtOrderHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="Order History"
+                android:textColor="#324E95"
+                android:textSize="14sp"
+                android:padding="10dp"
+                android:clickable="true"
+                android:focusable="true" />
 
 			<ImageView
                 android:id="@+id/imgAvatar"
@@ -127,24 +137,6 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp" />
 			</LinearLayout>
-
-			<TextView
-                android:id="@+id/txtSuccessfulDeliveries"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Successful Deliveries: "
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginTop="10dp" />
-
-			<TextView
-                android:id="@+id/txtFailedDeliveries"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Failed Deliveries: "
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginTop="20dp" />
 
 			<Button
                 android:id="@+id/btnSaveInfo"
