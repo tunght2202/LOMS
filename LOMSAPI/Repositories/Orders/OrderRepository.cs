@@ -45,7 +45,6 @@ namespace LOMSAPI.Repositories.Orders
                     ProductID = order.ProductID,
                     ProductCode = order.Product.ProductCode,
                     Description = order.Product.Description,
-                    UserID = order.Product.UserID,
                     Name = order.Product.Name,
                     ImageURL = order.Product.ImageURL,
                     Price = order.Product.Price,
