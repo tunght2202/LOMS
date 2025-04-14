@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text.RegularExpressions;
 namespace LOMSAPI.Repositories.Users
 {
     public class UserRepository : IUserRepository
@@ -98,7 +99,7 @@ namespace LOMSAPI.Repositories.Users
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
 
-            await SendEmailAsync(user.Email, "Xác thực tài khoản", $"Mã OTP của bạn là: {otpCode}");
+            await SendEmailAsync(user.Email, "Verify account", $"Your OTP code is: {otpCode}");
 
             return true;
         }
@@ -150,7 +151,7 @@ namespace LOMSAPI.Repositories.Users
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
-            await SendEmailAsync(user.Email, "Mã OTP đặt lại mật khẩu", $"Mã OTP: {otpCode}");
+            await SendEmailAsync(user.Email, "OTP code reset password", $"OTP code: {otpCode}");
 
             return true;
         }
@@ -221,9 +222,11 @@ namespace LOMSAPI.Repositories.Users
         {
             try
             {
+                var oldEmail = user.Email;
                 var userInfo = new User();
                 if (model.UserName != null)
                 {
+                    
                     user.UserName = model.UserName;
                     userInfo.UserName = model.UserName;
                 }
@@ -267,12 +270,12 @@ namespace LOMSAPI.Repositories.Users
                 else
                 {
                     var otpCode = new Random().Next(100000, 999999).ToString();
-                    await SendEmailAsync(model.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
-                    await _cache.SetStringAsync($"OTP_UPDATE_{model.Email}", otpCode, new DistributedCacheEntryOptions
+                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
-                    await _cache.SetStringAsync("UPDATE_EMAIL", model.Email, new DistributedCacheEntryOptions
+                    await _cache.SetStringAsync("UPDATE_EMAIL", oldEmail, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

@@ -1,9 +1,12 @@
 ﻿
+using Azure;
 using Azure.Core;
 using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -15,13 +18,16 @@ namespace LOMSAPI.Repositories.Orders
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly IListProductRepository _listProductRepository;
-
+        private readonly IConfiguration _configuration;
+        private string ACCESS_TOKEN;
         public OrderRepository(LOMSDbContext context, HttpClient httpClient
-            , IListProductRepository listProductRepository)
+            , IListProductRepository listProductRepository, IConfiguration configuration)
         {
             _context = context;
             _httpClient = httpClient;
             _listProductRepository = listProductRepository;
+            _configuration = configuration;
+            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token not configured.");
         }
 
         private OrderModel MapToModel(Order order)
@@ -247,6 +253,7 @@ namespace LOMSAPI.Repositories.Orders
 
                                 await _context.Orders.AddAsync(newOrder);
                                 result += await _context.SaveChangesAsync();
+                                await SendMessageAsync(newOrder.OrderID);
                             }
                         }
                     }
@@ -285,6 +292,7 @@ namespace LOMSAPI.Repositories.Orders
                                     };
 
                                     await _context.Orders.AddAsync(newOrder);
+                                    await SendMessageAsync(newOrder.OrderID);
                                     result += await _context.SaveChangesAsync();
                                 }
                             }
@@ -300,6 +308,76 @@ namespace LOMSAPI.Repositories.Orders
                 Console.WriteLine($"Error: {ex.Message}");
                 return 0;
             }
+        }
+
+        private async Task SendMessageAsync(int orderID)
+        {
+            var Order = await _context.Orders.FindAsync(orderID);
+            var Comment = await _context.Comments.FindAsync(Order.OrderID);
+            var LiveStreamCustomer = await _context.LiveStreamsCustomers.FindAsync(Comment.LiveStreamCustomerID);
+            var Customer = await _context.Customers.FindAsync(LiveStreamCustomer.CustomerID);
+            bool IsOldCustomer = Customer.Address == null || Customer.PhoneNumber == null;
+            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={ACCESS_TOKEN}";
+            
+            if (IsOldCustomer)
+            {
+                var payload = new
+                {
+                    recipient = new { id = Customer.CustomerID },
+                    message = new
+                    {
+                        text = "Your order has been successfully created\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
+                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Customer : {Customer.FacebookName}\n" +
+                                       $"Address : {Customer.Address}\n" +
+                                       $"Phone number : {Customer.PhoneNumber}"
+                    },
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Error send message: {result}");
+                }
+                else
+                {
+                    Console.WriteLine("Sent message successfully");
+                }
+            }
+            else
+            {
+                 var payload = new
+                {
+                    recipient = new { id = Customer.CustomerID },
+                    message = new
+                    {
+                        text = "Your order has been successfully created\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
+                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Customer : {Customer.FacebookName}\n" +
+                                       "Please provide your address and phone number for shipping!"
+                    },
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Error send message: {result}");
+                }
+                else
+                {
+                    Console.WriteLine("Sent message successfully");
+                }
+            }  
         }
     }
 }
