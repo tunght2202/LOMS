@@ -154,12 +154,12 @@ namespace LOMSAPI.Repositories.Products
 
             if (stock < reduceProduct)
             {
-                throw new Exception("stock not enough !");
+                throw new Exception("Stock not enough !");
             }
 
             if (reduceProduct < 0)
             {
-                throw new Exception("reduce product can't is  negative number");
+                throw new Exception("Reduce product can't is  negative number");
             }
 
             product.Stock = product.Stock - reduceProduct;
