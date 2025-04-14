@@ -17,6 +17,7 @@
 	<ItemGroup>
 		<PackageReference Include="glidex.forms" Version="2.1.1.648" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Xamarin.AndroidX.SwipeRefreshLayout" Version="1.1.0.4" />
 		<PackageReference Include="Xamarin.FFImageLoading" Version="2.4.11.982" />
 		<PackageReference Include="Xamarin.FFImageLoading.Transformations" Version="2.4.11.982" />
 		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2478" />

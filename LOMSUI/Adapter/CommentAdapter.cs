@@ -37,14 +37,36 @@ namespace LOMSUI.Adapter
                      .Error(Resource.Drawable.mtrl_ic_error)
                      .Into(commentHolder.ImgCustomerAvatar);
 
-                // Xóa sự kiện cũ trước khi gán sự kiện mới (tránh lặp sự kiện)
-                commentHolder.BtnCreateOrder.Click -= (s, e) => OnCreateOrder?.Invoke(comment);
-                commentHolder.BtnCreateOrder.Click += (s, e) => OnCreateOrder?.Invoke(comment);
+                // XÓA sự kiện trước bằng cách clear toàn bộ rồi gán lại
+                commentHolder.BtnCreateOrder.Click -= BtnCreateOrder_Click;
+                commentHolder.BtnCreateOrder.Click += BtnCreateOrder_Click;
 
-                commentHolder.BtnViewInfo.Click -= (s, e) => OnViewInfo?.Invoke(comment);
-                commentHolder.BtnViewInfo.Click += (s, e) => OnViewInfo?.Invoke(comment);
+                commentHolder.BtnViewInfo.Click -= BtnViewInfo_Click;
+                commentHolder.BtnViewInfo.Click += BtnViewInfo_Click;
+
+                // Gán comment làm Tag để sử dụng trong event
+                commentHolder.BtnCreateOrder.Tag = new CommentWrapper(comment);
+                commentHolder.BtnViewInfo.Tag = new CommentWrapper(comment);
+
             }
         }
+
+        private void BtnCreateOrder_Click(object sender, EventArgs e)
+        {
+            if (sender is View view && view.Tag is CommentWrapper wrapper)
+            {
+                OnCreateOrder?.Invoke(wrapper.Comment);
+            }
+        }
+
+        private void BtnViewInfo_Click(object sender, EventArgs e)
+        {
+            if (sender is View view && view.Tag is CommentWrapper wrapper)
+            {
+                OnViewInfo?.Invoke(wrapper.Comment);
+            }
+        }
+
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
