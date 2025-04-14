@@ -176,6 +176,11 @@ namespace LOMSAPI.Repositories.Products
             product.Status = false; return await _context.SaveChangesAsync();
         }
 
+        public Task<int> AddProduct(ProductModel product)
+        {
+            throw new NotImplementedException();
+        }
 
+        
     }
 }
