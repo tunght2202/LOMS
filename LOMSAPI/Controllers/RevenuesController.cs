@@ -1,8 +1,12 @@
 ﻿using LOMSAPI.Repositories.Revenues;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LOMSAPI.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
     public class RevenuesController : ControllerBase
     {
         private readonly IRevenueRepository _revenueRepository;

@@ -1,9 +1,13 @@
 ﻿
+using Azure;
 using Azure.Core;
 using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -15,13 +19,16 @@ namespace LOMSAPI.Repositories.Orders
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly IListProductRepository _listProductRepository;
-
+        private readonly IConfiguration _configuration;
+        private string ACCESS_TOKEN;
         public OrderRepository(LOMSDbContext context, HttpClient httpClient
-            , IListProductRepository listProductRepository)
+            , IListProductRepository listProductRepository, IConfiguration configuration)
         {
             _context = context;
             _httpClient = httpClient;
             _listProductRepository = listProductRepository;
+            _configuration = configuration;
+            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token not configured.");
         }
 
         private OrderModel MapToModel(Order order)
@@ -39,7 +46,6 @@ namespace LOMSAPI.Repositories.Orders
                     ProductID = order.ProductID,
                     ProductCode = order.Product.ProductCode,
                     Description = order.Product.Description,
-                    UserID = order.Product.UserID,
                     Name = order.Product.Name,
                     ImageURL = order.Product.ImageURL,
                     Price = order.Product.Price,
@@ -172,7 +178,7 @@ namespace LOMSAPI.Repositories.Orders
         // cộng trừ trong kho 
         // update số lượng sản phẩm trong order thì update luôn số lương sản phẩm trong stock
 
-        public async Task<int> CreateOrderFromComments(string liveStreamId)
+        public async Task<int> CreateOrderFromComments2(string liveStreamId)
         {
             try
             {
@@ -248,6 +254,7 @@ namespace LOMSAPI.Repositories.Orders
 
                                 await _context.Orders.AddAsync(newOrder);
                                 result += await _context.SaveChangesAsync();
+                                await SendMessageAsync(newOrder.OrderID);
                             }
                         }
                     }
@@ -286,6 +293,7 @@ namespace LOMSAPI.Repositories.Orders
                                     };
 
                                     await _context.Orders.AddAsync(newOrder);
+                                    await SendMessageAsync(newOrder.OrderID);
                                     result += await _context.SaveChangesAsync();
                                 }
                             }
@@ -302,5 +310,162 @@ namespace LOMSAPI.Repositories.Orders
                 return 0;
             }
         }
+        public async Task<int> CreateOrderFromComments(string liveStreamId)
+        {
+            try
+            {
+
+                var liveStream = await _context.LiveStreams
+                    .FirstOrDefaultAsync(l => l.LivestreamID.Equals(liveStreamId));
+
+                if (liveStream == null)
+                {
+                    throw new ArgumentException("Invalid LiveStreamID");
+                }
+                if (liveStream.ListProductID == null)
+                {
+                    throw new ArgumentException("Invalid ListProductID");
+                }
+
+                var listProductID = liveStream.ListProductID.Value;
+
+                var products = await _listProductRepository.GetProductListProductById(listProductID);
+                var productCodeToId = products.ToDictionary(p => p.ProductCode.ToLower(), p => p.ProductID);
+                var order = await _context.Orders
+                    .Where(o => o.Comment.LiveStreamCustomer.LivestreamID == liveStreamId)
+                    .ToListAsync();
+                var comments = new List<Comment>();
+                    comments = await _context.Comments
+                    .Where(c => c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
+                    .ToListAsync();
+                // produccode xnumber prr 3, prt, 
+                var result = 0;
+                var regex = new Regex(@"\b(?<code>[a-zA-Z]+\d*)\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
+
+                foreach (var comment in comments.OrderBy(c => c.CommentTime))
+                {
+                    if((order.Count <= 0)||(!order.Any(x => x.CommentID.Equals(comment.CommentID))))
+                    {
+
+                    
+                            var match = regex.Match(comment.Content);
+                            if (match.Success)
+                            {
+                                string code = match.Groups["code"].Value.ToLower();
+                                int quantity = 1;
+                                if (match.Groups["qty"].Success)
+                                {
+                                    quantity = int.Parse(match.Groups["qty"].Value);
+                                }
+
+                                if (productCodeToId.TryGetValue(code, out int productId))
+                                {
+                                    var product = await _context.Products.FindAsync(productId);
+                                    if (product != null)
+                                    {
+                                        
+                                        if (product.Stock < quantity)
+                                        {
+                                            continue;
+                                        }
+                                        product.Stock -= quantity;
+                                    }
+                                    var newOrder = new Order
+                                    {
+                                        ProductID = productId,
+                                        Quantity = quantity,
+                                        CommentID = comment.CommentID,
+                                        OrderDate = comment.CommentTime
+                                    };
+
+                                    await _context.Orders.AddAsync(newOrder);
+                                    result += await _context.SaveChangesAsync();
+                                }
+                            }
+                    }
+
+
+                }
+                
+                    return result ;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return 0;
+            }
+        }
+
+        private async Task SendMessageAsync(int orderID)
+        {
+            var Order = await _context.Orders.FindAsync(orderID);
+            var Comment = await _context.Comments.FindAsync(Order.OrderID);
+            var LiveStreamCustomer = await _context.LiveStreamsCustomers.FindAsync(Comment.LiveStreamCustomerID);
+            var Customer = await _context.Customers.FindAsync(LiveStreamCustomer.CustomerID);
+            bool IsOldCustomer = Customer.Address == null || Customer.PhoneNumber == null;
+            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={ACCESS_TOKEN}";
+            
+            if (IsOldCustomer)
+            {
+                var payload = new
+                {
+                    recipient = new { id = Customer.CustomerID },
+                    message = new
+                    {
+                        text = "Your order has been successfully created\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
+                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Customer : {Customer.FacebookName}\n" +
+                                       $"Address : {Customer.Address}\n" +
+                                       $"Phone number : {Customer.PhoneNumber}"
+                    },
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Error send message: {result}");
+                }
+                else
+                {
+                    Console.WriteLine("Sent message successfully");
+                }
+            }
+            else
+            {
+                 var payload = new
+                {
+                    recipient = new { id = Customer.CustomerID },
+                    message = new
+                    {
+                        text = "Your order has been successfully created\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
+                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Customer : {Customer.FacebookName}\n" +
+                                       "Please provide your address and phone number for shipping!"
+                    },
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Error send message: {result}");
+                }
+                else
+                {
+                    Console.WriteLine("Sent message successfully");
+                }
+            }  
+        }
+
+
     }
 }

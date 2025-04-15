@@ -221,8 +221,10 @@ namespace LOMSAPI.Repositories.Users
         public async Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model)
         {
             try
+
             {
                 var oldEmail = user.Email;
+
                 var userInfo = new User();
                 if (model.UserName != null)
                 {
@@ -269,8 +271,9 @@ namespace LOMSAPI.Repositories.Users
                 }
                 else
                 {
+                    userInfo.Email = model.Email;
                     var otpCode = new Random().Next(100000, 999999).ToString();
-                    await SendEmailAsync(model.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
                     await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
@@ -305,7 +308,10 @@ namespace LOMSAPI.Repositories.Users
             if (string.IsNullOrEmpty(userInfoString)) return false;
 
             var userInfo = JsonConvert.DeserializeObject<User>(userInfoString);
-            user.Email = userEmail;
+            if (userInfo.Email != null)
+            {
+                user.Email = userInfo.Email;
+            }
             if (userInfo.UserName != null)
             {
                 user.UserName = userInfo.UserName;

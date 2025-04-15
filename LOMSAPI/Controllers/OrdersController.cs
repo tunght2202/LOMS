@@ -1,6 +1,7 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LOMSAPI.Controllers
@@ -73,7 +74,7 @@ namespace LOMSAPI.Controllers
         {
             if (liveStreamId == null) return BadRequest("liveStreamId is null");
             var result = await _orderRepo.CreateOrderFromComments(liveStreamId);
-            return result > 0 ? Ok() : NotFound("Can't create this order");
+            return result > 0 ? Ok(result) : NotFound("Can't create this order");
         }
 
         [HttpPut("{id}")]

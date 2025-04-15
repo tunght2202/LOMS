@@ -30,6 +30,7 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_comments);
 
+            BottomNavHelper.SetupFooterNavigation(this);
 
             _apiService = new ApiService();
             _allComments = new List<CommentModel>();

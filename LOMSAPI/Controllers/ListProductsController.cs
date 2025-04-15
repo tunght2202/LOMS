@@ -1,6 +1,7 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ListProductsController : ControllerBase
     {
         private readonly IListProductRepository _context;
@@ -18,16 +20,16 @@ namespace LOMSAPI.Controllers
         }
         // Thanh Tùng
         // Get all List Product 
-        [HttpGet("GetAllListProduct")]
-        public async Task<IActionResult> GetAllListProduct()
-        {
-            var listListProduct = await _context.GetAllListProduct();
-            if (listListProduct == null)
+            [HttpGet("GetAllListProduct")]
+            public async Task<IActionResult> GetAllListProduct()
             {
-                return NotFound("not found any list product");
+                var listListProduct = await _context.GetAllListProduct();
+                if (listListProduct == null)
+                {
+                    return NotFound("not found any list product");
+                }
+                return Ok(listListProduct);
             }
-            return Ok(listListProduct);
-        }
         // Thanh Tùng
         // Get List Product by Name 
 
