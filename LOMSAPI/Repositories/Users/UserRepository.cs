@@ -221,8 +221,10 @@ namespace LOMSAPI.Repositories.Users
         public async Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model)
         {
             try
+
             {
                 var oldEmail = user.Email;
+
                 var userInfo = new User();
                 if (model.UserName != null)
                 {

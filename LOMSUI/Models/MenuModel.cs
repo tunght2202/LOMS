@@ -6,6 +6,6 @@ namespace LOMSUI.Models
     {
         public string UserName { get; set; }
         public string Email { get; set; }
-        // Thêm các thuộc tính khác nếu cần
+        public string ImageURL { get; set; }
     }
 }

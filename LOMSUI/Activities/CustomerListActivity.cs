@@ -24,6 +24,8 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_customer_list);
 
+            BottomNavHelper.SetupFooterNavigation(this);
+
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewCustomers);
             _txtNoCustomers = FindViewById<TextView>(Resource.Id.txtNoCustomers);
             _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);

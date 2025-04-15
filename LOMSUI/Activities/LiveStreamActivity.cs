@@ -11,6 +11,7 @@ using Android.Views;
 using AndroidX.RecyclerView.Widget;
 using System.Linq;
 using AndroidX.SwipeRefreshLayout.Widget;
+using LOMSUI.Activities;
 
 namespace LOMSUI
 {
@@ -28,6 +29,8 @@ namespace LOMSUI
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_live_stream);
+
+            BottomNavHelper.SetupFooterNavigation(this);
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
             _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);

@@ -11,7 +11,6 @@ namespace LOMSUI.Models
     {
         public string Email { get; set; }
 
-        [JsonProperty("OtpCode")]  
-        public string Otp { get; set; }
+        public string OtpCode { get; set; }
     }
 }
