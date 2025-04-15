@@ -1,13 +1,16 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.Products;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
@@ -42,8 +45,10 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Get List Product By User 
         [HttpGet("GetAllProductsByUser/{userId}")]
-        public async Task<ActionResult<ProductModel>> GetAllProductsByUser(string userId)
+        public async Task<ActionResult<ProductModel>> GetAllProductsByUser()
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var product = await _productRepository.GetAllProductsByUser(userId);
             if (product == null)
             {
@@ -57,7 +62,8 @@ namespace LOMSAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> AddProduct([FromForm] PostProductModel product,IFormFile image)
         {
-            var result = await _productRepository.AddProduct(product, image);
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _productRepository.AddProduct(product, image, userId);
             if (result == 1)
             {
                 return Ok();
