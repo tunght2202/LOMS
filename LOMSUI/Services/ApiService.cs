@@ -514,5 +514,26 @@ namespace LOMSUI.Services
             }
         }
 
+        //GetAllproduct
+        public async Task<List<ProductModel>> GetAllproduct()
+        {
+            string url = $"{BASE_URLL}/Products/GetProducts";
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<List<ProductModel>>(json);
+                    return data ?? new List<ProductModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching live streams from Facebook: {ex.Message}");
+            }
+            return new List<ProductModel>();
+        }
+
     }
 }
