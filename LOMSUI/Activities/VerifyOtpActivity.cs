@@ -32,20 +32,39 @@ namespace LOMSUI
         private async Task VerifyOtpAsync()
         {
             string otp = _otpEditText.Text.Trim();
-            if (!ValidateInput(otp, "Please enter OTP code!")) return;
 
-            var request = new VerifyOtpModel { Email = _email, Otp = otp };
-            if (await _apiService.VerifyOtpAsync(request))
+            // Validate OTP format
+            if (otp.Length != 6)
             {
-                ShowToast("Valid OTP! Please enter new password.");
-                NavigateToActivity<ResetPasswordActivity>("email", _email, "otp", otp);
+                ShowToast("OTP code must be 6 digits.");
+                return;
             }
-            else
+
+            var request = new VerifyOtpModel
             {
-                ShowToast("OTP code is invalid or expired.");
-            }
+                Email = _email,
+                OtpCode = otp
+            };
+
+            Console.WriteLine($"Sending OTP Verification for Email: {_email}");
+
+            bool isOtpValid = await _apiService.VerifyOtpAsync(request);
+
+            RunOnUiThread(() =>
+            {
+                if (isOtpValid)
+                {
+                    ShowToast("Valid OTP! Please enter a new password.");
+                    NavigateToActivity<ResetPasswordActivity>("email", _email, "otp", otp);
+                }
+                else
+                {
+                    ShowToast("OTP code is invalid or expired.");
+                }
+            });
         }
 
+        
         private bool ValidateInput(string input, string errorMessage)
         {
             if (string.IsNullOrEmpty(input))

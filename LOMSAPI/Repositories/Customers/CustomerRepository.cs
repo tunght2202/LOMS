@@ -136,6 +136,7 @@ namespace LOMSAPI.Repositories.Customers
                                {
                                    CustomerID = c.CustomerID,
                                    FacebookName = c.Customer.FacebookName,
+                                   ImageURL=c.Customer.ImageURL,
                                    FullName = c.Customer.FullName,
                                    Email = c.Customer.Email,
                                    Address = c.Customer.Address,
@@ -146,7 +147,7 @@ namespace LOMSAPI.Repositories.Customers
                 .GroupBy(ct => ct.CustomerID)
                 .Select(cus => cus.FirstOrDefault())
                 .ToListAsync();
-            if(customers == null)
+            if (customers == null)
             {
                 throw new Exception($"No customers found for user {userId}");
             }

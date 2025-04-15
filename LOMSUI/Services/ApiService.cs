@@ -10,6 +10,8 @@ using LOMSUI.Models;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
 using System.Collections.Generic;
+using System.Net.Http.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LOMSUI.Services
 {
@@ -69,11 +71,49 @@ namespace LOMSUI.Services
         }
 
 
-        public async Task<bool> RequestOtpAsync(ForgotPasswordModel model) => await SendPostRequestAsync("reset-password-request", model);
-        public async Task<bool> VerifyOtpAsync(VerifyOtpModel model) => await SendPostRequestAsync("reset-password-verify-otp", model, checkMessage: "OTP hợp lệ");
-        public async Task<bool> ResetPasswordAsync(ResetPasswordModel model) => await SendPostRequestAsync("reset-password", model);
+        public async Task<bool> RequestOtpAsync(ForgotPasswordModel model)
+        {
+             return await SendPostRequestAsync("reset-password-request", model);
+        }
+        public async Task<bool> VerifyOtpAsync(VerifyOtpModel model)
+        {
+            return await SendPostRequestAsync("reset-password-verify-otp", model, checkMessage: "OTP valid. You can reset your password.");
+        }
 
-        // add RegisterAsync
+        public async Task<bool> ResetPasswordAsync(ResetPasswordModel model) 
+        {
+
+            return await SendPostRequestAsync("reset-password", model);
+        }
+
+        private async Task<bool> SendPostRequestAsync(string endpoint, object model, string checkMessage = null)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var url = $"{BASE_URL.TrimEnd('/')}/{endpoint.TrimStart('/')}";
+
+                using (var response = await _httpClient.PostAsync(url, content))
+                {
+                    if (!response.IsSuccessStatusCode) return false;
+
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+
+                    if (!string.IsNullOrEmpty(checkMessage))
+                        return (responseData?.message ?? "").ToString().Contains(checkMessage);
+
+                    return responseData?.success ?? true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
         public async Task<bool> RegisterAsync(RegisterModel registerModel)
         {
             try
@@ -99,34 +139,24 @@ namespace LOMSUI.Services
             }
         }
 
-        private async Task<bool> SendPostRequestAsync(string endpoint, object model, string checkMessage = null)
+        public async Task<UserModels> GetUserProfileAsync(string token)
         {
-            try
+            string url = $"{BASE_URL}/user-profile";
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
             {
-                string json = JsonConvert.SerializeObject(model);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/{endpoint}", content))
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-
-                    if (!response.IsSuccessStatusCode) return false;
-
-                    var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
-                    if (checkMessage != null)
-                    {
-                        string message = responseData?.message;
-                        return !string.IsNullOrEmpty(message) && message.Contains(checkMessage);
-                    }
-
-                    return responseData?.success ?? true;
-                }
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<UserModels>(json);
             }
-            catch (Exception ex)
+            else
             {
-                return false;
+                throw new Exception("Unable to get user information");
             }
         }
+
+
         public async Task<List<CommentModel>> GetComments(string liveStreamId)
         {
             try
@@ -286,6 +316,37 @@ namespace LOMSUI.Services
             return false;
         }
 
+        public async Task<bool> SetupListProductAsync(string livestreamId, int listProductId)
+        {
+            var response = await _httpClient.PutAsync(
+                $"{BASE_URLL}/ListProducts/AddListProductInToLiveStream/listProductID/{listProductId}/liveStreamID/{livestreamId}",
+                null); 
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<ListProductModel>> GetListProductsAsync(string token)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/ListProducts/GetAllListProduct");
+
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<ListProductModel>>(responseContent);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetListProductsAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+
+
+
         public async Task<CustomerModel> GetCustomerByIdAsync(string customerId)
         {
             var response = await _httpClient.GetAsync($"{BASE_URLL}/Customers/GetCustomerById/{customerId}");
@@ -381,6 +442,61 @@ namespace LOMSUI.Services
         }
 
 
+
+        public async Task<string> UpdateUserProfileRequestAsync(UserModels model, string token)
+        {
+            var content = new MultipartFormDataContent();
+
+            if (!string.IsNullOrEmpty(model.UserName))
+                content.Add(new StringContent(model.UserName), "UserName");
+
+            if (!string.IsNullOrEmpty(model.PhoneNumber))
+                content.Add(new StringContent(model.PhoneNumber), "PhoneNumber");
+
+            if (!string.IsNullOrEmpty(model.Email))
+                content.Add(new StringContent(model.Email), "Email");
+
+            if (!string.IsNullOrEmpty(model.Address))
+                content.Add(new StringContent(model.Address), "Address");
+
+            if (!string.IsNullOrEmpty(model.Gender))
+                content.Add(new StringContent(model.Gender), "Gender");
+
+            if (!string.IsNullOrEmpty(model.Password))
+                content.Add(new StringContent(model.Password), "Password");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfile-request", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            return responseContent;
+        }
+
+
+        public async Task<bool> VerifyOtpAndUpdateProfileAsync(VerifyOtpModel otpModel, string token)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(otpModel);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfie", content);
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Response: {responseContent}");
+
+                var jsonResponse = JObject.Parse(responseContent);
+                var message = jsonResponse["message"]?.ToString();
+
+                return !string.IsNullOrEmpty(message) && message.Contains("Information edited successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in VerifyOtpAndUpdateProfileAsync: {ex.Message}");
+                return false;
+            }
+        }
 
     }
 }
