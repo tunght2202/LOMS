@@ -3,11 +3,11 @@
     android:id="@+id/bottomNavLinearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:layout_gravity="bottom"
+    android:orientation="horizontal"
     android:background="#50BD81">
 
-    <LinearLayout
+	<LinearLayout
         android:id="@+id/statisticsLayout"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
@@ -15,23 +15,23 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
+		<ImageView
             android:id="@+id/statisticsImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/statistics"
             android:layout_marginTop="8dp" />
 
-        <TextView
+		<TextView
             android:id="@+id/statisticsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thống kê"
+            android:text="Statistical"
             android:textSize="12sp"
             android:textColor="#000000"/>
-    </LinearLayout>
+	</LinearLayout>
 
-    <LinearLayout
+	<LinearLayout
         android:id="@+id/sellLayout"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
@@ -39,23 +39,23 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
+		<ImageView
             android:id="@+id/sellImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/sell"
             android:layout_marginTop="8dp" />
 
-        <TextView
+		<TextView
             android:id="@+id/sellTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bán hàng"
+            android:text="Sell"
             android:textSize="12sp"
             android:textColor="#000000"/>
-    </LinearLayout>
+	</LinearLayout>
 
-    <LinearLayout
+	<LinearLayout
         android:id="@+id/productsLayout"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
@@ -63,23 +63,23 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
+		<ImageView
             android:id="@+id/productsImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/productselling"
             android:layout_marginTop="8dp" />
 
-        <TextView
+		<TextView
             android:id="@+id/productsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sản phẩm"
+            android:text="Product"
             android:textSize="12sp"
             android:textColor="#000000"/>
-    </LinearLayout>
+	</LinearLayout>
 
-    <LinearLayout
+	<LinearLayout
         android:id="@+id/customersLayout"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
@@ -87,23 +87,23 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
+		<ImageView
             android:id="@+id/customersImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/customer"
             android:layout_marginTop="8dp" />
 
-        <TextView
+		<TextView
             android:id="@+id/customersTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Khách hàng"
+            android:text="Customer"
             android:textSize="12sp"
             android:textColor="#000000"/>
-    </LinearLayout>
+	</LinearLayout>
 
-    <LinearLayout
+	<LinearLayout
         android:id="@+id/menuLayout"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
@@ -111,20 +111,20 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
+		<ImageView
             android:id="@+id/menuImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/menucustom"
+            android:src="@drawable/menuhome"
             android:layout_marginTop="8dp" />
 
-        <TextView
+		<TextView
             android:id="@+id/menuTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Menu"
             android:textSize="12sp"
             android:textColor="#000000"/>
-    </LinearLayout>
+	</LinearLayout>
 
 </LinearLayout>
