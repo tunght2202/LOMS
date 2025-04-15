@@ -84,7 +84,7 @@ namespace LOMSUI.Activities
                     _phoneEditText.Text = user.PhoneNumber;
                     _emailEditText.Text = user.Email;
                     _addressEditText.Text = user.Address;
-                    _genderSpinner.SetSelection(user.Gender == "Nam" ? 0 : 1);
+                    _genderSpinner.SetSelection(user.Gender == "Female" ? 0 : 1);
                 }
             }
             catch (Exception ex)

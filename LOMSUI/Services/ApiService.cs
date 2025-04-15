@@ -70,6 +70,22 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> UpdateFacebookTokenAsync(string token)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsync($"{BASE_URL}/update-token-facebook?token={token}", null);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Update Token Response: {responseBody}");
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating Facebook token: {ex.Message}");
+                return false;
+            }
+        }
 
         public async Task<bool> RequestOtpAsync(ForgotPasswordModel model)
         {
@@ -321,7 +337,7 @@ namespace LOMSUI.Services
             var response = await _httpClient.PutAsync(
                 $"{BASE_URLL}/ListProducts/AddListProductInToLiveStream/listProductID/{listProductId}/liveStreamID/{livestreamId}",
                 null); 
-
+                
             return response.IsSuccessStatusCode;
         }
 
