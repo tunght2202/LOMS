@@ -112,7 +112,8 @@ namespace LOMSUI.Activities
 
             fanpageLinkLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Liên kết fanpage", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(FacebookTokenActivity));
+                StartActivity(intent);
             };
 
             printerConnectionLayout.Click += (sender, e) =>
