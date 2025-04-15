@@ -10,11 +10,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using LOMSAPI.Services;
-using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
-using static System.Net.Mime.MediaTypeNames;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 namespace LOMSAPI.Repositories.Users
 {
     public class UserRepository : IUserRepository
@@ -349,6 +345,19 @@ namespace LOMSAPI.Repositories.Users
             await _cache.RemoveAsync($"OTP_UPDATE_{userEmail}");
             await _cache.RemoveAsync("UPDATE_EMAIL");
 
+            return true;
+        }
+
+        public async Task<bool> UpdateTokenFacbook(string token, string userid)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userid);
+            if (user == null)
+            {
+                return false;
+            }
+            user.TokenFacbook = token;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
             return true;
         }
     }
