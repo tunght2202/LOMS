@@ -8,7 +8,6 @@ namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _orderRepo;
@@ -75,7 +74,7 @@ namespace LOMSAPI.Controllers
         {
             if (liveStreamId == null) return BadRequest("liveStreamId is null");
             var result = await _orderRepo.CreateOrderFromComments(liveStreamId);
-            return result > 0 ? Ok() : NotFound("Can't create this order");
+            return result > 0 ? Ok(result) : NotFound("Can't create this order");
         }
 
         [HttpPut("{id}")]
