@@ -26,7 +26,6 @@ namespace LOMSAPI.Repositories.Products
                 ProductID = product.ProductID,
                 ProductCode = product.ProductCode,
                 Description = product.Description,
-                UserID = product.UserID,
                 Name = product.Name,
                 Price = product.Price,
                 Stock = product.Stock,
@@ -42,7 +41,6 @@ namespace LOMSAPI.Repositories.Products
                 ProductID = product.ProductID,
                 ProductCode = product.ProductCode,
                 Description = product.Description,
-                UserID = product.UserID,
                 Name = product.Name,
                 Price = product.Price,
                 Stock = product.Stock,
@@ -50,12 +48,22 @@ namespace LOMSAPI.Repositories.Products
                 ImageURL = product.ImageURL
             };
         }
+        private Product MapToPostEntity(PostProductModel product)
+        {
+            return new Product
+            {
+                ProductCode = product.ProductCode,
+                Description = product.Description,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                Status = product.Status,
+            };
+        }
         public async Task<IEnumerable<ProductModel>> GetAllProducts()
         {
             var listProduct = await _context.Products.ToListAsync();
-
-            var getProductList = listProduct.ToList();
-            return getProductList.Select(x => MapToModel(x));
+            return listProduct.Select(x => MapToModel(x));
         }
 
         public async Task<ProductModel> GetProductById(int id)
@@ -89,25 +97,16 @@ namespace LOMSAPI.Repositories.Products
             return productList;
         }
 
-        public async Task<int> AddProduct(PostProductModel postProduct, IFormFile imge)
+        public async Task<int> AddProduct(PostProductModel postProduct, IFormFile imge, string userId)
         {
             if (postProduct == null)
             {
                 throw new Exception("Product can't null");
             }
             string imageUrl = await _cloudinaryService.UploadImageAsync(imge);
-            postProduct.ImageURL = imageUrl;
-            var product = new Product()
-            {
-                ProductCode = postProduct.ProductCode,
-                Description = postProduct.Description,
-                UserID = postProduct.UserID,
-                Name = postProduct.Name,
-                Price = postProduct.Price,
-                Stock = postProduct.Stock,
-                Status = postProduct.Status,
-                ImageURL = postProduct.ImageURL
-            };
+            var product = MapToPostEntity(postProduct);
+            product.ImageURL = imageUrl;
+            product.UserID = userId;
             await _context.Products.AddAsync(product);
             return await _context.SaveChangesAsync();
 
@@ -176,6 +175,11 @@ namespace LOMSAPI.Repositories.Products
             product.Status = false; return await _context.SaveChangesAsync();
         }
 
+        public Task<int> AddProduct(ProductModel product)
+        {
+            throw new NotImplementedException();
+        }
 
+        
     }
 }
