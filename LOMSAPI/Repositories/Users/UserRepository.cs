@@ -272,7 +272,7 @@ namespace LOMSAPI.Repositories.Users
                 else
                 {
                     var otpCode = new Random().Next(100000, 999999).ToString();
-                    await SendEmailAsync(model.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
                     await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)

@@ -18,16 +18,16 @@ namespace LOMSAPI.Controllers
         }
         // Thanh Tùng
         // Get all List Product 
-        [HttpGet("GetAllListProduct")]
-        public async Task<IActionResult> GetAllListProduct()
-        {
-            var listListProduct = await _context.GetAllListProduct();
-            if (listListProduct == null)
+            [HttpGet("GetAllListProduct")]
+            public async Task<IActionResult> GetAllListProduct()
             {
-                return NotFound("not found any list product");
+                var listListProduct = await _context.GetAllListProduct();
+                if (listListProduct == null)
+                {
+                    return NotFound("not found any list product");
+                }
+                return Ok(listListProduct);
             }
-            return Ok(listListProduct);
-        }
         // Thanh Tùng
         // Get List Product by Name 
 

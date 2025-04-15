@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-	<LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#00a880"
         android:gravity="center">
 
-		<ImageView
+        <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -19,15 +19,15 @@
             android:layout_marginBottom="10dp"
             android:src="@drawable/logo_loms" />
 
-	</LinearLayout>
-	<LinearLayout
+    </LinearLayout>
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="16dp"
         android:layout_gravity="center">
 
-		<TextView
+        <TextView
             android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             android:layout_gravity="center_horizontal"
             android:textColor="@android:color/black"
             android:layout_marginBottom="20dp" />
-		<TextView
+        <TextView
             android:id="@+id/txtNoOrders"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,13 +46,15 @@
             android:gravity="center"
             android:layout_marginTop="16dp"
             android:visibility="gone" />
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewOrders"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:scrollbars="vertical" />
 
-		<androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewOrders"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:scrollbars="vertical" />
-	</LinearLayout>
+    <include layout="@layout/layout_bottom_nav" />
 
 </LinearLayout>

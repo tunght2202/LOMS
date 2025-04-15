@@ -121,12 +121,16 @@ namespace LOMSUI.Activities
                     Password = password
                 }, _token);
 
-                if (result.Contains("authentication code"))
+                if (result.Contains("Please enter email verification code."))
                 {
                     Toast.MakeText(this, "OTP code sent to email, please verify.", ToastLength.Long).Show();
                     var intent = new Intent(this, typeof(VerifyOtpUpdateUserActivity));
-                    intent.PutExtra("email", email); 
+                    intent.PutExtra("email", email);
                     StartActivity(intent);
+                }
+                else if (result.Contains("Information edited successfully."))
+                {
+                    Toast.MakeText(this, "Information updated successfully!", ToastLength.Long).Show();
                 }
                 else
                 {

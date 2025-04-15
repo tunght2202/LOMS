@@ -1,4 +1,4 @@
-using Android.Content;
+﻿using Android.Content;
 using LOMSUI.Models;
 using LOMSUI.Services;
 
@@ -59,14 +59,11 @@ namespace LOMSUI.Activities
 
             try
             {
-                var otpModel = new VerifyOtpModel
+                var success = await _apiService.VerifyOtpAndUpdateProfileAsync(new VerifyOtpModel
                 {
-                    Otp = otpCode,
-                    Email = _email
-                };
-
-                bool success = await _apiService.VerifyOtpAndUpdateProfileAsync(otpModel, _token);
-
+                    Email = _email, 
+                    OtpCode = otpCode
+                }, _token);
                 if (success)
                 {
                     Toast.MakeText(this, "Email verified and profile updated successfully.", ToastLength.Long).Show();
