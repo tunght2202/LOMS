@@ -17,7 +17,8 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.menu);
 
-            // Lấy các view từ layout
+            BottomNavHelper.SetupFooterNavigation(this);
+
             TextView userNameTextView = FindViewById<TextView>(Resource.Id.userNameTextView);
             TextView emailTextView = FindViewById<TextView>(Resource.Id.emailTextView);
             ImageView ImageView = FindViewById<ImageView>(Resource.Id.profileImageView);
@@ -32,10 +33,6 @@ namespace LOMSUI.Activities
             LinearLayout printerConnectionLayout = FindViewById<LinearLayout>(Resource.Id.printerConnectionLayout);
             LinearLayout privacyPolicyLayout = FindViewById<LinearLayout>(Resource.Id.privacyPolicyLayout);
             LinearLayout termsOfUseLayout = FindViewById<LinearLayout>(Resource.Id.termsOfUseLayout);
-            LinearLayout statisticsLayout = FindViewById<LinearLayout>(Resource.Id.statisticsLayout);
-            LinearLayout sellLayout = FindViewById<LinearLayout>(Resource.Id.sellLayout);
-            LinearLayout productsLayout = FindViewById<LinearLayout>(Resource.Id.productsLayout);
-            LinearLayout customersLayout = FindViewById<LinearLayout>(Resource.Id.customersLayout);
 
             var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
             string token = prefs.GetString("token", null);
@@ -129,27 +126,6 @@ namespace LOMSUI.Activities
             termsOfUseLayout.Click += (sender, e) =>
             {
                 Toast.MakeText(this, "Điều khoản sử dụng", ToastLength.Short).Show();
-            };
-
-            statisticsLayout.Click += (sender, e) =>
-            {
-                Toast.MakeText(this, "Thống kê", ToastLength.Short).Show();
-            };
-
-            sellLayout.Click += (sender, e) =>
-            {
-                Toast.MakeText(this, "Bán hàng", ToastLength.Short).Show();
-            };
-
-            productsLayout.Click += (sender, e) =>
-            {
-                Intent intent = new Intent(this, typeof(ProductActivity));
-                StartActivity(intent);
-            };
-
-            customersLayout.Click += (sender, e) =>
-            {
-                Toast.MakeText(this, "Khách hàng", ToastLength.Short).Show();
             };
 
         }

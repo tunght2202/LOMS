@@ -29,7 +29,8 @@ namespace LOMSUI.Activities
 
             productsLayout.Click += (sender, e) =>
             {
-               
+                var intent = new Intent(activity, typeof(ProductActivity));
+                activity.StartActivity(intent);
             };
 
             customersLayout.Click += (sender, e) =>

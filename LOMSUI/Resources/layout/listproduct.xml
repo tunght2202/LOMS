@@ -34,7 +34,6 @@
 
 	</LinearLayout>
 
-	<!-- Nội dung chính: danh sách + trạng thái + nút thêm -->
 	<LinearLayout
         android:id="@+id/productContentLayout"
         android:layout_width="match_parent"
@@ -58,7 +57,7 @@
 		<ListView
             android:id="@+id/productListView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+			android:layout_height="wrap_content"
             android:layout_weight="1"
             android:divider="#cccccc"
             android:dividerHeight="1dp" />
@@ -74,7 +73,6 @@
 
 	</LinearLayout>
 
-	<!-- Footer -->
 	<include layout="@layout/layout_bottom_nav" />
 
 </LinearLayout>
