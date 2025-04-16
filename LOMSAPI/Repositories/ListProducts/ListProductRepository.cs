@@ -179,12 +179,15 @@ namespace LOMSAPI.Repositories.ListProducts
             var listProduct = await _context.ListProducts
                 .FirstOrDefaultAsync(lp => lp.ListProductId == listProductId);
 
-            if (listProduct == null)
+            if (listProduct == null || listProductId == 0)
             {
-                throw new Exception("ListProductID does not exist.");
+                liveStream.ListProductID = null;
+            }
+            else
+            {
+                liveStream.ListProductID = listProductId;
             }
 
-            liveStream.ListProductID = listProductId;
             var result = await _context.SaveChangesAsync();
             return result;
         }
