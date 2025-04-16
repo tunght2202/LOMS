@@ -293,8 +293,8 @@ namespace LOMSAPI.Repositories.Orders
                                     };
 
                                     await _context.Orders.AddAsync(newOrder);
-                                    await SendMessageAsync(newOrder.OrderID);
                                     result += await _context.SaveChangesAsync();
+                                    await SendMessageAsync(newOrder.OrderID);
                                 }
                             }
                         }

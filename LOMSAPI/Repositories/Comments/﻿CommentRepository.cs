@@ -28,7 +28,6 @@ namespace LOMSAPI.Repositories.Comments
 
         public async Task<List<Comment>> GetAllComments(string LiveStreamId)
         {
-            //string liveStreamId = ExtractLiveStreamId(LiveStreamURL);
             if (string.IsNullOrEmpty(LiveStreamId))
                 throw new ArgumentException("Unable to get LiveStream ID from URL");
             await _cache.SetStringAsync("Livestream_Id", LiveStreamId, new DistributedCacheEntryOptions
