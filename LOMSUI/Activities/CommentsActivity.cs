@@ -33,6 +33,13 @@ namespace LOMSUI.Activities
             BottomNavHelper.SetupFooterNavigation(this);
 
             _apiService = new ApiService();
+            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+            string token = prefs.GetString("token", null);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _apiService.SetToken(token);
+            }
             _allComments = new List<CommentModel>();
 
             txtLiveStreamId = FindViewById<EditText>(Resource.Id.txtLiveStreamId);

@@ -182,66 +182,24 @@ namespace LOMSUI.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception($"Request failed with status code {response.StatusCode}");
+                    Console.WriteLine($"API error: {response.StatusCode}");
+                    return new List<CommentModel>();
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"API Response: {json}");
 
-                var apiResponse = JsonConvert.DeserializeObject<List<dynamic>>(json);
-                List<CommentModel> comments = new List<CommentModel>();
+                var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
 
-                if (apiResponse != null && apiResponse.Any())
+                if (comments == null || comments.Count == 0)
                 {
-                    foreach (var item in apiResponse)
-                    {
-                        try
-                        {
-                            comments.Add(new CommentModel
-                            {
-                                CommentID = item.commentID?.ToString() ?? "",
-                                Content = item.content?.ToString() ?? "",
-                                CommentTime = item.commentTime != null ? (DateTime)item.commentTime : DateTime.MinValue,
-                                CustomerID = item.liveStreamCustomer?.customer?.customerID?.ToString() ?? "",
-                                CustomerName = item.liveStreamCustomer?.customer?.facebookName?.ToString() ?? "Ẩn danh",
-                                LiveStreamID = item.liveStreamCustomer?.livestreamID?.ToString() ?? "",
-                                AvatarUrl = item.liveStreamCustomer?.customer?.imageURL?.ToString() ?? ""
-                            });
-
-                            var nestedComments = item.liveStreamCustomer?.comments?["$values"];
-                            if (nestedComments != null)
-                            {
-                                foreach (var nestedComment in nestedComments)
-                                {
-                                    comments.Add(new CommentModel
-                                    {
-                                        CommentID = nestedComment.commentID?.ToString() ?? "",
-                                        Content = nestedComment.content?.ToString() ?? "",
-                                        CommentTime = nestedComment.commentTime != null ? (DateTime)nestedComment.commentTime : DateTime.MinValue,
-                                        CustomerID = item.liveStreamCustomer?.customer?.customerID?.ToString() ?? "",
-                                        CustomerName = item.liveStreamCustomer?.customer?.facebookName?.ToString() ?? "Ẩn danh",
-                                        LiveStreamID = item.liveStreamCustomer?.livestreamID?.ToString() ?? "",
-                                        AvatarUrl = item.liveStreamCustomer?.customer?.imageURL?.ToString() ?? ""
-                                    });
-                                }
-                            }
-                        }
-                        catch (Exception innerEx)
-                        {
-                            Console.WriteLine($"Error processing item: {innerEx.Message}");
-                        }
-                    }
-
-                    comments = comments.GroupBy(c => c.CommentID).Select(g => g.First()).ToList();
-
-                    comments = comments.Where(c => !string.IsNullOrEmpty(c.Content)).ToList();
-
-                    Console.WriteLine($"Total comments after processing: {comments.Count}");
+                    Console.WriteLine("No comments found or parsing failed.");
+                    return new List<CommentModel>();
                 }
-                else
-                {
-                    Console.WriteLine("No comments were returned by the API.");
-                }
+
+                comments = comments.Where(c => !string.IsNullOrEmpty(c.Content)).ToList();
+
+                Console.WriteLine($"Total comments: {comments.Count}");
 
                 return comments;
             }
@@ -253,25 +211,6 @@ namespace LOMSUI.Services
         }
 
 
-
-
-        /* public async Task<List<CommentModel>> GetCommentsByProductCode(string liveStreamURL, string productCode)
-         {
-             try
-             {
-                 string fullUrl = $"{BASE_URLL}/Comment/get-comments-productcode?liveStreamURL={liveStreamURL}&ProductCode={productCode}";
-                 var response = await _httpClient.GetAsync(fullUrl);
-                 var json = await response.Content.ReadAsStringAsync();
-                 var comments = JsonConvert.DeserializeObject<List<CommentModel>>(json);
-
-                 return comments ?? new List<CommentModel>();
-             }
-             catch (Exception)
-             {
-                 return new List<CommentModel>();
-             }
-         }
- */
 
         public async Task<List<LiveStreamModel>> GetAllLiveStreams()
         {
@@ -295,7 +234,6 @@ namespace LOMSUI.Services
 
 
 
-        // Lấy chi tiết livestream theo ID
         public async Task<LiveStreamModel> GetLiveStreamByIdAsync(string livestreamId)
         {
             string url = $"{BASE_URLL}/LiveStreams/{livestreamId}";

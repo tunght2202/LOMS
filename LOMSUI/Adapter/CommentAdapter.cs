@@ -37,14 +37,12 @@ namespace LOMSUI.Adapter
                      .Error(Resource.Drawable.mtrl_ic_error)
                      .Into(commentHolder.ImgCustomerAvatar);
 
-                // XÓA sự kiện trước bằng cách clear toàn bộ rồi gán lại
                 commentHolder.BtnCreateOrder.Click -= BtnCreateOrder_Click;
                 commentHolder.BtnCreateOrder.Click += BtnCreateOrder_Click;
 
                 commentHolder.BtnViewInfo.Click -= BtnViewInfo_Click;
                 commentHolder.BtnViewInfo.Click += BtnViewInfo_Click;
 
-                // Gán comment làm Tag để sử dụng trong event
                 commentHolder.BtnCreateOrder.Tag = new CommentWrapper(comment);
                 commentHolder.BtnViewInfo.Tag = new CommentWrapper(comment);
 
