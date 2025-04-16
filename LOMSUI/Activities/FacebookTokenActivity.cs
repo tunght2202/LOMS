@@ -8,7 +8,7 @@ public class FacebookTokenActivity : Activity
 {
     private EditText etTokenCode;
     private Button updateTokenButton;
-    private ApiService _apiService = new ApiService();
+    private ApiService _apiService;
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -20,13 +20,8 @@ public class FacebookTokenActivity : Activity
         etTokenCode = FindViewById<EditText>(Resource.Id.etTokenCode);
         updateTokenButton = FindViewById<Button>(Resource.Id.updateTokenButton);
 
-        var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-        string token = prefs.GetString("token", null);
+        _apiService = ApiServiceProvider.Instance;
 
-        if (!string.IsNullOrEmpty(token))
-        {
-            _apiService.SetToken(token);
-        }
 
         updateTokenButton.Click += async (s, e) =>
         {

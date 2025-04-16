@@ -12,6 +12,7 @@ namespace LOMSUI.Activities
         private int _orderId;
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_order_detail);
 
             _orderId = Intent.GetIntExtra("OrderId", -1);
@@ -47,7 +48,7 @@ namespace LOMSUI.Activities
             _txtTotalPrice.Text =$"Price: {order.Quantity * order.Product.Price:n0}đ";
             _txtOrderStatus.Text = "Status: " + order.Status;
             _txtProductName.Text = "Product Name: " + order.Product.Name;
-            _txtProductPrice.Text = "Price: " + order.Product.Price;
+            _txtTotalPrice.Text =$"Price: {order.Quantity * order.Product.Price:n0}đ";
         }
     }
 }

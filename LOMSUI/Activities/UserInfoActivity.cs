@@ -22,28 +22,25 @@ namespace LOMSUI.Activities
         private Spinner _genderSpinner;
         private Button _updateButton;
 
-        private ApiService _apiService = new ApiService();
+        private ApiService _apiService;
         private string _token; 
 
-        protected override async void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)   
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_user_info);
+
+            _token = ApiServiceProvider.Token;
+
+            _apiService = ApiServiceProvider.Instance;
 
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             ActionBar.SetHomeButtonEnabled(true);
 
             InitViews();
 
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            _token = prefs.GetString("token", null);
+            _apiService = ApiServiceProvider.Instance;
 
-            if (string.IsNullOrEmpty(_token))
-            {
-                Toast.MakeText(this, "Token not found, please login again", ToastLength.Long).Show();
-                Finish();
-                return;
-            }
 
             await LoadUserInfo();
 

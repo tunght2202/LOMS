@@ -309,7 +309,11 @@ namespace LOMSUI.Services
                 var content = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<CustomerModel>(content);
             }
-            return null;
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error {response.StatusCode}: {error}");
+            }
         }
 
         public async Task<bool> UpdateCustomerAsync(string customerId, CustomerModel customer)
@@ -319,6 +323,7 @@ namespace LOMSUI.Services
             var response = await _httpClient.PutAsync($"{BASE_URLL}/Customers/UpdateCustomerByID/{customerId}", content);
             return response.IsSuccessStatusCode;
         }
+
 
         public async Task<List<CustomerModel>> GetCustomersByLiveStreamIdAsync(string liveStreamID)
         {
@@ -334,11 +339,11 @@ namespace LOMSUI.Services
             throw new Exception($"Unable to load customer list: {response.StatusCode} - {response.ReasonPhrase}");
         }
 
-        public async Task<List<CustomerModel>> GetCustomersByUserIdAsync(string userId)
+        public async Task<List<CustomerModel>> GetCustomersByUserIdAsync()
         {
             try
             {
-                var url = $"{BASE_URLL}/Customers/User/{userId}";
+                var url = $"{BASE_URLL}/Customers/User";
                 var response = await _httpClient.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -445,7 +450,6 @@ namespace LOMSUI.Services
             if (!string.IsNullOrEmpty(model.Password))
                 content.Add(new StringContent(model.Password), "Password");
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfile-request", content);
             var responseContent = await response.Content.ReadAsStringAsync();
 

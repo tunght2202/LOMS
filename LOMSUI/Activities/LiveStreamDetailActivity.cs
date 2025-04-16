@@ -21,7 +21,7 @@ namespace LOMSUI
         private string _status;
         private string _startTime;
         private string _token;
-        private readonly ApiService _apiService = new ApiService();
+        private  ApiService _apiService = new ApiService();
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -39,8 +39,12 @@ namespace LOMSUI
             _btnViewCustomers = FindViewById<Button>(Resource.Id.btnViewCustomers);
             _btnViewOrders = FindViewById<Button>(Resource.Id.btnViewOrders);
 
+
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");
-            _token = GetSharedPreferences("auth", FileCreationMode.Private).GetString("token", null);
+            _apiService = ApiServiceProvider.Instance;
+
+            _token = ApiServiceProvider.Token;
+
 
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");
             _title = Intent.GetStringExtra("Title");

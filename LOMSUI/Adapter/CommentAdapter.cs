@@ -32,7 +32,7 @@ namespace LOMSUI.Adapter
                 commentHolder.TxtCommentTime.Text = comment.GetFormattedTime();
 
                 Glide.With(commentHolder.ItemView.Context)
-                     .Load(comment.AvatarUrl)
+                     .Load(comment.customerAvatar)
                      .Placeholder(Resource.Drawable.loms)
                      .Error(Resource.Drawable.mtrl_ic_error)
                      .Into(commentHolder.ImgCustomerAvatar);

@@ -22,6 +22,7 @@ namespace LOMSUI.Activities
         private CustomerAdapter _adapter;
         private List<CustomerModel> _customers = new List<CustomerModel>();
         private string _liveStreamID;
+        private ApiService _apiService;
         private SwipeRefreshLayout _swipeRefreshLayout;
 
 
@@ -37,6 +38,8 @@ namespace LOMSUI.Activities
             _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
+
+            _apiService = ApiServiceProvider.Instance;
 
             _liveStreamID = Intent.GetStringExtra("LiveStreamID");
 
@@ -58,8 +61,8 @@ namespace LOMSUI.Activities
         {
             try
             {
-                var apiService = new ApiService();
-                _customers = await apiService.GetCustomersByLiveStreamIdAsync(_liveStreamID);
+                //var apiService = new ApiService();
+                _customers = await _apiService.GetCustomersByLiveStreamIdAsync(_liveStreamID);
 
                 RunOnUiThread(() =>
                 {
