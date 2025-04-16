@@ -31,6 +31,7 @@ namespace LOMSAPI.Repositories.Orders
             _httpClient = httpClient;
             _listProductRepository = listProductRepository;
             _configuration = configuration;
+
             _print = print;
         }
 

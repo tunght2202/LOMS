@@ -32,7 +32,8 @@ namespace LOMSUI.Activities
 
             BottomNavHelper.SetupFooterNavigation(this);
 
-            _apiService = new ApiService();
+            _apiService = ApiServiceProvider.Instance;
+
             _allComments = new List<CommentModel>();
 
             txtLiveStreamId = FindViewById<EditText>(Resource.Id.txtLiveStreamId);
@@ -136,7 +137,7 @@ namespace LOMSUI.Activities
             {
                 if (comments == null || comments.Count == 0)
                 {
-                    recyclerViewComments.Visibility = Android.Views.ViewStates.Gone;
+                    recyclerViewComments.Visibility = Android.Views.ViewStates.Visible;
                     txtNoComments.Visibility = Android.Views.ViewStates.Visible;
                     txtNoComments.Text = "No comments!";
 

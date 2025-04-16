@@ -16,6 +16,7 @@ namespace LOMSUI.Activities
         private CustomerAdapter _adapter;
         private List<CustomerModel> _customers = new List<CustomerModel>();
         private string userId;
+        private ApiService _apiService;
         private SwipeRefreshLayout _swipeRefreshLayout;
 
         protected override async void OnCreate(Bundle? savedInstanceState)
@@ -32,15 +33,8 @@ namespace LOMSUI.Activities
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            userId = prefs.GetString("userID", "");
+            _apiService = ApiServiceProvider.Instance;
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                Toast.MakeText(this, "Missing userID!", ToastLength.Short).Show();
-                Finish();
-                return;
-            }
             _swipeRefreshLayout.Refresh += async (s, e) =>
             {
                 await LoadCustomers();
@@ -53,8 +47,7 @@ namespace LOMSUI.Activities
         {
             try
             {
-                var apiService = new ApiService();
-                _customers = await apiService.GetCustomersByUserIdAsync(userId);
+                _customers = await _apiService.GetCustomersByUserIdAsync();
 
                 RunOnUiThread(() =>
                 {
