@@ -139,7 +139,7 @@ namespace LOMSAPI.Controllers
                 return Unauthorized(new { message = "User not authenticated" });
             }
 
-            var result = await _userRepository.UpdateTokenFacbook(token,userId);
+            var result = await _userRepository.UpdateTokenFacbook(token, userId);
             if (!result)
             {
                 return BadRequest(new { message = "Error updating Facebook token" });
