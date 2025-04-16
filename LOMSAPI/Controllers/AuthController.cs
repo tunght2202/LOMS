@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using Azure.Core;
 
 namespace LOMSAPI.Controllers
 {
@@ -128,6 +129,23 @@ namespace LOMSAPI.Controllers
             if (!result) return BadRequest("OTP code is invalid or expired.");
 
             return Ok(new { message = "Information edited successfully." });
+        }
+        [HttpPut("update-token-facebook")]
+        public async Task<IActionResult> UpdateTokenFacebook(string token)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "User not authenticated" });
+            }
+
+            var result = await _userRepository.UpdateTokenFacbook(token,userId);
+            if (!result)
+            {
+                return BadRequest(new { message = "Error updating Facebook token" });
+            }
+
+            return Ok(new { message = "Facebook token updated successfully!" });
         }
     }
 }
