@@ -17,7 +17,6 @@ namespace LOMSAPI.Repositories.LiveStreams
             _context = context;
             _httpClient = httpClient;
             _configuration = configuration;
-            _accessToken = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token không được cấu hình.");
             _pageId = _configuration["Facebook:PageId"] ?? throw new ArgumentNullException("Page ID không được cấu hình.");
         }
 
@@ -40,6 +39,15 @@ namespace LOMSAPI.Repositories.LiveStreams
             if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
                 throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
 
+            // Fetch the user's Facebook token from the database
+            var user = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new { u.TokenFacbook })
+                .FirstOrDefaultAsync();
+
+            if (user == null || string.IsNullOrEmpty(user.TokenFacbook))
+                throw new UnauthorizedAccessException("User not found or no Facebook token available.");
+            _accessToken = user.TokenFacbook;
             var liveStreamsFromFacebook = new List<LiveStream>();
             string apiUrl = $"https://graph.facebook.com/v22.0/{_pageId}/live_videos?fields=id,title,creation_time,status,embed_html,permalink_url&access_token={_accessToken}";
 
