@@ -200,11 +200,6 @@ namespace LOMSAPI.Repositories.Orders
             return orders.Select(o => MapToModel(o));
         }
 
-        // Kiểm tra thời gian order xem có bị trùng nhau không
-        // gủi messager
-        // cộng trừ trong kho 
-        // update số lượng sản phẩm trong order thì update luôn số lương sản phẩm trong stock
-
         public async Task<int> CreateOrderFromComments(string liveStreamId)
         {
             try

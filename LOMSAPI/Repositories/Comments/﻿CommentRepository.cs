@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
+using LOMSAPI.Models;
 
 namespace LOMSAPI.Repositories.Comments
 {
@@ -15,20 +16,17 @@ namespace LOMSAPI.Repositories.Comments
         private readonly IDistributedCache _cache;
 
         private readonly IConfiguration _configuration;
-        private string ACCESS_TOKEN;
         public CommentRepository(LOMSDbContext context, HttpClient httpClient, IDistributedCache cache, IConfiguration configuration)
         {
             _context = context;
             _httpClient = httpClient;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _configuration = configuration;
-            ACCESS_TOKEN = "EAAIYLfie53cBO9QXqZBGgGAkpn0zEQLpPG2sv2g0dFeicmLxWYwUGuhe5ab5BrZCZCFkbvemgpMkxP8CU0gH3ljMaxz08csqTCNvHscAng337DZBGG0p2zdqqqObT4G2VZBKowMu54TPb2eRUYpew4AmBtlbiKOjqZCVBirXUXopRhY32XzU8U0UyMnho1fR6yM6g8T5SR3xjBREqbNPK7cTsZD";
         }
 
 
-        public async Task<List<Comment>> GetAllComments(string LiveStreamId)
+        public async Task<List<CommentModel>> GetAllComments(string LiveStreamId, string token)
         {
-            //string liveStreamId = ExtractLiveStreamId(LiveStreamURL);
             if (string.IsNullOrEmpty(LiveStreamId))
                 throw new ArgumentException("Unable to get LiveStream ID from URL");
             await _cache.SetStringAsync("Livestream_Id", LiveStreamId, new DistributedCacheEntryOptions
@@ -36,7 +34,7 @@ namespace LOMSAPI.Repositories.Comments
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
             });
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={ACCESS_TOKEN}";
+            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={token}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
@@ -46,24 +44,11 @@ namespace LOMSAPI.Repositories.Comments
             return await ParseCommentsAsync(jsonResponse, LiveStreamId);
         }
 
-
-        public async Task<List<Comment>> GetCommentsByProductCode(string ProductCode)
-        {
-            var LiveStreamId = await _cache.GetStringAsync("Livestream_Id");
-            List<Comment> allComments = await GetAllComments(LiveStreamId);
-            var filteredComments = allComments
-                            .Where(c => c.Content.Contains(ProductCode, StringComparison.OrdinalIgnoreCase))
-                            .OrderBy(c => c.CommentTime)
-                            .ToList();
-
-            return filteredComments;
-        }
-
-        private async Task<List<Comment>> ParseCommentsAsync(string jsonResponse, string liveStreamId)
+        private async Task<List<CommentModel>> ParseCommentsAsync(string jsonResponse, string liveStreamId)
         {
             using JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement root = doc.RootElement;
-            List<Comment> comments = new List<Comment>();
+            List<CommentModel> comments = new List<CommentModel>();
             if (root.TryGetProperty("data", out JsonElement dataElement))
             {
                 foreach (JsonElement item in dataElement.EnumerateArray())
@@ -72,21 +57,14 @@ namespace LOMSAPI.Repositories.Comments
                     string? content = item.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : "";
                     DateTime commentTime = DateTime.Parse(item.GetProperty("created_time").GetString().Replace("+0000", "Z"));
 
-                    string? customerID = item.TryGetProperty("from", out JsonElement fromElement)
-                                && fromElement.TryGetProperty("id", out JsonElement idElement)
-                                ? idElement.GetString()
-                                : null;
-
-                    string? customerName = item.TryGetProperty("from", out JsonElement from1Element)
-                                && from1Element.TryGetProperty("name", out JsonElement nameElement)
-                                ? nameElement.GetString()
-                                : null;
-                    string? avatar = item.TryGetProperty("from", out JsonElement from2Element) &&
-                            from2Element.TryGetProperty("picture", out JsonElement pictureElement) &&
-                            pictureElement.TryGetProperty("data", out JsonElement data1Element) &&
-                            data1Element.TryGetProperty("url", out JsonElement urlElement)
-                            ? urlElement.GetString()
-                            : null;
+                    JsonElement? fromElement = item.TryGetProperty("from", out var fe) ? fe : (JsonElement?)null;
+                    string? customerID = fromElement?.TryGetProperty("id", out var idElement) == true ? idElement.GetString() : null;
+                    string? customerName = fromElement?.TryGetProperty("name", out var nameElement) == true ? nameElement.GetString() : null;
+                    string? avatar = fromElement?.TryGetProperty("picture", out var pictureElement) == true &&
+                                     pictureElement.TryGetProperty("data", out var data1Element) &&
+                                     data1Element.TryGetProperty("url", out var urlElement)
+                                     ? urlElement.GetString()
+                                     : null;
 
 
                     // Kiểm tra nếu có dữ liệu bị null
@@ -128,14 +106,22 @@ namespace LOMSAPI.Repositories.Comments
                             _context.Comments.Add(new Comment
                             {
                                 CommentID = commentID,
-                                Content = content,
+                                Content = content,  
                                 CommentTime = commentTime,
                                 LiveStreamCustomerID = liveStreamCustomerId,
                             });
                             await _context.SaveChangesAsync();
                         }
                         var comment = await _context.Comments.FirstOrDefaultAsync(s => s.CommentID == commentID);
-                        comments.Add(comment);
+                        comments.Add(new CommentModel
+                        {
+                            CommentID = comment.CommentID,
+                            CustomerId = customerID,
+                            CustomerName = customerName,
+                            Content = comment.Content,
+                            CommentTime = commentTime,
+                            CustomerAvatar = avatar
+                        });
                     }
                     catch (DbUpdateException ex)
                     {
