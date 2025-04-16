@@ -20,7 +20,6 @@ namespace LOMSAPI.Repositories.Orders
         private readonly HttpClient _httpClient;
         private readonly IListProductRepository _listProductRepository;
         private readonly IConfiguration _configuration;
-        private string ACCESS_TOKEN;
         public OrderRepository(LOMSDbContext context, HttpClient httpClient
             , IListProductRepository listProductRepository, IConfiguration configuration)
         {
@@ -28,7 +27,6 @@ namespace LOMSAPI.Repositories.Orders
             _httpClient = httpClient;
             _listProductRepository = listProductRepository;
             _configuration = configuration;
-            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token not configured.");
         }
 
         private OrderModel MapToModel(Order order)
@@ -310,7 +308,7 @@ namespace LOMSAPI.Repositories.Orders
                 return 0;
             }
         }
-        public async Task<int> CreateOrderFromComments(string liveStreamId)
+        public async Task<int> CreateOrderFromComments(string liveStreamId, string userid)
         {
             try
             {
@@ -396,14 +394,14 @@ namespace LOMSAPI.Repositories.Orders
             }
         }
 
-        private async Task SendMessageAsync(int orderID)
+        private async Task SendMessageAsync(int orderID, string userid)
         {
             var Order = await _context.Orders.FindAsync(orderID);
             var Comment = await _context.Comments.FindAsync(Order.OrderID);
             var LiveStreamCustomer = await _context.LiveStreamsCustomers.FindAsync(Comment.LiveStreamCustomerID);
             var Customer = await _context.Customers.FindAsync(LiveStreamCustomer.CustomerID);
             bool IsOldCustomer = Customer.Address == null || Customer.PhoneNumber == null;
-            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={ACCESS_TOKEN}";
+            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={userid}";
             
             if (IsOldCustomer)
             {
