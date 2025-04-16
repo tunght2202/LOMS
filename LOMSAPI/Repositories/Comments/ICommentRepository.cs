@@ -1,9 +1,9 @@
 ﻿using LOMSAPI.Data.Entities;
+using LOMSAPI.Models;
 namespace LOMSAPI.Repositories.Comments
 {
     public interface ICommentRepository
     {
-        Task<List<Comment>> GetAllComments(string LiveStreamId);
-        Task<List<Comment>> GetCommentsByProductCode(string ProductCode);
+        Task<List<CommentModel>> GetAllComments(string LiveStreamId, string token);
     }
 }
