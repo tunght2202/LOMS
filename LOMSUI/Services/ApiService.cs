@@ -1,17 +1,9 @@
-﻿using System;
-using System.Buffers.Text;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Android.Util;
 using LOMSUI.Models;
 using Newtonsoft.Json;
-using Xamarin.Essentials;
-using System.Collections.Generic;
-using System.Net.Http.Json;
 using Newtonsoft.Json.Linq;
+using LOMSAPI.Models;
 
 namespace LOMSUI.Services
 {
@@ -155,6 +147,48 @@ namespace LOMSUI.Services
             }
         }
 
+
+        public async Task<RevenueData> GetRevenueDataAsync()
+        {
+            try
+            {
+                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-revenue"))
+                {
+                    if (!response.IsSuccessStatusCode) return null;
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<RevenueData>(responseBody);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching revenue data: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> GetTotalOrdersAsync()
+        {
+            try
+            {
+                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders")) 
+                {
+                    if (!response.IsSuccessStatusCode) return -1;
+                        
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseBody);
+                    return orderResponse?.TotalOrders ?? -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching total orders: {ex.Message}");
+                return -1;
+            }
+        }
+
+
+
         public async Task<UserModels> GetUserProfileAsync(string token)
         {
             string url = $"{BASE_URL}/user-profile";
@@ -284,9 +318,13 @@ namespace LOMSUI.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync($"{BASE_URLL}/ListProducts/GetAllListProduct");
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/ListProducts/GetAllListProduct"); 
 
-                response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"API call failed: {response.StatusCode}");
+                    return new List<ListProductModel>(); 
+                }
 
                 var responseContent = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<List<ListProductModel>>(responseContent);
@@ -294,9 +332,10 @@ namespace LOMSUI.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in GetListProductsAsync: {ex.Message}");
-                throw;
+                return new List<ListProductModel>(); 
             }
         }
+
 
 
 
@@ -516,18 +555,22 @@ namespace LOMSUI.Services
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
-                if (response.IsSuccessStatusCode)
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var data = JsonConvert.DeserializeObject<List<ProductModel>>(json);
-                    return data ?? new List<ProductModel>();
+                    Console.WriteLine($"API error: {response.StatusCode} - {response.ReasonPhrase}");
+                    return new List<ProductModel>(); 
                 }
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<List<ProductModel>>(json);
+                return data ?? new List<ProductModel>();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching live streams from Facebook: {ex.Message}");
+                Console.WriteLine($"Error fetching products: {ex.Message}");
+                return new List<ProductModel>();
             }
-            return new List<ProductModel>();
         }
 
     }

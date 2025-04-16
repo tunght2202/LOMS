@@ -1,11 +1,6 @@
-﻿using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Widget;
+﻿using Android.Content;
 using Bumptech.Glide;
-using LOMSUI.Models;
 using LOMSUI.Services;
-using System;
 
 namespace LOMSUI.Activities
 {
