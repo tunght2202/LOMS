@@ -86,8 +86,9 @@ namespace LOMSAPI.Controllers
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             User user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            string accessToken = user.TokenFacbook;
             if (liveStreamId == null) return BadRequest("liveStreamId is null");
-            var result = await _orderRepo.CreateOrderFromComments(liveStreamId, userId);
+            var result = await _orderRepo.CreateOrderFromComments(liveStreamId, accessToken);
             return result > 0 ? Ok(result) : NotFound("Can't create this order");
         }
 
