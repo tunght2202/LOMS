@@ -38,7 +38,6 @@ namespace LOMSUI
                 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
-            // Khởi tạo ApiService và set token từ SharedPreferences
             _apiService = new ApiService();
             var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
             string token = prefs.GetString("token", null);

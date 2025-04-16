@@ -22,7 +22,7 @@ namespace LOMSAPI.Repositories.Comments
             _httpClient = httpClient;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _configuration = configuration;
-            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token not configured.");
+            ACCESS_TOKEN = "EAAIYLfie53cBOzepCakr5Kp7jI8aZBFoxNkDOBqLZBYAqh6pTXkDgaIVAD2KZCJsZAlceo5wdJml1BMZAgZAaGZBA9rAfOah75Lmi8SAZAKFov98yqzs8uUY5CYHyNHcPabDuEcCMjZCPeNRFP4ZBdlcN9E9LKaWQaODAykzSc8icDrQzyUVY2vAanW1qBJaqa1jRCLVdJTEBOZC8tJmtV7kLoTJjcZD";
         }
 
 

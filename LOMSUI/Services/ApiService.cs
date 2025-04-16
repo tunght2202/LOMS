@@ -457,6 +457,32 @@ namespace LOMSUI.Services
             return JsonConvert.DeserializeObject<List<OrderModel>>(json);
         }
 
+        public async Task<OrderModel> GetOrderByIdAsync(int id)
+        {
+            try
+            {
+                var url = $"{BASE_URLL}/Orders/{id}";
+                var response = await _httpClient.GetAsync(url);
+
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"Failed to fetch order. Status Code: {response.StatusCode}");
+                        return null;
+                    }
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"API Response: {responseBody}");
+
+                    return JsonConvert.DeserializeObject<OrderModel>(responseBody);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching order: {ex.Message}");
+                return null;
+            }
+        }
 
 
         public async Task<string> UpdateUserProfileRequestAsync(UserModels model, string token)

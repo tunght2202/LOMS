@@ -47,9 +47,9 @@ namespace LOMSUI.Activities
             _adapter = new OrderHistoryAdapter(this, orders);
             _adapter.OnViewDetailClick += order =>
             {
-                // var intent = new Intent(this, typeof(OrderDetailActivity));
-                // intent.PutExtra("orderId", order.OrderID);
-                // StartActivity(intent);
+                 var intent = new Intent(this, typeof(OrderDetailActivity));
+                 intent.PutExtra("OrderId", order.OrderID);
+                 StartActivity(intent);
             };
 
             _recyclerView.SetAdapter(_adapter);

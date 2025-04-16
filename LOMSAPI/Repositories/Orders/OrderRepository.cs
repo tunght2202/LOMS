@@ -28,7 +28,7 @@ namespace LOMSAPI.Repositories.Orders
             _httpClient = httpClient;
             _listProductRepository = listProductRepository;
             _configuration = configuration;
-            ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token not configured.");
+            ACCESS_TOKEN = "EAAIYLfie53cBOzepCakr5Kp7jI8aZBFoxNkDOBqLZBYAqh6pTXkDgaIVAD2KZCJsZAlceo5wdJml1BMZAgZAaGZBA9rAfOah75Lmi8SAZAKFov98yqzs8uUY5CYHyNHcPabDuEcCMjZCPeNRFP4ZBdlcN9E9LKaWQaODAykzSc8icDrQzyUVY2vAanW1qBJaqa1jRCLVdJTEBOZC8tJmtV7kLoTJjcZD";
         }
 
         private OrderModel MapToModel(Order order)

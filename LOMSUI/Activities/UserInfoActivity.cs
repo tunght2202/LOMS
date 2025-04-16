@@ -16,12 +16,14 @@ namespace LOMSUI.Activities
     [Activity(Label = "User Update")]
     public class UserInfoActivity : Activity
     {
-        private EditText _userNameEditText, _phoneEditText, _emailEditText, _addressEditText, _passwordEditText, _confirmPasswordEditText;
+        private EditText _userNameEditText, _phoneEditText, 
+                         _emailEditText, _addressEditText, 
+                         _passwordEditText, _confirmPasswordEditText;
         private Spinner _genderSpinner;
         private Button _updateButton;
 
         private ApiService _apiService = new ApiService();
-        private string _token;
+        private string _token; 
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
