@@ -20,11 +20,12 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_order_history);
 
+            _apiService = ApiServiceProvider.Instance;
+
             _customerId = Intent.GetStringExtra("customerId");
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewOrders);
             _txtNoOrders = FindViewById<TextView>(Resource.Id.txtNoOrders);
-            _apiService = new ApiService();
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 

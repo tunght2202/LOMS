@@ -396,7 +396,7 @@ namespace LOMSAPI.Repositories.Orders
                 DiaChi = "FPT University",
                 SoDienThoai = "0123456789"
             };
-            _print.PrintCustomerLabel("COM5", printInfo);
+            _print.PrintCustomerLabel("COM4", printInfo);
             return Task.FromResult(true);
         }
     }

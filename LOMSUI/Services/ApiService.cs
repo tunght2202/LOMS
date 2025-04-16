@@ -427,6 +427,33 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> CreateOrderFromCommentAsync(string commentId)
+        {
+            var url = $"{BASE_URLL}/Orders?commentId={commentId}";
+
+            var response = await _httpClient.PostAsync(url,null);
+            return response.IsSuccessStatusCode;
+        }
+
+
+        public async Task<(bool isSuccess, string message)> CreateOrdersFromCommentsAsync(string liveStreamId)
+        {
+            var url = $"{BASE_URLL}/Orders/CreateOrderFromComments/LiveStreamID/{liveStreamId}";
+
+            var response = await _httpClient.PostAsync(url, null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return (true, $"Order {json} created successfully!");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return (false, $"{error}");
+            }
+        }
+
 
         public async Task<string> UpdateUserProfileRequestAsync(UserModels model, string token)
         {

@@ -25,8 +25,9 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_order_history);
 
+            _apiService = ApiServiceProvider.Instance;
+
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");
-            _apiService = new ApiService();
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewOrders);
             _txtNoOrders = FindViewById<TextView>(Resource.Id.txtNoOrders);
 

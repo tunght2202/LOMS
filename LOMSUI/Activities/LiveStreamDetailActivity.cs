@@ -13,9 +13,11 @@ namespace LOMSUI
     public class LiveStreamDetailActivity : Activity
     {
         private TextView _txtTitle, _txtStatus, _txtStartTime;
-        private Button _btnViewComments, _btnViewCustomers, _btnViewOrders, _btnSetupListProduct;
-        private Spinner _spinnerListProduct;
+        private Button _btnViewComments, _btnViewCustomers,
+                       _btnViewOrders, _btnSetupListProduct,
+                       _btnAutoCreateOrder;
 
+        private Spinner _spinnerListProduct;
         private string _liveStreamId;
         private string _title;
         private string _status;
@@ -34,6 +36,7 @@ namespace LOMSUI
             _txtStatus = FindViewById<TextView>(Resource.Id.txtLiveStatus);
             _txtStartTime = FindViewById<TextView>(Resource.Id.txtLiveStartTime);
             _btnSetupListProduct = FindViewById<Button>(Resource.Id.btnSetupListProduct);
+            _btnAutoCreateOrder = FindViewById<Button>(Resource.Id.btnAutoCreateOrder);
             _spinnerListProduct = FindViewById<Spinner>(Resource.Id.spinnerListProduct);
             _btnViewComments = FindViewById<Button>(Resource.Id.btnViewComments);
             _btnViewCustomers = FindViewById<Button>(Resource.Id.btnViewCustomers);
@@ -41,6 +44,7 @@ namespace LOMSUI
 
 
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");
+
             _apiService = ApiServiceProvider.Instance;
 
             _token = ApiServiceProvider.Token;
@@ -59,8 +63,12 @@ namespace LOMSUI
 
             _btnSetupListProduct.Click += async (s, e) => await SetupListProduct();
 
+            _btnAutoCreateOrder.Click += async (sender, e) =>
+            {
+                await HandleAutoCreateOrderAsync();
+            };
 
-            _btnViewComments.Click += (s, e) =>
+           _btnViewComments.Click += (s, e) =>
             {
                 var intent = new Intent(this, typeof(CommentsActivity));
                 intent.PutExtra("LivestreamID", _liveStreamId);
@@ -89,7 +97,10 @@ namespace LOMSUI
             {
                 var listProducts = await _apiService.GetListProductsAsync(_token);
 
-                var adapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleSpinnerItem, listProducts.Select(lp => lp.ListProductName).ToList());
+                var displayList = new List<string> { "Not Select" };
+                displayList.AddRange(listProducts.Select(lp => lp.ListProductName));
+
+                var adapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleSpinnerItem, displayList);
                 adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
                 _spinnerListProduct.Adapter = adapter;
             }
@@ -98,6 +109,7 @@ namespace LOMSUI
                 Toast.MakeText(this, "Error loading products: " + ex.Message, ToastLength.Long).Show();
             }
         }
+
 
         private async Task SetupListProduct()
         {
@@ -111,16 +123,36 @@ namespace LOMSUI
 
             try
             {
-                var listProducts = await _apiService.GetListProductsAsync(_token);
-                var selectedListProduct = listProducts[selectedIndex];
+                int listProductId = 0;
+                    
+                if (selectedIndex > 0)
+                {
+                    var listProducts = await _apiService.GetListProductsAsync(_token);
+                    listProductId = listProducts[selectedIndex - 1].ListProductId;
+                }
 
-                var success = await _apiService.SetupListProductAsync(_liveStreamId, selectedListProduct.ListProductId);
+                var success = await _apiService.SetupListProductAsync(_liveStreamId, listProductId);
 
                 Toast.MakeText(this, success ? "ListProduct setup successfully!" : "Failed to setup ListProduct.", ToastLength.Short).Show();
             }
             catch (Exception ex)
             {
                 Toast.MakeText(this, "Error setting up ListProduct: " + ex.Message, ToastLength.Long).Show();
+            }
+        }
+
+
+        private async Task HandleAutoCreateOrderAsync()
+        {
+            try
+            {
+                var (isSuccess, message) = await _apiService.CreateOrdersFromCommentsAsync(_liveStreamId);
+
+                Toast.MakeText(this, message, ToastLength.Long).Show();
+            }
+            catch (Exception ex)
+            {
+                Toast.MakeText(this, $"Erorr: {ex.Message}", ToastLength.Long).Show();
             }
         }
 
