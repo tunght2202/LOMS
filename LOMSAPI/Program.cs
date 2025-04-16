@@ -75,6 +75,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepository>();
 builder.Services.AddScoped<IRevenueRepository, RevenueRepository>();
+builder.Services.AddScoped<IPrintService, PrintService>();
 builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

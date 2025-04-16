@@ -33,9 +33,10 @@ namespace LOMSAPI.Controllers
             return Ok(orders);
         }
 
-        [HttpGet("user/{userID}")]
-        public async Task<IActionResult> GetAllByUserId(string userID)
+        [HttpGet("User")]
+        public async Task<IActionResult> GetAllByUserId()
         {
+            string userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var orders = await _orderRepo.GetAllOrdersByUserIdAsync(userID);
             if (orders == null || !orders.Any())
                 return NotFound("No orders found for the user.");
@@ -69,10 +70,14 @@ namespace LOMSAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(OrderModel model)
+        public async Task<IActionResult> Create(string commentId)
         {
-            var orderId = await _orderRepo.AddOrderAsync(model);
-            return CreatedAtAction(nameof(GetById), new { id = orderId }, model);
+            var result = await _orderRepo.AddOrderAsync(commentId);
+            if (result)
+            {
+                return Ok();
+            }
+            return BadRequest("Can't create this order");
         }
 
 
