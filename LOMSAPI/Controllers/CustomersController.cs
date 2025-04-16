@@ -40,7 +40,8 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Get customer by User ID 
         [HttpGet("User")]
-        public async Task<IActionResult> GetByUserID()
+
+        public async Task<IActionResult> GetByUserID() 
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var customer = await _customerRepository.GetCustomersByUserIdAsync(userId);

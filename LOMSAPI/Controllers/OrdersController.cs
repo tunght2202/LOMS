@@ -1,20 +1,28 @@
-﻿using LOMSAPI.Data.Entities;
+﻿using CloudinaryDotNet.Actions;
+using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _orderRepo;
-
-        public OrdersController(IOrderRepository context)
+        private readonly IDistributedCache _cache;
+        private readonly LOMSDbContext _context;
+        public OrdersController(IOrderRepository context,IDistributedCache cache, LOMSDbContext lomscontext)
         {
             _orderRepo = context;
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _context = lomscontext;
         }
 
         [HttpGet]
@@ -26,9 +34,10 @@ namespace LOMSAPI.Controllers
             return Ok(orders);
         }
 
-        [HttpGet("user/{userID}")]
-        public async Task<IActionResult> GetAllByUserId(string userID)
+        [HttpGet("User")]
+        public async Task<IActionResult> GetAllByUserId()
         {
+            string userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var orders = await _orderRepo.GetAllOrdersByUserIdAsync(userID);
             if (orders == null || !orders.Any())
                 return NotFound("No orders found for the user.");
@@ -62,18 +71,25 @@ namespace LOMSAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(OrderModel model)
+        public async Task<IActionResult> Create(string commentId)
         {
-            var orderId = await _orderRepo.AddOrderAsync(model);
-            return CreatedAtAction(nameof(GetById), new { id = orderId }, model);
+            var result = await _orderRepo.AddOrderAsync(commentId);
+            if (result)
+            {
+                return Ok();
+            }
+            return BadRequest("Can't create this order");
         }
          
 
         [HttpPost("CreateOrderFromComments/LiveStreamID/{liveStreamId}")]
         public async Task<IActionResult> CreateOrderFromComments(string liveStreamId)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            string accessToken = user.TokenFacbook;
             if (liveStreamId == null) return BadRequest("liveStreamId is null");
-            var result = await _orderRepo.CreateOrderFromComments(liveStreamId);
+            var result = await _orderRepo.CreateOrderFromComments(liveStreamId, accessToken);
             return result > 0 ? Ok(result) : NotFound("Can't create this order");
         }
 
@@ -90,6 +106,12 @@ namespace LOMSAPI.Controllers
         {
             var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
             return result > 0 ? Ok() : NotFound("Can;t update status of this order");
+        }
+        [HttpPut("TestPrint")]
+        public async Task<IActionResult> TestPrint()
+        {
+            await _orderRepo.PrinTest();
+            return Ok("Test print success");
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿
 using Azure;
 using Azure.Core;
+using CloudinaryDotNet;
 using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
+using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -20,15 +22,17 @@ namespace LOMSAPI.Repositories.Orders
         private readonly HttpClient _httpClient;
         private readonly IListProductRepository _listProductRepository;
         private readonly IConfiguration _configuration;
-        private string ACCESS_TOKEN;
+        private readonly IPrintService _print;
         public OrderRepository(LOMSDbContext context, HttpClient httpClient
-            , IListProductRepository listProductRepository, IConfiguration configuration)
+            , IListProductRepository listProductRepository, IConfiguration configuration
+            , IPrintService print)
         {
             _context = context;
             _httpClient = httpClient;
             _listProductRepository = listProductRepository;
             _configuration = configuration;
-            ACCESS_TOKEN = "EAAIYLfie53cBOzepCakr5Kp7jI8aZBFoxNkDOBqLZBYAqh6pTXkDgaIVAD2KZCJsZAlceo5wdJml1BMZAgZAaGZBA9rAfOah75Lmi8SAZAKFov98yqzs8uUY5CYHyNHcPabDuEcCMjZCPeNRFP4ZBdlcN9E9LKaWQaODAykzSc8icDrQzyUVY2vAanW1qBJaqa1jRCLVdJTEBOZC8tJmtV7kLoTJjcZD";
+
+            _print = print;
         }
 
         private OrderModel MapToModel(Order order)
@@ -112,13 +116,35 @@ namespace LOMSAPI.Repositories.Orders
             return await _context.Orders.AnyAsync(o => o.OrderID == orderId);
         }
         // order thủ công 
-        public async Task<int> AddOrderAsync(OrderModel orderModel)
+        public async Task<bool> AddOrderAsync(string commentId)
         {
-            orderModel.OrderDate = DateTime.Now;
-            var order = MapToEntity(orderModel);
-            await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
-            return order.OrderID;
+            try
+            {
+                if(commentId == null)
+                {
+                    throw new ArgumentNullException("Comment ID is null");
+                }
+                var commentorder = await _context.Comments
+                    .Include(c => c.LiveStreamCustomer)
+                    .ThenInclude(c => c.Customer)
+                    .FirstOrDefaultAsync(c => c.CommentID == commentId);
+                var inforPrint = new PrintInfo()
+                {
+                    TenKhach = commentorder.LiveStreamCustomer.Customer.FacebookName,
+                    ThoiGian = commentorder.CommentTime,
+                    NoiDungCommment = commentorder.Content,
+                    DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
+                    SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
+                };
+                _print.PrintCustomerLabel("COM5", inforPrint);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return false;
+            }
+
         }
 
         public async Task<int> UpdateOrderAsync(OrderModel orderModel)
@@ -173,144 +199,7 @@ namespace LOMSAPI.Repositories.Orders
             return orders.Select(o => MapToModel(o));
         }
 
-        // Kiểm tra thời gian order xem có bị trùng nhau không
-        // gủi messager
-        // cộng trừ trong kho 
-        // update số lượng sản phẩm trong order thì update luôn số lương sản phẩm trong stock
-
-        public async Task<int> CreateOrderFromComments2(string liveStreamId)
-        {
-            try
-            {
-
-                var liveStream = await _context.LiveStreams
-                    .FirstOrDefaultAsync(l => l.LivestreamID.Equals(liveStreamId));
-
-                if (liveStream == null)
-                {
-                    throw new ArgumentException("Invalid LiveStreamID");
-                }
-                if (liveStream.ListProductID == null)
-                {
-                    throw new ArgumentException("Invalid ListProductID");
-                }
-
-                var listProductID = liveStream.ListProductID.Value;
-
-                var products = await _listProductRepository.GetProductListProductById(listProductID);
-                var productCodeToId = products.ToDictionary(p => p.ProductCode.ToLower(), p => p.ProductID);
-                var order = await _context.Orders
-                    .Include(o => o.Comment)
-                    .ThenInclude(c => c.LiveStreamCustomer)
-                    .Where(o => o.Comment.LiveStreamCustomer.LivestreamID == liveStreamId)
-                    .OrderByDescending(o => o.OrderDate)
-                    .FirstOrDefaultAsync();
-                var comments = new List<Comment>();
-                if (order == null)
-                {
-                    comments = await _context.Comments
-                    .Where(c => c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
-                    .ToListAsync();
-                }
-                else
-                {
-                    comments = await _context.Comments
-                    .Where(c => (c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
-                    && (c.CommentTime >= order.Comment.CommentTime))
-                    .ToListAsync();
-                }
-                // produccode xnumber prr 3, prt, 
-                var result = 0;
-                var regex = new Regex(@"\b(?<code>[a-zA-Z]+\d*)\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
-
-                foreach (var comment in comments.OrderBy(c => c.CommentTime))
-                {
-                    if (order == null)
-                    {
-                        var match = regex.Match(comment.Content);
-                        if (match.Success)
-                        {
-                            string code = match.Groups["code"].Value.ToLower();
-                            int quantity = int.Parse(match.Groups["qty"].Value);
-
-                            if (productCodeToId.TryGetValue(code, out int productId))
-                            {
-                                var product = await _context.Products.FindAsync(productId);
-                                if (product != null)
-                                {
-                                    product.Stock -= quantity;
-                                    if (product.Stock < 0)
-                                    {
-                                        continue;
-                                    }
-                                }
-                                var newOrder = new Order
-                                {
-                                    ProductID = productId,
-                                    Quantity = quantity,
-                                    CommentID = comment.CommentID,
-                                    OrderDate = comment.CommentTime
-                                };
-
-                                await _context.Orders.AddAsync(newOrder);
-                                result += await _context.SaveChangesAsync();
-                                await SendMessageAsync(newOrder.OrderID);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (comment.CommentID != order.CommentID)
-                        {
-                            var match = regex.Match(comment.Content);
-                            if (match.Success)
-                            {
-                                string code = match.Groups["code"].Value.ToLower();
-                                int quantity = 1;
-                                if (match.Groups["qty"].Success)
-                                {
-                                    quantity = int.Parse(match.Groups["qty"].Value);
-                                }
-
-                                if (productCodeToId.TryGetValue(code, out int productId))
-                                {
-                                    var product = await _context.Products.FindAsync(productId);
-                                    if (product != null)
-                                    {
-                                        
-                                        if (product.Stock < quantity)
-                                        {
-                                            continue;
-                                        }
-                                        product.Stock -= quantity;
-                                    }
-                                    var newOrder = new Order
-                                    {
-                                        ProductID = productId,
-                                        Quantity = quantity,
-                                        CommentID = comment.CommentID,
-                                        OrderDate = comment.CommentTime
-                                    };
-
-                                    await _context.Orders.AddAsync(newOrder);
-                                    result += await _context.SaveChangesAsync();
-                                    await SendMessageAsync(newOrder.OrderID);
-                                }
-                            }
-                        }
-                    }
-
-                }
-                
-                    return result ;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return 0;
-            }
-        }
-        public async Task<int> CreateOrderFromComments(string liveStreamId)
+        public async Task<int> CreateOrderFromComments(string liveStreamId, string TokenFacbook)
         {
             try
             {
@@ -336,6 +225,7 @@ namespace LOMSAPI.Repositories.Orders
                     .ToListAsync();
                 var comments = new List<Comment>();
                     comments = await _context.Comments
+                    .Include(c => c.LiveStreamCustomer)
                     .Where(c => c.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
                     .ToListAsync();
                 // produccode xnumber prr 3, prt, 
@@ -370,17 +260,46 @@ namespace LOMSAPI.Repositories.Orders
                                         }
                                         product.Stock -= quantity;
                                     }
-                                    var newOrder = new Order
-                                    {
-                                        ProductID = productId,
-                                        Quantity = quantity,
-                                        CommentID = comment.CommentID,
-                                        OrderDate = comment.CommentTime
-                                    };
 
-                                    await _context.Orders.AddAsync(newOrder);
-                                    result += await _context.SaveChangesAsync();
+                                    var sanpham = $"{product.Name} X{quantity}";
+                                var tonggiaDecimal  = product.Price * quantity;
+                                var tonggia = (int)tonggiaDecimal;
+                                string formatted = tonggia.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND";
+                                var newOrder = new Order
+                                {
+                                    ProductID = productId,
+                                    Quantity = quantity,
+                                    CommentID = comment.CommentID,
+                                    OrderDate = comment.CommentTime
+                                };
+                                var customer = await _context.Customers
+                                    .FirstOrDefaultAsync(c => c.CustomerID.Equals(comment.LiveStreamCustomer.CustomerID));
+                                if (customer.Address != null && customer.PhoneNumber != null)
+                                {
+                                    newOrder.Status = OrderStatus.Confirmed;
                                 }
+                                    
+                                    await _context.Orders.AddAsync(newOrder);
+                                    await _context.SaveChangesAsync();
+                                    result++;
+                                await SendMessageAsync(customer.CustomerID, TokenFacbook, newOrder.OrderID);
+
+                                var ordernew = await _context.Orders
+                                    .FirstOrDefaultAsync(Orders => Orders.CommentID.Equals(comment.CommentID));
+                                var printInfo = new PrintInfo()
+                                {
+                                    MaSo = ordernew.OrderID.ToString(),
+                                    TenKhach = customer.FacebookName,
+                                    ThoiGian = comment.CommentTime,
+                                    NoiDungCommment = comment.Content,
+                                    SanPham = sanpham,
+                                    TongGia = formatted,
+                                    DiaChi = customer.Address,
+                                    SoDienThoai = customer.PhoneNumber
+                                };
+                                _print.PrintCustomerLabel("COM4", printInfo);
+
+                            }
                             }
                     }
 
@@ -396,25 +315,23 @@ namespace LOMSAPI.Repositories.Orders
             }
         }
 
-        private async Task SendMessageAsync(int orderID)
+        private async Task SendMessageAsync(string customerId, string TokenFacbook, int OrderId)
         {
-            var Order = await _context.Orders.FindAsync(orderID);
-            var Comment = await _context.Comments.FindAsync(Order.OrderID);
-            var LiveStreamCustomer = await _context.LiveStreamsCustomers.FindAsync(Comment.LiveStreamCustomerID);
-            var Customer = await _context.Customers.FindAsync(LiveStreamCustomer.CustomerID);
-            bool IsOldCustomer = Customer.Address == null || Customer.PhoneNumber == null;
-            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={ACCESS_TOKEN}";
+            Order order = await _context.Orders.FirstOrDefaultAsync(s =>s.OrderID == OrderId);
+            var Customer = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == customerId);
+            bool IsNewCustomer = Customer.Address == null || Customer.PhoneNumber == null;
+            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={TokenFacbook}";
             
-            if (IsOldCustomer)
+            if (!IsNewCustomer)
             {
                 var payload = new
                 {
-                    recipient = new { id = Customer.CustomerID },
+                    recipient = new { id = customerId },
                     message = new
                     {
                         text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
-                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
+                                       $"Order creation time : {order.OrderDate}\n" +
                                        $"Customer : {Customer.FacebookName}\n" +
                                        $"Address : {Customer.Address}\n" +
                                        $"Phone number : {Customer.PhoneNumber}"
@@ -443,8 +360,8 @@ namespace LOMSAPI.Repositories.Orders
                     message = new
                     {
                         text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
-                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
+                                       $"Order creation time : {order.OrderDate}\n" +
                                        $"Customer : {Customer.FacebookName}\n" +
                                        "Please provide your address and phone number for shipping!"
                     },
@@ -466,6 +383,21 @@ namespace LOMSAPI.Repositories.Orders
             }  
         }
 
-
+        public Task<bool> PrinTest()
+        {
+            var printInfo = new PrintInfo()
+            {
+                MaSo = "123",
+                TenKhach = "LOMS APP",
+                ThoiGian = DateTime.Now,
+                NoiDungCommment = "Thank you",
+                SanPham = "Test product X1",
+                TongGia = "10.0000 VND",
+                DiaChi = "FPT University",
+                SoDienThoai = "0123456789"
+            };
+            _print.PrintCustomerLabel("COM5", printInfo);
+            return Task.FromResult(true);
+        }
     }
 }
