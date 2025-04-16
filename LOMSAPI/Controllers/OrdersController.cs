@@ -3,6 +3,7 @@ using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
@@ -96,6 +97,12 @@ namespace LOMSAPI.Controllers
         {
             var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
             return result > 0 ? Ok() : NotFound("Can;t update status of this order");
+        }
+        [HttpPut("TestPrint")]
+        public async Task<IActionResult> TestPrint()
+        {
+            await _orderRepo.PrinTest();
+            return Ok("Test print success");
         }
     }
 }

@@ -31,6 +31,15 @@ namespace LOMSAPI.Controllers
                 return Ok(listListProduct);
             }
         // Thanh Tùng
+        // Get Exit List Product By LiveStream
+        [HttpGet("GetExitListProductByLiveStream/LiveStreamID/{liveStreamID}")]
+            public async Task<IActionResult> GetExitListProductInLiveStream(string liveStreamID)
+            {
+                var result = await _context.CheckListProductExitInLiveStream(liveStreamID);
+            
+                return Ok(result);
+            }
+        // Thanh Tùng
         // Get List Product by Name 
 
         [HttpGet("GetListProductByName/{listProductName}")]

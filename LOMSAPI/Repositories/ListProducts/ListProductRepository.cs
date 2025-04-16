@@ -189,5 +189,11 @@ namespace LOMSAPI.Repositories.ListProducts
             return result;
         }
 
+        public Task<bool> CheckListProductExitInLiveStream(string liveStreamId)
+        {
+            var result = _context.LiveStreams
+                .AnyAsync(x => x.LivestreamID.Equals(liveStreamId) && x.ListProductID != null);
+            return result;
+        }
     }
 }
