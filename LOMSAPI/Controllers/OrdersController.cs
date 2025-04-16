@@ -1,21 +1,27 @@
-﻿using LOMSAPI.Data.Entities;
+﻿using CloudinaryDotNet.Actions;
+using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _orderRepo;
-
-        public OrdersController(IOrderRepository context)
+        private readonly IDistributedCache _cache;
+        private readonly LOMSDbContext _context;
+        public OrdersController(IOrderRepository context,IDistributedCache cache, LOMSDbContext lomscontext)
         {
             _orderRepo = context;
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _context = lomscontext;
         }
 
         [HttpGet]
@@ -78,8 +84,11 @@ namespace LOMSAPI.Controllers
         [HttpPost("CreateOrderFromComments/LiveStreamID/{liveStreamId}")]
         public async Task<IActionResult> CreateOrderFromComments(string liveStreamId)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            string accessToken = user.TokenFacbook;
             if (liveStreamId == null) return BadRequest("liveStreamId is null");
-            var result = await _orderRepo.CreateOrderFromComments(liveStreamId);
+            var result = await _orderRepo.CreateOrderFromComments(liveStreamId, accessToken);
             return result > 0 ? Ok(result) : NotFound("Can't create this order");
         }
 

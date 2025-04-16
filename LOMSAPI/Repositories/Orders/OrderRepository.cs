@@ -23,7 +23,6 @@ namespace LOMSAPI.Repositories.Orders
         private readonly IListProductRepository _listProductRepository;
         private readonly IConfiguration _configuration;
         private readonly IPrintService _print;
-        private string ACCESS_TOKEN;
         public OrderRepository(LOMSDbContext context, HttpClient httpClient
             , IListProductRepository listProductRepository, IConfiguration configuration
             , IPrintService print)
@@ -33,7 +32,6 @@ namespace LOMSAPI.Repositories.Orders
             _listProductRepository = listProductRepository;
             _configuration = configuration;
             _print = print;
-            //ACCESS_TOKEN = _configuration["Facebook:AccessToken"] ?? throw new ArgumentNullException("Access token not configured.");
         }
 
         private OrderModel MapToModel(Order order)
@@ -200,7 +198,7 @@ namespace LOMSAPI.Repositories.Orders
             return orders.Select(o => MapToModel(o));
         }
 
-        public async Task<int> CreateOrderFromComments(string liveStreamId)
+        public async Task<int> CreateOrderFromComments(string liveStreamId, string TokenFacbook)
         {
             try
             {
@@ -282,7 +280,8 @@ namespace LOMSAPI.Repositories.Orders
                                     
                                     await _context.Orders.AddAsync(newOrder);
                                     await _context.SaveChangesAsync();
-                                result++;
+                                    result++;
+                                await SendMessageAsync(customer.CustomerID, TokenFacbook, newOrder.OrderID);
 
                                 var ordernew = await _context.Orders
                                     .FirstOrDefaultAsync(Orders => Orders.CommentID.Equals(comment.CommentID));
@@ -297,7 +296,8 @@ namespace LOMSAPI.Repositories.Orders
                                     DiaChi = customer.Address,
                                     SoDienThoai = customer.PhoneNumber
                                 };
-                                _print.PrintCustomerLabel("COM5", printInfo);
+                                _print.PrintCustomerLabel("COM4", printInfo);
+
                             }
                             }
                     }
@@ -314,25 +314,23 @@ namespace LOMSAPI.Repositories.Orders
             }
         }
 
-        private async Task SendMessageAsync(int orderID)
+        private async Task SendMessageAsync(string customerId, string TokenFacbook, int OrderId)
         {
-            var Order = await _context.Orders.FindAsync(orderID);
-            var Comment = await _context.Comments.FindAsync(Order.OrderID);
-            var LiveStreamCustomer = await _context.LiveStreamsCustomers.FindAsync(Comment.LiveStreamCustomerID);
-            var Customer = await _context.Customers.FindAsync(LiveStreamCustomer.CustomerID);
-            bool IsOldCustomer = Customer.Address == null || Customer.PhoneNumber == null;
-            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={ACCESS_TOKEN}";
+            Order order = await _context.Orders.FirstOrDefaultAsync(s =>s.OrderID == OrderId);
+            var Customer = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == customerId);
+            bool IsNewCustomer = Customer.Address == null || Customer.PhoneNumber == null;
+            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={TokenFacbook}";
             
-            if (IsOldCustomer)
+            if (!IsNewCustomer)
             {
                 var payload = new
                 {
-                    recipient = new { id = Customer.CustomerID },
+                    recipient = new { id = customerId },
                     message = new
                     {
                         text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
-                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
+                                       $"Order creation time : {order.OrderDate}\n" +
                                        $"Customer : {Customer.FacebookName}\n" +
                                        $"Address : {Customer.Address}\n" +
                                        $"Phone number : {Customer.PhoneNumber}"
@@ -361,8 +359,8 @@ namespace LOMSAPI.Repositories.Orders
                     message = new
                     {
                         text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == Order.ProductID).Name}\n" +
-                                       $"Order creation time : {Order.OrderDate}\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
+                                       $"Order creation time : {order.OrderDate}\n" +
                                        $"Customer : {Customer.FacebookName}\n" +
                                        "Please provide your address and phone number for shipping!"
                     },
