@@ -16,5 +16,6 @@ namespace LOMSAPI.Repositories.Orders
         Task<bool> AddOrderAsync(string commentId);
         Task<int> UpdateOrderAsync(OrderModel order);
         Task<int> UpdateStatusOrderAsync(int orderID, OrderStatus newStatus);
+        Task<bool> PrinTest();
     }
 }

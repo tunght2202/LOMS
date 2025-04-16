@@ -382,6 +382,21 @@ namespace LOMSAPI.Repositories.Orders
             }  
         }
 
-
+        public Task<bool> PrinTest()
+        {
+            var printInfo = new PrintInfo()
+            {
+                MaSo = "123",
+                TenKhach = "LOMS APP",
+                ThoiGian = DateTime.Now,
+                NoiDungCommment = "Thank you",
+                SanPham = "Test product X1",
+                TongGia = "10.0000 VND",
+                DiaChi = "FPT University",
+                SoDienThoai = "0123456789"
+            };
+            _print.PrintCustomerLabel("COM5", printInfo);
+            return Task.FromResult(true);
+        }
     }
 }
