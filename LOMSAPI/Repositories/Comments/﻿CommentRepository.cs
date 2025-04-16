@@ -22,7 +22,6 @@ namespace LOMSAPI.Repositories.Comments
             _httpClient = httpClient;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _configuration = configuration;
-           
         }
 
 
