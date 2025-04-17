@@ -22,14 +22,8 @@ namespace LOMSUI.Activities
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.homepage);
+            BottomNavHelper.SetupFooterNavigation(this);
 
-          /*  bottomNavLayout = FindViewById<LinearLayout>(Resource.Id.bottomNavLayout);
-            thongKeLayout = FindViewById<LinearLayout>(Resource.Id.thongKeLayout);
-            banHangLayout = FindViewById<LinearLayout>(Resource.Id.banHangLayout);
-            sanPhamLayout = FindViewById<LinearLayout>(Resource.Id.sanPhamLayout);
-            khachHangLayout = FindViewById<LinearLayout>(Resource.Id.khachHangLayout);
-            menuLayout = FindViewById<LinearLayout>(Resource.Id.menuLayout);
-*/
             _txtTotalRevenue = FindViewById<TextView>(Resource.Id.txtTotalRevenue);
             _txtTotalOrders = FindViewById<TextView>(Resource.Id.txtTotalOrders);
 
@@ -38,34 +32,7 @@ namespace LOMSUI.Activities
              LoadRevenueData();
             LoadProductData();
 
-          /*  thongKeLayout.Click += (sender, e) =>
-            {
-                
-            };
-
-            banHangLayout.Click += (sender, e) =>
-            {
-                
-            };*/
-
-            /*      sanPhamLayout.Click += (sender, e) =>
-                  {
-                      Intent intent = new Intent(this, typeof(ProductActivity));
-                      StartActivity(intent);
-                  };
-
-                  khachHangLayout.Click += (sender, e) =>
-                  {
-                      Intent intent = new Intent(this, typeof(CustomerListActivity));
-                      StartActivity(intent);
-                  };
-
-                  menuLayout.Click += (sender, e) =>
-                  {
-                      Intent intent = new Intent(this, typeof(MenuActivity));
-                      StartActivity(intent);
-                  };
-      */
+         
         }
         private async Task LoadRevenueData()
         {
@@ -137,8 +104,6 @@ namespace LOMSUI.Activities
             }
             return row;
         }
-
-
 
     }
 }
