@@ -297,7 +297,7 @@ namespace LOMSAPI.Repositories.Orders
                                     DiaChi = customer.Address,
                                     SoDienThoai = customer.PhoneNumber
                                 };
-                                _print.PrintCustomerLabel("COM4", printInfo);
+                                _print.PrintCustomerLabel("COM5", printInfo);
 
                             }
                             }
@@ -396,7 +396,7 @@ namespace LOMSAPI.Repositories.Orders
                 DiaChi = "FPT University",
                 SoDienThoai = "0123456789"
             };
-            _print.PrintCustomerLabel("COM4", printInfo);
+            _print.PrintCustomerLabel("COM5", printInfo);
             return Task.FromResult(true);
         }
     }
