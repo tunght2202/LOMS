@@ -13,7 +13,8 @@ namespace LOMSUI.Activities
     [Activity(Label = "ProductActivity")]
     public class ProductActivity : Activity
     {
-        private ApiService _apiService = new ApiService();
+        private ApiService _apiService;
+        private ProductAdapter _adapter;
         private ListView _productListView;
         private TextView _noProductsTextView;
         private Button _addProductButton;
@@ -21,7 +22,7 @@ namespace LOMSUI.Activities
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.listproduct); 
+            SetContentView(Resource.Layout.activity_product); 
 
             BottomNavHelper.SetupFooterNavigation(this);
 
@@ -29,15 +30,8 @@ namespace LOMSUI.Activities
             _noProductsTextView = FindViewById<TextView>(Resource.Id.noProductsTextView);
             _addProductButton = FindViewById<Button>(Resource.Id.addProductButton);
 
-            _apiService = new ApiService();
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            string token = prefs.GetString("token", null);
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                _apiService.SetToken(token);
-            }
-
+            _apiService = ApiServiceProvider.Instance;
+       
             _addProductButton.Click += (s, e) =>
             {
                 Toast.MakeText(this, "Chuyển đến màn thêm sản phẩm", ToastLength.Short).Show();
@@ -49,20 +43,36 @@ namespace LOMSUI.Activities
 
         private async Task LoadProductDataAsync()
         {
-            var products = await _apiService.GetAllproduct();
-
-            RunOnUiThread(() =>
+            try
             {
-                if (products != null && products.Count > 0)
+                var products = await _apiService.GetAllproduct();
+
+                RunOnUiThread(() =>
                 {
-                    _noProductsTextView.Visibility = ViewStates.Gone;
-                    _productListView.Adapter = new ProductAdapter(this, products);
-                }
-                else
-                {
-                    _noProductsTextView.Visibility = ViewStates.Visible;
-                }
-            });
+                    if (products != null && products.Count > 0)
+                    {
+                        _noProductsTextView.Visibility = ViewStates.Gone;
+
+                        _adapter = new ProductAdapter(this, products);
+                        _productListView.Adapter = _adapter;
+
+                        _adapter.OnViewDetailClick += product =>
+                        {
+                            /* var intent = new Intent(this, typeof(ProductDetailActivity));
+                             intent.PutExtra("ProductID", product.ProductID);
+                             StartActivity(intent);*/
+                        };
+                    }
+                    else
+                    {
+                        _noProductsTextView.Visibility = ViewStates.Visible;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading product data: {ex.Message}");
+            }
         }
     }
 }

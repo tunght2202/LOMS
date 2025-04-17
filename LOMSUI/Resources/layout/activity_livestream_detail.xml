@@ -59,27 +59,36 @@
                 android:textSize="16sp"
                 android:layout_marginBottom="24dp" />
 
-			 <TextView
-                android:id="@+id/txtStreamTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Livestream Product"
-				android:textColor="@android:color/black"
-                android:layout_marginBottom="10dp"
-                android:textStyle="bold" />
+			<TextView
+			   android:id="@+id/txtStreamTitle"
+			   android:layout_width="wrap_content"
+			   android:layout_height="wrap_content"
+			   android:text="Livestream Product"
+			   android:textColor="@android:color/black"
+			   android:layout_marginBottom="10dp"
+			   android:textStyle="bold" />
 
-            <Spinner
+			<Spinner
                 android:id="@+id/spinnerListProduct"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"/>
 
-            <Button
+			<Button
                 android:id="@+id/btnSetupListProduct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#009688"
                 android:text="Setup" />
+
+			<Button
+                android:id="@+id/btnAutoCreateOrder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Automatic order creation"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#00BCD4"
+                android:textColor="@android:color/white"/>
 
 		</LinearLayout>
 
@@ -114,7 +123,7 @@
 			   android:layout_marginLeft="10dp"
 			   android:backgroundTint="#009688"
 			   android:textColor="@android:color/white" />
-			
+
 		</LinearLayout>
 	</LinearLayout>
 

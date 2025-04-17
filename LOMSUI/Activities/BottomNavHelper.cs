@@ -19,7 +19,8 @@ namespace LOMSUI.Activities
 
             statisticsLayout.Click += (sender, e) =>
             {
-                
+                var intent = new Intent(activity, typeof(HomePageActivity));
+                activity.StartActivity(intent);
             };
 
             sellLayout.Click += (sender, e) =>

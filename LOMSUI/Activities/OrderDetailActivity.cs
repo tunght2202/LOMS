@@ -8,12 +8,14 @@ namespace LOMSUI.Activities
         private TextView _txtOrderCode, _txtOrderDate, 
                          _txtTotalPrice, _txtOrderStatus,
                          _txtProductName, _txtProductPrice, _txtOrderQuantity;
-        private ApiService _apiService = new ApiService();
+        private ApiService _apiService;
         private int _orderId;
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_order_detail);
+
+            _apiService = ApiServiceProvider.Instance;
 
             _orderId = Intent.GetIntExtra("OrderId", -1);
             if (_orderId == -1)
@@ -48,7 +50,7 @@ namespace LOMSUI.Activities
             _txtTotalPrice.Text =$"Price: {order.Quantity * order.Product.Price:n0}đ";
             _txtOrderStatus.Text = "Status: " + order.Status;
             _txtProductName.Text = "Product Name: " + order.Product.Name;
-            _txtTotalPrice.Text =$"Price: {order.Quantity * order.Product.Price:n0}đ";
+            _txtProductPrice.Text =$"Price: {order.Quantity * order.Product.Price:n0}đ";
         }
     }
 }
