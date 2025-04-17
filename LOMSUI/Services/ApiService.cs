@@ -155,6 +155,75 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> RegisterWithAvatarAsync(RegisterModel registerModel, Stream imageStream)
+        {
+            try
+            {
+                using (var content = new MultipartFormDataContent())
+                {
+                    content.Add(new StringContent(registerModel.Username), "UserName");
+                    content.Add(new StringContent(registerModel.PhoneNumber), "PhoneNumber");
+                    content.Add(new StringContent(registerModel.Email), "Email");
+                    content.Add(new StringContent(registerModel.Password), "Password");
+                    content.Add(new StringContent(registerModel.Gender), "Gender");
+                    content.Add(new StringContent(registerModel.Address), "Address");
+
+                    if (imageStream != null)
+                    {
+                        var imageContent = new StreamContent(imageStream);
+                        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg"); 
+                        content.Add(imageContent, "Avatar", "avatar.jpg"); 
+                    }
+
+                    using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"[API] register-account-request with avatar Response: {response.StatusCode} - {responseBody}");
+
+                        var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                        return responseData?.success ?? response.IsSuccessStatusCode;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] register-account-request with avatar: {ex.Message}");
+                return false;
+            }
+        }
+
+        // verify OTP
+        public async Task<bool> VerifyOtpRegisterAsync(VerifyOtpModel model)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{BASE_URL}/register-account", content); 
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
+                return responseObject?.Success ?? false;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error (Verify OTP): {ex.Message}");
+                return false;
+            }
+            catch (Newtonsoft.Json.JsonException ex)
+            {
+                Console.WriteLine($"JSON Error (Verify OTP): {ex.Message}");
+                return false;
+            }
+        }
+
+        private class ApiResponse
+        {
+            public bool Success { get; set; }
+        }
+
         public async Task<UserModels> GetUserProfileAsync(string token)
         {
             string url = $"{BASE_URL}/user-profile";
