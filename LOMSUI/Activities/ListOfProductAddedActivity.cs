@@ -88,7 +88,7 @@ namespace LOMSUI.Activities
                 Android.Views.View view = convertView;
                 if (view == null)
                 {
-                    view = Android.Views.LayoutInflater.From(context).Inflate(Resource.Layout.listproduct, null);
+                    view = Android.Views.LayoutInflater.From(context).Inflate(Resource.Layout.activity_product, null);
                 }
 
                 ListOfProductAddedModel product = productList[position];
