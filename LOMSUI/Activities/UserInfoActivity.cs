@@ -16,32 +16,31 @@ namespace LOMSUI.Activities
     [Activity(Label = "User Update")]
     public class UserInfoActivity : Activity
     {
-        private EditText _userNameEditText, _phoneEditText, _emailEditText, _addressEditText, _passwordEditText, _confirmPasswordEditText;
+        private EditText _userNameEditText, _phoneEditText, 
+                         _emailEditText, _addressEditText, 
+                         _passwordEditText, _confirmPasswordEditText;
         private Spinner _genderSpinner;
         private Button _updateButton;
 
-        private ApiService _apiService = new ApiService();
-        private string _token;
+        private ApiService _apiService;
+        private string _token; 
 
-        protected override async void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)   
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_user_info);
+
+            _token = ApiServiceProvider.Token;
+
+            _apiService = ApiServiceProvider.Instance;
 
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             ActionBar.SetHomeButtonEnabled(true);
 
             InitViews();
 
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            _token = prefs.GetString("token", null);
+            _apiService = ApiServiceProvider.Instance;
 
-            if (string.IsNullOrEmpty(_token))
-            {
-                Toast.MakeText(this, "Token not found, please login again", ToastLength.Long).Show();
-                Finish();
-                return;
-            }
 
             await LoadUserInfo();
 
@@ -84,7 +83,7 @@ namespace LOMSUI.Activities
                     _phoneEditText.Text = user.PhoneNumber;
                     _emailEditText.Text = user.Email;
                     _addressEditText.Text = user.Address;
-                    _genderSpinner.SetSelection(user.Gender == "Nam" ? 0 : 1);
+                    _genderSpinner.SetSelection(user.Gender == "Female" ? 0 : 1);
                 }
             }
             catch (Exception ex)
@@ -121,12 +120,16 @@ namespace LOMSUI.Activities
                     Password = password
                 }, _token);
 
-                if (result.Contains("authentication code"))
+                if (result.Contains("Please enter email verification code."))
                 {
                     Toast.MakeText(this, "OTP code sent to email, please verify.", ToastLength.Long).Show();
-                    var intent = new Intent(this, typeof(VerifyOtpActivity));
-                    intent.PutExtra("email", email); 
+                    var intent = new Intent(this, typeof(VerifyOtpUpdateUserActivity));
+                    intent.PutExtra("email", email);
                     StartActivity(intent);
+                }
+                else if (result.Contains("Information edited successfully."))
+                {
+                    Toast.MakeText(this, "Information updated successfully!", ToastLength.Long).Show();
                 }
                 else
                 {

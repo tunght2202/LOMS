@@ -10,10 +10,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using LOMSAPI.Services;
-using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
-using static System.Net.Mime.MediaTypeNames;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 namespace LOMSAPI.Repositories.Users
 {
     public class UserRepository : IUserRepository
@@ -98,7 +95,7 @@ namespace LOMSAPI.Repositories.Users
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
 
-            await SendEmailAsync(user.Email, "Xác thực tài khoản", $"Mã OTP của bạn là: {otpCode}");
+            await SendEmailAsync(user.Email, "Verify account", $"Your OTP code is: {otpCode}");
 
             return true;
         }
@@ -150,7 +147,7 @@ namespace LOMSAPI.Repositories.Users
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
-            await SendEmailAsync(user.Email, "Mã OTP đặt lại mật khẩu", $"Mã OTP: {otpCode}");
+            await SendEmailAsync(user.Email, "OTP code reset password", $"OTP code: {otpCode}");
 
             return true;
         }
@@ -220,10 +217,14 @@ namespace LOMSAPI.Repositories.Users
         public async Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model)
         {
             try
+
             {
+                var oldEmail = user.Email;
+
                 var userInfo = new User();
                 if (model.UserName != null)
                 {
+                    
                     user.UserName = model.UserName;
                     userInfo.UserName = model.UserName;
                 }
@@ -266,13 +267,14 @@ namespace LOMSAPI.Repositories.Users
                 }
                 else
                 {
+                    userInfo.Email = model.Email;
                     var otpCode = new Random().Next(100000, 999999).ToString();
-                    await SendEmailAsync(model.Email, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
-                    await _cache.SetStringAsync($"OTP_UPDATE_{model.Email}", otpCode, new DistributedCacheEntryOptions
+                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
-                    await _cache.SetStringAsync("UPDATE_EMAIL", model.Email, new DistributedCacheEntryOptions
+                    await _cache.SetStringAsync("UPDATE_EMAIL", oldEmail, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -302,7 +304,10 @@ namespace LOMSAPI.Repositories.Users
             if (string.IsNullOrEmpty(userInfoString)) return false;
 
             var userInfo = JsonConvert.DeserializeObject<User>(userInfoString);
-            user.Email = userEmail;
+            if (userInfo.Email != null)
+            {
+                user.Email = userInfo.Email;
+            }
             if (userInfo.UserName != null)
             {
                 user.UserName = userInfo.UserName;
@@ -340,6 +345,19 @@ namespace LOMSAPI.Repositories.Users
             await _cache.RemoveAsync($"OTP_UPDATE_{userEmail}");
             await _cache.RemoveAsync("UPDATE_EMAIL");
 
+            return true;
+        }
+
+        public async Task<bool> UpdateTokenFacbook(string token, string userid)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userid);
+            if (user == null)
+            {
+                return false;
+            }
+            user.TokenFacbook = token;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
             return true;
         }
     }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
 	<LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +33,7 @@
                 android:id="@+id/txtLiveTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tiêu đề livestream"
+                android:text="Title livestream"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
@@ -42,7 +43,7 @@
                 android:id="@+id/txtLiveStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trạng thái: Live"
+                android:text="Status: Live"
                 android:background="@android:color/holo_red_light"
                 android:textColor="@android:color/white"
                 android:padding="4dp"
@@ -53,10 +54,41 @@
                 android:id="@+id/txtLiveStartTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Bắt đầu: 01-04-2025 10:00 AM"
+                android:text="Start: 01-04-2025 10:00 AM"
 				android:textStyle="bold"
                 android:textSize="16sp"
                 android:layout_marginBottom="24dp" />
+
+			<TextView
+			   android:id="@+id/txtStreamTitle"
+			   android:layout_width="wrap_content"
+			   android:layout_height="wrap_content"
+			   android:text="Livestream Product"
+			   android:textColor="@android:color/black"
+			   android:layout_marginBottom="10dp"
+			   android:textStyle="bold" />
+
+			<Spinner
+                android:id="@+id/spinnerListProduct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"/>
+
+			<Button
+                android:id="@+id/btnSetupListProduct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#009688"
+                android:text="Setup" />
+
+			<Button
+                android:id="@+id/btnAutoCreateOrder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Automatic order creation"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#00BCD4"
+                android:textColor="@android:color/white"/>
 
 		</LinearLayout>
 
@@ -91,8 +123,16 @@
 			   android:layout_marginLeft="10dp"
 			   android:backgroundTint="#009688"
 			   android:textColor="@android:color/white" />
-			
+
 		</LinearLayout>
+	</LinearLayout>
+
+	<LinearLayout
+		  android:layout_width="match_parent"
+		  android:layout_height="match_parent"
+		  android:layout_gravity="bottom"
+		  android:orientation="horizontal">
+		<include layout="@layout/layout_bottom_nav" />
 
 	</LinearLayout>
 </LinearLayout>

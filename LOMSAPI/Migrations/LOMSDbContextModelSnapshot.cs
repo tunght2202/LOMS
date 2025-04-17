@@ -331,6 +331,9 @@ namespace LOMSAPI.Migrations
                     b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TokenFacbook")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 

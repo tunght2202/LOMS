@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Net;
 using Android.OS;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
@@ -30,8 +31,10 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_comments);
 
+            BottomNavHelper.SetupFooterNavigation(this);
 
-            _apiService = new ApiService();
+            _apiService = ApiServiceProvider.Instance;
+
             _allComments = new List<CommentModel>();
 
             txtLiveStreamId = FindViewById<EditText>(Resource.Id.txtLiveStreamId);
@@ -135,7 +138,7 @@ namespace LOMSUI.Activities
             {
                 if (comments == null || comments.Count == 0)
                 {
-                    recyclerViewComments.Visibility = Android.Views.ViewStates.Gone;
+                    recyclerViewComments.Visibility = Android.Views.ViewStates.Visible;
                     txtNoComments.Visibility = Android.Views.ViewStates.Visible;
                     txtNoComments.Text = "No comments!";
 
@@ -157,8 +160,18 @@ namespace LOMSUI.Activities
 
                     Toast.MakeText(this, $"Total comments: {comments.Count}", ToastLength.Short).Show();
 
-                    _commentAdapter.OnCreateOrder += comment =>
-                        Toast.MakeText(this, $"Create Order: {comment.CustomerName}", ToastLength.Short).Show();
+                    _commentAdapter.OnCreateOrder += async comment =>
+                    {
+                        var result = await _apiService.CreateOrderFromCommentAsync(comment.CommentID);
+                        if (result)
+                        {
+                            Toast.MakeText(this, "Order created successfully!", ToastLength.Short).Show();
+                        }
+                        else
+                        {
+                            Toast.MakeText(this, "Order creation failed!", ToastLength.Short).Show();
+                        }
+                    };
 
                     _commentAdapter.OnViewInfo += comment =>
                     {

@@ -18,6 +18,7 @@ using LOMSAPI.Repositories.ListProducts;
 using LOMSAPI.Repositories.Orders;
 using LOMSAPI.Repositories.LiveStreams;
 using System.Text.Json.Serialization;
+using LOMSAPI.Repositories.Revenues;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +74,8 @@ builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ILiveStreamRepostitory, LiveStreamRepository>();
+builder.Services.AddScoped<IRevenueRepository, RevenueRepository>();
+builder.Services.AddScoped<IPrintService, PrintService>();
 builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

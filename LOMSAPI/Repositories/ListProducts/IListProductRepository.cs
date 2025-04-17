@@ -7,6 +7,7 @@ namespace LOMSAPI.Repositories.ListProducts
     {
         Task<bool> CheckExitListProductByName (string listProductName);
         Task<bool> CheckExitListProductById (int listProductId);
+        Task<bool> CheckListProductExitInLiveStream (String liveStreamId);
         Task<IEnumerable<ListProductModel>> GetAllListProduct();
         Task<IEnumerable<ListProductModel>> GetListProductByName(string listProductName);
         Task<ListProduct> GetListProductById(int listProductId);

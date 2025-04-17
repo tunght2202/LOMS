@@ -1,13 +1,16 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.Customers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerRepository _customerRepository;
@@ -36,11 +39,13 @@ namespace LOMSAPI.Controllers
         }
         // Thanh Tùng
         // Get customer by User ID 
-        [HttpGet("User/{userID}")]
-        public async Task<IActionResult> GetByUserID(string userID) 
+        [HttpGet("User")]
+
+        public async Task<IActionResult> GetByUserID() 
         {
-            var customer = await _customerRepository.GetCustomersByUserIdAsync(userID);
-            if (customer == null) { return BadRequest($"{userID} not exit"); }
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var customer = await _customerRepository.GetCustomersByUserIdAsync(userId);
+            if (customer == null) { return BadRequest($"{userId} not exit"); }
             return Ok(customer);
         }
         // Thanh Tùng

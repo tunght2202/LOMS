@@ -53,5 +53,7 @@
 		        android:layout_weight="1"
 		        android:scrollbars="vertical"/>
 		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+	
+	<include layout="@layout/layout_bottom_nav" />
 
 </LinearLayout>

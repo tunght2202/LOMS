@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 public class RegisterRequestModel
 {
     [Required]
+    [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "Username only includes characters from A - Z and numbers.")]
     public string UserName { get; set; }
 
     [Required, EmailAddress]
@@ -17,7 +18,7 @@ public class RegisterRequestModel
     public string? FullName { get; set; }
     
     public string? Address { get; set; }
-    
+    [RegularExpression("^(Male|Female)$", ErrorMessage = "Gender chỉ được là 'Male' hoặc 'Female'.")]
     public string? Gender { get; set; }
 
     
