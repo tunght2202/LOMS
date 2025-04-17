@@ -85,7 +85,7 @@ namespace LOMSUI.Activities
                 var registerModel = new RegisterModel
                 {
                     Username = username,
-                    Phone = phone,
+                    PhoneNumber = phone,
                     Email = email,
                     Password = password,
                     Gender = gender

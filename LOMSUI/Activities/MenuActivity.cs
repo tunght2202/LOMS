@@ -42,7 +42,7 @@ namespace LOMSUI.Activities
                 try
                 {
                     var apiService = new ApiService();
-                    var user = await apiService.GetUserProfileAsync(token); 
+                    var user = await apiService.GetUserProfileAsync(token);
 
                     if (user != null)
                     {
@@ -72,7 +72,7 @@ namespace LOMSUI.Activities
             logoutButton.Click += (sender, e) =>
             {
                 var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-                prefs.Edit().Remove("token").Apply(); 
+                prefs.Edit().Remove("token").Apply();
 
                 Intent intent = new Intent(this, typeof(LoginActivity));
                 intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.NewTask);
@@ -87,7 +87,7 @@ namespace LOMSUI.Activities
 
             orderManagementLayout.Click += (sender, e) =>
             {
-               
+
                 Toast.MakeText(this, "Quản lý đơn hàng", ToastLength.Short).Show();
             };
 
