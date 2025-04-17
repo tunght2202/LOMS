@@ -22,7 +22,7 @@ namespace LOMSUI.Activities
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.listproduct); 
+            SetContentView(Resource.Layout.activity_product); 
 
             BottomNavHelper.SetupFooterNavigation(this);
 

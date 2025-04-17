@@ -12,7 +12,7 @@ namespace LOMSUI.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.listproduct);
+            SetContentView(Resource.Layout.activity_product);
 
             addProductButton = FindViewById<Button>(Resource.Id.addProductButton);
 
