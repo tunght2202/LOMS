@@ -12,7 +12,7 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.menu);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            BottomNavHelper.SetupFooterNavigation(this, "menu");
 
             TextView userNameTextView = FindViewById<TextView>(Resource.Id.userNameTextView);
             TextView emailTextView = FindViewById<TextView>(Resource.Id.emailTextView);

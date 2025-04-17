@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Live Orders")]
-    public class OrdersInLiveActivity : Activity
+    public class OrdersInLiveActivity : BaseActivity
     {
         private RecyclerView _recyclerView;
         private TextView _txtNoOrders;

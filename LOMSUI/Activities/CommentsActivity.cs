@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Comments")]
-    public class CommentsActivity : Activity
+    public class CommentsActivity : BaseActivity
     {
         private EditText txtLiveStreamId, txtProductCode;
         private Button btnFetchComments, btnFilterByProduct;
@@ -31,7 +31,7 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_comments);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            //BottomNavHelper.SetupFooterNavigation(this);
 
             _apiService = ApiServiceProvider.Instance;
 

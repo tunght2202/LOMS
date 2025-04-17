@@ -4,8 +4,8 @@ using Android.OS;
 using Android.Widget;
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "ListProductActivity")]
-    public class ListProductActivity : Activity
+    [Activity(Label = "ListProduct")]
+    public class ListProductActivity : BaseActivity
     {
         private Button addProductButton;
 

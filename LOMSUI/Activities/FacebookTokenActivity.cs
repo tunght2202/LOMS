@@ -3,8 +3,8 @@ using LOMSUI.Services;
 
 namespace LOMSUI.Activities;
 
-[Activity(Label = "FacebookTokenActivity")]
-public class FacebookTokenActivity : Activity
+[Activity(Label = "FacebookToken")]
+public class FacebookTokenActivity : BaseActivity
 {
     private EditText etTokenCode;
     private Button updateTokenButton;
@@ -15,7 +15,7 @@ public class FacebookTokenActivity : Activity
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_facebook_token);
 
-        BottomNavHelper.SetupFooterNavigation(this);
+       // BottomNavHelper.SetupFooterNavigation(this);
 
         etTokenCode = FindViewById<EditText>(Resource.Id.etTokenCode);
         updateTokenButton = FindViewById<Button>(Resource.Id.updateTokenButton);

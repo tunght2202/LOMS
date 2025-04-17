@@ -7,37 +7,51 @@ using LOMSUI.Services;
 using System.Threading.Tasks;
 using LOMSUI.Models;
 using Android.Content;
+using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "ProductActivity")]
-    public class ProductActivity : Activity
+    [Activity(Label = "Product")]
+    public class ProductActivity : BaseActivity
     {
         private ApiService _apiService;
         private ProductAdapter _adapter;
-        private ListView _productListView;
+        private RecyclerView _productRecyclerView;
         private TextView _noProductsTextView;
         private Button _addProductButton;
+        private SwipeRefreshLayout _swipeRefreshLayout;
+
+        private List<ProductModel> _products = new List<ProductModel>();
+
 
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_product); 
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            BottomNavHelper.SetupFooterNavigation(this, "products");
 
-            _productListView = FindViewById<ListView>(Resource.Id.productListView);
+            _productRecyclerView = FindViewById<RecyclerView>(Resource.Id.productRecyclerView);
             _noProductsTextView = FindViewById<TextView>(Resource.Id.noProductsTextView);
             _addProductButton = FindViewById<Button>(Resource.Id.addProductButton);
+            _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
+
+            _productRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
             _apiService = ApiServiceProvider.Instance;
        
             _addProductButton.Click += (s, e) =>
             {
-                Toast.MakeText(this, "Chuyển đến màn thêm sản phẩm", ToastLength.Short).Show();
-                // StartActivity(typeof(AddProductActivity));
+                var intent = new Intent(this, typeof(AddNewProductActivity));
+                StartActivity(intent);
             };
 
+            _swipeRefreshLayout.Refresh += async (s, e) =>
+            {
+                LoadProductDataAsync();
+                _swipeRefreshLayout.Refreshing = false;
+            };
             await LoadProductDataAsync();
         }
 
@@ -53,14 +67,17 @@ namespace LOMSUI.Activities
                     {
                         _noProductsTextView.Visibility = ViewStates.Gone;
 
+                        _products = products;
                         _adapter = new ProductAdapter(this, products);
-                        _productListView.Adapter = _adapter;
+                        _productRecyclerView.SetAdapter(_adapter);
+
+                        _adapter.OnDeleteClick += product => ShowDeleteConfirmationDialog(product);
 
                         _adapter.OnViewDetailClick += product =>
                         {
-                            /* var intent = new Intent(this, typeof(ProductDetailActivity));
-                             intent.PutExtra("ProductID", product.ProductID);
-                             StartActivity(intent);*/
+                            var intent = new Intent(this, typeof(ProductDetailActivity));
+                            intent.PutExtra("ProductID", product.ProductID);
+                            StartActivity(intent);
                         };
                     }
                     else
@@ -73,6 +90,28 @@ namespace LOMSUI.Activities
             {
                 Console.WriteLine($"Error loading product data: {ex.Message}");
             }
+        }
+        private void ShowDeleteConfirmationDialog(ProductModel product)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.SetTitle("Confirm deletion");
+            builder.SetMessage($"Are you sure you want to delete the product?");
+            builder.SetPositiveButton("Yes", async (sender, args) =>
+            {
+                bool success = await _apiService.DeleteProductAsync(product.ProductID);
+                Toast.MakeText(this, success ? "Deleted successfully!" : "Delete failure!", ToastLength.Short).Show();
+
+                if (success)
+                {
+                    _products.Remove(product); 
+                    _adapter.NotifyDataSetChanged();
+                }
+            });
+
+                builder.SetNegativeButton("No", (sender, args) => { });
+
+            AlertDialog dialog = builder.Create();
+            dialog.Show();
         }
     }
 }

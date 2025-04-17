@@ -10,7 +10,7 @@ using System;
 namespace LOMSUI
 {
     [Activity(Label = "Livestream Details")]
-    public class LiveStreamDetailActivity : Activity
+    public class LiveStreamDetailActivity : BaseActivity
     {
         private TextView _txtTitle, _txtStatus, _txtStartTime;
         private Button _btnViewComments, _btnViewCustomers,
@@ -30,7 +30,7 @@ namespace LOMSUI
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_livestream_detail);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            //BottomNavHelper.SetupFooterNavigation(this);
 
             _txtTitle = FindViewById<TextView>(Resource.Id.txtLiveTitle);
             _txtStatus = FindViewById<TextView>(Resource.Id.txtLiveStatus);
