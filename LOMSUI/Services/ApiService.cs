@@ -490,6 +490,19 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> CheckListProductExistsAsync(string liveStreamId)
+        {
+            var url = $"{BASE_URLL}/ListProducts/GetExitListProductByLiveStream/LiveStreamID/{liveStreamId}";
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return bool.Parse(json); 
+            }
+            return false;
+        }
+
+
 
         public async Task<string> UpdateUserProfileRequestAsync(UserModels model, string token)
         {

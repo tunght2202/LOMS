@@ -65,6 +65,14 @@ namespace LOMSUI
 
             _btnAutoCreateOrder.Click += async (sender, e) =>
             {
+
+                bool hasListProduct = await _apiService.CheckListProductExistsAsync(_liveStreamId);
+
+                if (!hasListProduct)
+                {
+                    Toast.MakeText(this, "Product list not set up for livestream!", ToastLength.Long).Show();
+                    return;
+                }
                 await HandleAutoCreateOrderAsync();
             };
 
