@@ -2,6 +2,7 @@
 using Android.Views;
 using LOMSUI.Services;
 using System.Globalization;
+using Xamarin.Essentials;
 
 namespace LOMSUI.Activities
 {
@@ -11,6 +12,10 @@ namespace LOMSUI.Activities
 
         private TextView _txtTotalRevenue, _txtTotalOrders;
         private ApiService _apiService;
+        private TextView _txtStartDate, _txtEndDate;
+        private DateTime _startDate = DateTime.Now.AddDays(-7);
+        private DateTime _endDate = DateTime.Now;
+
 
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -21,10 +26,19 @@ namespace LOMSUI.Activities
 
             _txtTotalRevenue = FindViewById<TextView>(Resource.Id.txtTotalRevenue);
             _txtTotalOrders = FindViewById<TextView>(Resource.Id.txtTotalOrders);
+            _txtStartDate = FindViewById<TextView>(Resource.Id.txtStartDate);
+            _txtEndDate = FindViewById<TextView>(Resource.Id.txtEndDate);
+
+            _txtStartDate.Text = _startDate.ToString("d/M/yyyy");
+            _txtEndDate.Text = _endDate.ToString("d/M/yyyy");
+
 
             _apiService = ApiServiceProvider.Instance;
 
-             LoadRevenueData();
+            FindViewById<LinearLayout>(Resource.Id.startDateLayout).Click += (s, e) => ShowDatePicker(true);
+            FindViewById<LinearLayout>(Resource.Id.endDateLayout).Click += (s, e) => ShowDatePicker(false);
+
+            LoadRevenueData();
             LoadProductData();
 
          
@@ -46,11 +60,49 @@ namespace LOMSUI.Activities
             }
         }
 
+        private void ShowDatePicker(bool isStart)
+        {
+            DateTime current = isStart ? _startDate : _endDate;
+
+            DatePickerDialog dialog = new DatePickerDialog(this, (sender, e) =>
+            {
+                if (isStart)
+                {
+                    _startDate = e.Date;
+                    _txtStartDate.Text = _startDate.ToString("d/M/yyyy");
+                }
+                else
+                {
+                    _endDate = e.Date;
+                    _txtEndDate.Text = _endDate.ToString("d/M/yyyy");
+                }
+
+                if (_startDate <= _endDate)
+                {
+                    LoadRevenueByDateRange(); 
+                }
+
+            }, current.Year, current.Month - 1, current.Day);
+
+            dialog.Show();
+        }
+
+        private async void LoadRevenueByDateRange()
+        {
+            var revenue = await _apiService.GetRevenueByDateRangeAsync(_startDate, _endDate);
+            if (revenue != null)
+            {
+                _txtTotalRevenue.Text = string.Format(CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", revenue.TotalRevenue);
+            }
+        }
+
+
+
         private async Task LoadProductData()
         {
             try
             {
-                var products = await _apiService.GetAllproduct();
+                var products = await _apiService.GetAllProductsByUserAsync();
                 TableLayout productTable = FindViewById<TableLayout>(Resource.Id.productListLayout);
                 if (products == null || products.Count == 0) return;
 
