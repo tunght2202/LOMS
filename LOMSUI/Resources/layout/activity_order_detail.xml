@@ -100,7 +100,7 @@
             android:textColor="@android:color/holo_red_dark"/>
     </LinearLayout>
     
-    <include layout="@layout/layout_bottom_nav" />
-
+<!--    <include layout="@layout/layout_bottom_nav" />
+-->
 
 </LinearLayout>

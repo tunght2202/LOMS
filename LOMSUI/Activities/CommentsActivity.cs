@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Comments")]
-    public class CommentsActivity : Activity
+    public class CommentsActivity : BaseActivity
     {
         private EditText txtLiveStreamId, txtProductCode;
         private Button btnFetchComments, btnFilterByProduct;
@@ -31,7 +31,7 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_comments);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            //BottomNavHelper.SetupFooterNavigation(this);
 
             _apiService = ApiServiceProvider.Instance;
 
@@ -162,6 +162,14 @@ namespace LOMSUI.Activities
 
                     _commentAdapter.OnCreateOrder += async comment =>
                     {
+                        bool hasListProduct = await _apiService.CheckListProductExistsAsync(_currentLiveStreamId);
+
+                        if (hasListProduct)
+                        {
+                            Toast.MakeText(this, "Please create an order using the automatic function!", ToastLength.Long).Show();
+                            return;
+                        }
+
                         var result = await _apiService.CreateOrderFromCommentAsync(comment.CommentID);
                         if (result)
                         {
@@ -172,6 +180,7 @@ namespace LOMSUI.Activities
                             Toast.MakeText(this, "Order creation failed!", ToastLength.Short).Show();
                         }
                     };
+
 
                     _commentAdapter.OnViewInfo += comment =>
                     {

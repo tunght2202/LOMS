@@ -16,7 +16,7 @@ using LOMSUI.Activities;
 namespace LOMSUI
 {
     [Activity(Label = "Live Streams")]
-    public class LiveStreamActivity : Activity
+    public class LiveStreamActivity : BaseActivity
     {
         private SwipeRefreshLayout _swipeRefreshLayout;
         private RecyclerView _recyclerView;
@@ -30,7 +30,7 @@ namespace LOMSUI
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_live_stream);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+           // BottomNavHelper.SetupFooterNavigation(this);
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
             _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);
@@ -49,15 +49,6 @@ namespace LOMSUI
             await LoadLiveStreams();
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                Finish(); 
-                return true;
-            }
-            return base.OnOptionsItemSelected(item);
-        }
         private async Task LoadLiveStreams()
         {
             _liveStreams = await _apiService.GetAllLiveStreams();

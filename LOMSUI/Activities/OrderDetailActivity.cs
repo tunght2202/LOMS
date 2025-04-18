@@ -3,7 +3,7 @@
 namespace LOMSUI.Activities
 {
     [Activity(Label = "OrderDetail")]
-    public class OrderDetailActivity : Activity
+    public class OrderDetailActivity : BaseActivity
     {
         private TextView _txtOrderCode, _txtOrderDate, 
                          _txtTotalPrice, _txtOrderStatus,

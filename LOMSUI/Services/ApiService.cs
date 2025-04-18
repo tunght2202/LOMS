@@ -337,9 +337,6 @@ namespace LOMSUI.Services
         }
 
 
-
-
-
         public async Task<CustomerModel> GetCustomerByIdAsync(string customerId)
         {
             var response = await _httpClient.GetAsync($"{BASE_URLL}/Customers/GetCustomerById/{customerId}");
@@ -493,6 +490,19 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> CheckListProductExistsAsync(string liveStreamId)
+        {
+            var url = $"{BASE_URLL}/ListProducts/GetExitListProductByLiveStream/LiveStreamID/{liveStreamId}";
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return bool.Parse(json); 
+            }
+            return false;
+        }
+
+
 
         public async Task<string> UpdateUserProfileRequestAsync(UserModels model, string token)
         {
@@ -572,6 +582,86 @@ namespace LOMSUI.Services
                 return new List<ProductModel>();
             }
         }
+
+        public async Task<ProductModel> GetProductByIdAsync(int productId)
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URLL}/Products/GetProductId/{productId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<ProductModel>(content);
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error {response.StatusCode}: {error}");
+            }
+        }
+
+        public async Task<bool> UpdateProductAsync(int productId, ProductModel product)
+        {
+            try
+            {
+                using (var form = new MultipartFormDataContent())
+                {
+                    form.Add(new StringContent(product.Name), "name");
+                    form.Add(new StringContent(product.ProductCode ?? ""), "productCode");
+                    form.Add(new StringContent(product.Description), "description");
+                    form.Add(new StringContent(product.Price.ToString()), "price");
+                    form.Add(new StringContent(product.Stock.ToString()), "stock");
+                    form.Add(new StringContent(product.Status.ToString().ToLower()), "status");
+
+                    var response = await _httpClient.PutAsync($"{BASE_URLL}/Products/updateProduct/{productId}", form);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    return response.IsSuccessStatusCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in UpdateProductAsync: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> AddProductAsync(ProductModel product, Stream imageStream, string fileName)
+        {
+               var form = new MultipartFormDataContent
+               {
+                      { new StringContent(product.ProductCode ?? ""), "productCode" },
+                      { new StringContent(product.Name), "name" },
+                      { new StringContent(product.Description), "description" },
+                      { new StringContent(product.Price.ToString()), "price" },
+                      { new StringContent(product.Stock.ToString()), "stock" },
+                      { new StringContent(product.Status.ToString().ToLower()), "status" }
+               };
+
+            var imageContent = new StreamContent(imageStream);
+            imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+            form.Add(imageContent, "image", fileName);
+
+            var response = await _httpClient.PostAsync($"{BASE_URLL}/Products", form);
+            return response.IsSuccessStatusCode;
+        }
+
+
+        public async Task<bool> DeleteProductAsync(int productId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"{BASE_URLL}/Products/DeleteProductById/{productId}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in DeleteProductAsync: {ex.Message}");
+                return false;
+            }
+        }
+
+
 
     }
 }

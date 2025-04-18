@@ -7,7 +7,7 @@ using LOMSUI.Services;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "OrderHistory")]
-    public class OrderHistoryActivity : Activity
+    public class OrderHistoryActivity : BaseActivity
     {
         private RecyclerView _recyclerView;
         private TextView _txtNoOrders;

@@ -14,7 +14,7 @@ using Android.Views;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "User Update")]
-    public class UserInfoActivity : Activity
+    public class UserInfoActivity : BaseActivity
     {
         private EditText _userNameEditText, _phoneEditText, 
                          _emailEditText, _addressEditText, 

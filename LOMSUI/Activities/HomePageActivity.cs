@@ -8,12 +8,7 @@ namespace LOMSUI.Activities
     [Activity(Label = "HomePage", MainLauncher = true)]
     public class HomePageActivity : Activity
     {
-      /*  LinearLayout bottomNavLayout;
-        LinearLayout thongKeLayout;
-        LinearLayout banHangLayout;
-        LinearLayout sanPhamLayout;
-        LinearLayout khachHangLayout;
-        LinearLayout menuLayout;*/
+
         private TextView _txtTotalRevenue, _txtTotalOrders;
         private ApiService _apiService;
 
@@ -22,7 +17,7 @@ namespace LOMSUI.Activities
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.homepage);
-            BottomNavHelper.SetupFooterNavigation(this);
+            BottomNavHelper.SetupFooterNavigation(this, "statistics");
 
             _txtTotalRevenue = FindViewById<TextView>(Resource.Id.txtTotalRevenue);
             _txtTotalOrders = FindViewById<TextView>(Resource.Id.txtTotalOrders);
