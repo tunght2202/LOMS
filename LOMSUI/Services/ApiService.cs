@@ -193,7 +193,7 @@ namespace LOMSUI.Services
         }
 
         // verify OTP
-        public async Task<bool> VerifyOtpRegisterAsync(VerifyOtpModel model)
+        public async Task<bool> VerifyOtpRegisterAsync(VerifyOtpRegisModel model)
         {
             try
             {
@@ -205,7 +205,7 @@ namespace LOMSUI.Services
 
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var responseObject = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
-                return responseObject?.Success ?? false;
+                return true;
             }
             catch (HttpRequestException ex)
             {
@@ -221,7 +221,9 @@ namespace LOMSUI.Services
 
         private class ApiResponse
         {
-            public bool Success { get; set; }
+          
+            [JsonProperty("message")]
+            public string Message { get; set; }
         }
 
         public async Task<UserModels> GetUserProfileAsync(string token)

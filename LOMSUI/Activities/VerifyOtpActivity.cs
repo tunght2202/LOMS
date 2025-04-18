@@ -33,7 +33,6 @@ namespace LOMSUI
         {
             string otp = _otpEditText.Text.Trim();
 
-            // Validate OTP format
             if (otp.Length != 6)
             {
                 ShowToast("OTP code must be 6 digits.");

@@ -155,7 +155,7 @@ namespace LOMSUI.Activities
                     using (Stream imageStream = ContentResolver.OpenInputStream(_selectedImageUri))
                     {
                         registrationSuccessful = await _apiService.RegisterWithAvatarAsync(registerModel, imageStream);
-                    }
+                        }
                 }
                 else
                 {
@@ -165,7 +165,7 @@ namespace LOMSUI.Activities
                 if (registrationSuccessful)
                 {
                     Toast.MakeText(this, "Yêu cầu đăng ký thành công. Vui lòng kiểm tra email để lấy mã OTP.", ToastLength.Long).Show();
-                    Intent intent = new Intent(this, typeof(VerifyOtpActivity));
+                    Intent intent = new Intent(this, typeof(VerifyOtpRegisterActivity));
                     intent.PutExtra("email", email);
                     StartActivity(intent);
                 }
