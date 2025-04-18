@@ -17,7 +17,6 @@ namespace LOMSUI.Activities
     {
         private ImageView _imgProduct;
         private EditText _edtName, _edtDescription, _edtPrice, _edtStock;
-        private Switch _switchStatus;
         private Button _btnSave, _btnCancel;
         private Uri _imageUri;
         private Stream _imageStream;
@@ -33,7 +32,6 @@ namespace LOMSUI.Activities
             _edtDescription = FindViewById<EditText>(Resource.Id.edtDescripton);
             _edtPrice = FindViewById<EditText>(Resource.Id.productPriceEditText);
             _edtStock = FindViewById<EditText>(Resource.Id.edtStock);
-            _switchStatus = FindViewById<Switch>(Resource.Id.switchStatus);
             _btnSave = FindViewById<Button>(Resource.Id.saveButton);
             _btnCancel = FindViewById<Button>(Resource.Id.cancelButton);
 
@@ -78,7 +76,6 @@ namespace LOMSUI.Activities
                 Description = _edtDescription.Text,
                 Price = decimal.Parse(_edtPrice.Text),
                 Stock = int.Parse(_edtStock.Text),
-                Status = _switchStatus.Checked
             };
 
             var success = await _apiService.AddProductAsync(product, _imageStream, "product.jpg");

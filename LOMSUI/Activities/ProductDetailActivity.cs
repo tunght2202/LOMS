@@ -12,7 +12,6 @@ namespace LOMSUI.Activities
         private ImageView _imgProduct;
         private EditText _etName, _etCode,
                        _etDescription, _etStock, _etPrice;
-        private Switch _switchStatus;
         private Button _btnSaveInfo;
         private ApiService _apiService;
         private int _productId;
@@ -51,7 +50,6 @@ namespace LOMSUI.Activities
             _etDescription = FindViewById<EditText>(Resource.Id.etDescription);
             _etStock = FindViewById<EditText>(Resource.Id.etStock);
             _etPrice = FindViewById<EditText>(Resource.Id.etPrice);
-            _switchStatus = FindViewById<Switch>(Resource.Id.switchStatus);
             _btnSaveInfo = FindViewById<Button>(Resource.Id.btnSaveInfo);
 
 
@@ -67,7 +65,6 @@ namespace LOMSUI.Activities
                 _etDescription.Text = _product.Description;
                 _etStock.Text = _product.Stock.ToString();
                 _etPrice.Text = product.Price.ToString("0");
-                _switchStatus.Checked = _product.Status;
 
                 Glide.With(this).Load(_product.ImageURL).Into(_imgProduct);
             });
@@ -82,7 +79,6 @@ namespace LOMSUI.Activities
             _product.Description = _etDescription.Text;
             _product.Stock = int.Parse(_etStock.Text);
             _product.Price = decimal.Parse(_etPrice.Text);
-            _product.Status = _switchStatus.Checked;
 
             bool success = await _apiService.UpdateProductAsync(_productId, _product);
             if (success)

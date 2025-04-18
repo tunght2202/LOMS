@@ -15,7 +15,6 @@ namespace LOMSUI.Models
         public string? ImageURL { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
-        public bool Status { get; set; }
 
     }
 }
