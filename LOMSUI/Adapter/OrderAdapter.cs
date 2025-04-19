@@ -12,7 +12,7 @@ namespace LOMSUI.Adapter
 {
     public class OrderAdapter : RecyclerView.Adapter
     {
-        private readonly List<OrderModel> _orders;
+        private List<OrderModel> _orders;
         private readonly Context _context;
         public event Action<OrderModel> OnViewDetailClick;
 
@@ -35,7 +35,18 @@ namespace LOMSUI.Adapter
             viewHolder.TxtTotalPrice.Text = $"Price: {order.Quantity * order.Product.Price:n0}đ"; 
             viewHolder.TxtOrderStatus.Text = $"Status: {order.Status}";
 
-            viewHolder.BtnViewDetail.Click += (s, e) => OnViewDetailClick?.Invoke(order);
+            viewHolder.BtnViewDetail.Tag = new OrderModelWrapper(order);
+            viewHolder.BtnViewDetail.Click -= BtnViewDetail_Click;
+            viewHolder.BtnViewDetail.Click += BtnViewDetail_Click;
+
+        }
+        void BtnViewDetail_Click(object sender, EventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is OrderModelWrapper wrapper)
+            {
+                var order = wrapper.Order;
+                OnViewDetailClick?.Invoke(order);
+            }
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -60,6 +71,13 @@ namespace LOMSUI.Adapter
                 BtnViewDetail = itemView.FindViewById<Button>(Resource.Id.btnViewOrderDetails);
             }
         }
+
+        public void UpdateData(List<OrderModel> newOrders)
+        {
+            _orders = newOrders;
+            NotifyDataSetChanged();
+        }
+
     }
 
 }

@@ -5,15 +5,20 @@ using Android.Views;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
 using LOMSUI.Adapter;
+using LOMSUI.Helpers;
+using LOMSUI.Models;
 using LOMSUI.Services;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace LOMSUI.Activities
 {
     [Activity(Label = "LiveStream Orders")]
     public class OrdersInLiveActivity : BaseActivity
     {
+
+        private List<OrderModel> _allOrders = new List<OrderModel>();
+        private OrderStatusFilterHelper _statusFilterHelper;
+        private LinearLayout _currentSelectedLayout;
         private RecyclerView _recyclerView;
         private TextView _txtNoOrders;
         private OrderAdapter _adapter;
@@ -33,27 +38,48 @@ namespace LOMSUI.Activities
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
+            _statusFilterHelper = new OrderStatusFilterHelper(this, FilterOrdersByStatus);
+
             await LoadOrders();
+
         }
 
         private async Task LoadOrders()
         {
             var orders = await _apiService.GetOrdersByLiveStreamIdAsync(_liveStreamId);
-            if (orders == null || !orders.Any())
-            {
-                _txtNoOrders.Visibility = ViewStates.Visible;
-                return;
-            }
 
-            _adapter = new OrderAdapter(this, orders);
+            _allOrders = orders ?? new List<OrderModel>();
+
+            _adapter = new OrderAdapter(this, new List<OrderModel>());
             _adapter.OnViewDetailClick += order =>
             {
-                 var intent = new Intent(this, typeof(OrderDetailActivity));
-                 intent.PutExtra("OrderId", order.OrderID);
-                 StartActivity(intent);
+                var intent = new Intent(this, typeof(OrderDetailActivity));
+                intent.PutExtra("OrderId", order.OrderID);
+                StartActivity(intent);
             };
-
             _recyclerView.SetAdapter(_adapter);
+
+            _statusFilterHelper.SelectDefaultStatus("Pending"); 
         }
+
+
+
+        private void FilterOrdersByStatus(string status, LinearLayout selectedLayout)
+        {
+            var filteredOrders = (_allOrders ?? new List<OrderModel>())
+                                 .Where(o => o.Status == status)
+                                 .ToList();
+
+            _adapter?.UpdateData(filteredOrders);
+            _txtNoOrders.Visibility = filteredOrders.Any() ? ViewStates.Gone : ViewStates.Visible;
+
+            if (_currentSelectedLayout != null)
+                _currentSelectedLayout.SetBackgroundResource(Resource.Drawable.status_tab_background);
+
+            selectedLayout.SetBackgroundResource(Resource.Drawable.status_tab_selected);
+            _currentSelectedLayout = selectedLayout;
+        }
+
+
     }
 }
