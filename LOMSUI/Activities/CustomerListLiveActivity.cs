@@ -15,13 +15,14 @@ using System.Threading.Tasks;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Customer List")]
-    public class CustomerListLiveActivity : Activity
+    public class CustomerListLiveActivity : BaseActivity
     {
         private RecyclerView _recyclerView;
         private TextView _txtNoCustomers;
         private CustomerAdapter _adapter;
         private List<CustomerModel> _customers = new List<CustomerModel>();
         private string _liveStreamID;
+        private ApiService _apiService;
         private SwipeRefreshLayout _swipeRefreshLayout;
 
 
@@ -30,13 +31,15 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_customer_list);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            //BottomNavHelper.SetupFooterNavigation(this);
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewCustomers);
             _txtNoCustomers = FindViewById<TextView>(Resource.Id.txtNoCustomers);
             _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
+
+            _apiService = ApiServiceProvider.Instance;
 
             _liveStreamID = Intent.GetStringExtra("LiveStreamID");
 
@@ -58,8 +61,8 @@ namespace LOMSUI.Activities
         {
             try
             {
-                var apiService = new ApiService();
-                _customers = await apiService.GetCustomersByLiveStreamIdAsync(_liveStreamID);
+                //var apiService = new ApiService();
+                _customers = await _apiService.GetCustomersByLiveStreamIdAsync(_liveStreamID);
 
                 RunOnUiThread(() =>
                 {

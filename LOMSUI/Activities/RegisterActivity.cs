@@ -12,7 +12,7 @@ using LOMSUI.Activities;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Register")]
-    public class RegisterActivity : Activity
+    public class RegisterActivity : BaseActivity
     {
         private EditText _usernameEditText;
         private EditText _phoneEditText;

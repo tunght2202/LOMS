@@ -1,3 +1,4 @@
+using Android.Content;
 using Android.Views;
 using AndroidX.RecyclerView.Widget;
 using LOMSUI.Adapter;
@@ -6,7 +7,7 @@ using LOMSUI.Services;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "OrderHistory")]
-    public class OrderHistoryActivity : Activity
+    public class OrderHistoryActivity : BaseActivity
     {
         private RecyclerView _recyclerView;
         private TextView _txtNoOrders;
@@ -19,11 +20,12 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_order_history);
 
+            _apiService = ApiServiceProvider.Instance;
+
             _customerId = Intent.GetStringExtra("customerId");
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewOrders);
             _txtNoOrders = FindViewById<TextView>(Resource.Id.txtNoOrders);
-            _apiService = new ApiService();
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
@@ -42,9 +44,9 @@ namespace LOMSUI.Activities
             _adapter = new OrderHistoryAdapter(this, orders);
             _adapter.OnViewDetailClick += order =>
             {
-                /*var intent = new Intent(this, typeof(OrderDetailActivity));
-                intent.PutExtra("orderId", order.OrderID);
-                StartActivity(intent);*/
+                var intent = new Intent(this, typeof(OrderDetailActivity));
+                intent.PutExtra("OrderId", order.OrderID);
+                StartActivity(intent);
             };
 
             _recyclerView.SetAdapter(_adapter);

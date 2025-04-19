@@ -8,78 +8,84 @@ using Android.Content;
 using Android.OS;
 using Android.Widget;
 using LOMSUI.Models;
+using LOMSUI.Services;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "AddNewProductActivity", MainLauncher =true)]
-    public class AddNewProductActivity : Activity
+    [Activity(Label = "Add Product")]
+    public class AddNewProductActivity : BaseActivity
     {
-        private ImageView productImageView;
-        private EditText productNameEditText;
-        private EditText productDescriptionEditText;
-        private EditText productPriceEditText;
-        private EditText productDiscountEditText;
-        private EditText productQuantityEditText;
-        private Button cancelButton;
-        private Button saveButton;
-        private ImageView backButton;
+        private ImageView _imgProduct;
+        private EditText _edtName, _edtDescription, _edtPrice, _edtStock;
+        private Switch _switchStatus;
+        private Button _btnSave, _btnCancel;
+        private Uri _imageUri;
+        private Stream _imageStream;
+        private ApiService _apiService;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.addnewproduct);
 
-            productImageView = FindViewById<ImageView>(Resource.Id.productImageView);
-            productNameEditText = FindViewById<EditText>(Resource.Id.productNameEditText);
-            productDescriptionEditText = FindViewById<EditText>(Resource.Id.productDescriptionEditText);
-            productPriceEditText = FindViewById<EditText>(Resource.Id.productPriceEditText);
-            productDiscountEditText = FindViewById<EditText>(Resource.Id.productDiscountEditText);
-            productQuantityEditText = FindViewById<EditText>(Resource.Id.productQuantityEditText);
-            cancelButton = FindViewById<Button>(Resource.Id.cancelButton);
-            saveButton = FindViewById<Button>(Resource.Id.saveButton);
-            backButton = FindViewById<ImageView>(Resource.Id.backButton);
-           
-           
+            _imgProduct = FindViewById<ImageView>(Resource.Id.imgProductadd);
+            _edtName = FindViewById<EditText>(Resource.Id.edtProductName);
+            _edtDescription = FindViewById<EditText>(Resource.Id.edtDescripton);
+            _edtPrice = FindViewById<EditText>(Resource.Id.productPriceEditText);
+            _edtStock = FindViewById<EditText>(Resource.Id.edtStock);
+            _switchStatus = FindViewById<Switch>(Resource.Id.switchStatus);
+            _btnSave = FindViewById<Button>(Resource.Id.saveButton);
+            _btnCancel = FindViewById<Button>(Resource.Id.cancelButton);
 
-            productImageView.Click += (sender, e) =>
+            _apiService = ApiServiceProvider.Instance;
+
+            _imgProduct.Click += ChooseImage;
+            _btnSave.Click += async (s, e) => await SaveProduct();
+            _btnCancel.Click += (s, e) => Finish(); 
+        }
+
+        private void ChooseImage(object sender, EventArgs e)
+        {
+            Intent intent = new Intent(Intent.ActionGetContent);
+            intent.SetType("image/*");
+            intent.AddCategory(Intent.CategoryOpenable); 
+            StartActivityForResult(Intent.CreateChooser(intent, "Select Image"), 101);
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == 101 && resultCode == Result.Ok && data != null)
             {
-                Toast.MakeText(this, "Chọn ảnh sản phẩm", ToastLength.Short).Show();
+                Android.Net.Uri androidUri = data.Data;
+                _imgProduct.SetImageURI(androidUri);
+                _imageStream = ContentResolver.OpenInputStream(androidUri);
+            }
+        }
+
+        private async Task SaveProduct()
+        {
+            if (_imageStream == null)
+            {
+                Toast.MakeText(this, "Please select an image", ToastLength.Short).Show();
+                return;
+            }
+
+            var product = new ProductModel
+            {
+                Name = _edtName.Text,
+                Description = _edtDescription.Text,
+                Price = decimal.Parse(_edtPrice.Text),
+                Stock = int.Parse(_edtStock.Text),
+                Status = _switchStatus.Checked
             };
 
-            cancelButton.Click += (sender, e) =>
-            {
-                Finish(); 
-            };
+            var success = await _apiService.AddProductAsync(product, _imageStream, "product.jpg");
 
-            saveButton.Click += (sender, e) =>
-            {
-                string name = productNameEditText.Text;
-                string description = productDescriptionEditText.Text;
-                decimal price = decimal.Parse(productPriceEditText.Text);
-                decimal discount = decimal.Parse(productDiscountEditText.Text);
-                int quantity = int.Parse(productQuantityEditText.Text);
-
-                var product = new AddNewProductModel
-                {
-                    Name = name,
-                    Description = description,
-                    Price = price,
-                    Discount = discount,
-                    Quantity = quantity,
-                };
-
-               
-
-                Toast.MakeText(this, "Sản phẩm đã được lưu", ToastLength.Short).Show();
-                Finish(); 
-            };
-
-            backButton.Click += (sender, e) =>
-            {
-                Intent intent = new Intent(this, typeof(ListProductActivity));
-                StartActivity(intent);
-                Finish();
-            };
+            Toast.MakeText(this, success ? "Add successful" : "Add failed", ToastLength.Short).Show();
+            if (success) Finish(); 
         }
     }
+
 }

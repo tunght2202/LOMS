@@ -62,5 +62,17 @@ namespace LOMSAPI.Controllers
             var revenue = await _revenueRepository.GetRevenueByDateRange(startDate, endDate);
             return Ok(new { StartDate = startDate, EndDate = endDate, TotalRevenue = revenue });
         }
+        [HttpGet("total-orders-cancelled")]
+        public async Task<IActionResult> GetTotalOrdersCancelled()
+        {
+            var totalCancelled = await _revenueRepository.GetTotalOrederCancelled();
+            return Ok(new { TotalOrdersCancelled = totalCancelled });
+        }
+        [HttpGet("total-orders-returned")]
+        public async Task<IActionResult> GetTotalOrdersReturned()
+        {
+            var totalReturned = await _revenueRepository.GetTotalOrederReturned();
+            return Ok(new { TotalOrdersReturned = totalReturned });
+        }
     }
 }

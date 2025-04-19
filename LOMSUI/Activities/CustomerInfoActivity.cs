@@ -7,22 +7,22 @@ using LOMSUI.Services;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Customer Information")]
-    public class CustomerInfoActivity : Activity
+    public class CustomerInfoActivity : BaseActivity
     {
         private ImageView _imgAvatar;
         private TextView _txtFacebookName;
         private EditText _etFullName, _etEmail, _etPhone, _etAddress;
         private Button _btnSave;
         private TextView txtOrderHistory;
-        private ApiService _apiService = new ApiService();
+        private ApiService _apiService;
         private string _customerId;
         private CustomerModel _customer;
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_customer_info);
-            ActionBar.SetDisplayHomeAsUpEnabled(true);
-            ActionBar.SetHomeButtonEnabled(true);
+
+            _apiService = ApiServiceProvider.Instance; 
 
             _customerId = Intent.GetStringExtra("CustomerID");
             if (string.IsNullOrEmpty(_customerId))
@@ -40,17 +40,6 @@ namespace LOMSUI.Activities
                 LoadCustomer(_customer);
             }
         }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                Finish(); 
-                return true;
-            }
-            return base.OnOptionsItemSelected(item);
-        }
-
         private void InitViews()
         {
             _imgAvatar = FindViewById<ImageView>(Resource.Id.imgAvatar);

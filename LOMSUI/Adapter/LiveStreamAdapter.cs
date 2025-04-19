@@ -47,7 +47,7 @@ namespace LOMSUI.Adapter
             };
 
             viewHolder.BtnViewDetail.Click += (sender, e) =>
-            {
+            {       
                 Intent intent = new Intent(_context, typeof(LiveStreamDetailActivity));
                 intent.PutExtra("LiveStreamID", item.LivestreamID);
                 intent.PutExtra("Title", item.StreamTitle);

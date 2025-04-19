@@ -2,77 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:layout_height="match_parent">
 
-   <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#00a880"
-    android:padding="16dp"
-    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:background="#00a880"
+        android:gravity="center">
 
         <ImageView
-            android:id="@+id/backButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/backarrow"
-            android:layout_marginRight="8dp"
-            android:tint="#000000" android:layerType="software" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="LOMS"
-            android:textSize="20sp"
-            android:textColor="#000"
-            android:textStyle="bold"
-            android:gravity="left" />
-
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/logo_loms" />
     </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Thêm sản phẩm"
-        android:textSize="18sp"
-        android:textColor="#000"
-        android:gravity="center"
-        android:layout_marginTop="8dp" 
-        android:textStyle="bold"/>
-
-</LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_weight="1">
-
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hình ảnh sản phẩm (tối đa 1 ảnh)"
-                android:textSize="16sp"
-                android:textColor="#000"
-                android:layout_marginBottom="8dp" />
-
             <ImageView
-                android:id="@+id/productImageView"
+                android:id="@+id/imgProductadd"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:src="@drawable/addimage"
+                android:layout_gravity="center"
                 android:background="#E0E0E0"
                 android:scaleType="center"
                 android:layout_marginBottom="16dp" />
@@ -80,41 +41,39 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tên sản phẩm"
-                android:textSize="16sp"
+                android:text="Product Name"
                 android:textColor="#000"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
             <EditText
-                android:id="@+id/productNameEditText"
+                android:id="@+id/edtProductName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ví dụ: quần dài, áo dài, tất trắng,..."
                 android:inputType="text"
                 android:layout_marginBottom="16dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mô tả sản phẩm"
+                android:text="Descripton"
                 android:textSize="16sp"
-                android:textColor="#000"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
             <EditText
-                android:id="@+id/productDescriptionEditText"
+                android:id="@+id/edtDescripton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Mô tả chi tiết về sản phẩm"
                 android:inputType="textMultiLine"
                 android:layout_marginBottom="16dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Giá bán"
+                android:text="Price"
                 android:textSize="16sp"
-                android:textColor="#000"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
             <LinearLayout
@@ -144,9 +103,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Giảm giá"
+                android:text="Quantity"
                 android:textSize="16sp"
-                android:textColor="#000"
+                android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
             <LinearLayout
@@ -156,38 +115,36 @@
                 android:layout_marginBottom="16dp">
 
                 <EditText
-                    android:id="@+id/productDiscountEditText"
+                    android:id="@+id/edtStock"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberDecimal"
+                    android:inputType="number"
                     android:text="0" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="%"
-                    android:textSize="16sp"
-                    android:textColor="#000"
-                    android:layout_marginLeft="8dp" />
+                    android:text="Status: "
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
 
+                <Switch
+                    android:id="@+id/switchStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="Active" />
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Số lượng sản phẩm"
-                android:textSize="16sp"
-                android:textColor="#000"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/productQuantityEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:text="0"
-                android:layout_marginBottom="16dp" />
 
         </LinearLayout>
 
@@ -204,7 +161,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hủy"
+            android:text="Cancel"
             android:backgroundTint="#d32f2f"
             android:textColor="#fff"
             android:layout_marginRight="8dp" />
@@ -214,19 +171,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Lưu Sản Phẩm"
+            android:text="Add"
             android:backgroundTint="#4caf50"
             android:textColor="#fff"
             android:layout_marginLeft="8dp" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#00a880">
-
-    </LinearLayout>
 
 </LinearLayout>
