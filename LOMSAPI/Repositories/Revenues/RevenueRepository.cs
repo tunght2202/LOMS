@@ -47,7 +47,7 @@ namespace LOMSAPI.Repositories.Revenues
 
         //Note: This method needs LiveStreamCustomerID which wasn't in the original Order entity
         // I'll comment it out and provide an alternative
-        
+
         public async Task<decimal> GetRevenueByLivestreamId(string livestreamId)
         {
             try
@@ -107,6 +107,31 @@ namespace LOMSAPI.Repositories.Revenues
             {
                 // Log the exception here in a real application
                 throw new InvalidOperationException("Error calculating revenue by date range", ex);
+            }
+        }
+
+        public Task<int> GetTotalOrederCancelled()
+        {
+            try
+            {
+                return _context.Orders.CountAsync(o => o.Status == OrderStatus.Canceled);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here in a real application
+                throw new InvalidOperationException("Error counting total canceled orders", ex);
+            }
+        }
+        public Task<int> GetTotalOrederReturned()
+        {
+            try
+            {
+                return _context.Orders.CountAsync(o => o.Status == OrderStatus.Returned);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here in a real application
+                throw new InvalidOperationException("Error counting total returned orders", ex);
             }
         }
     }
