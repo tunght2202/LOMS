@@ -194,7 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Quay Lại"
-                android:backgroundTint="#F08080"
+                android:backgroundTint="#E91E63"
                 android:textColor="#FFFFFF"
                 android:layout_marginRight="4dp" />
 
@@ -204,7 +204,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Đăng Ký"
-                android:backgroundTint="#87CEEB"
+                android:backgroundTint="#00BCD4"
                 android:textColor="#FFFFFF" />
 
         </LinearLayout>

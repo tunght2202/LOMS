@@ -79,7 +79,11 @@ namespace LOMSUI.Activities
 
                 if (_startDate <= _endDate)
                 {
-                    LoadRevenueByDateRange(); 
+                    LoadRevenueByDateRange();
+                }
+                else
+                {
+                    Toast.MakeText(this, "Start date cannot be greater than end date!", ToastLength.Short).Show();
                 }
 
             }, current.Year, current.Month - 1, current.Day);
@@ -119,7 +123,7 @@ namespace LOMSUI.Activities
                     $"{i + 1}",
                     products[i].Name,
                     products[i].Stock.ToString(),
-                    $"{products[i].Price:N0} VND"
+                    $"{products[i].Price:N0} đ"
                 }));
                     }
                 });

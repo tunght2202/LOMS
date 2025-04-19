@@ -624,6 +624,7 @@ namespace LOMSUI.Services
                     form.Add(new StringContent(product.Description), "description");
                     form.Add(new StringContent(product.Price.ToString()), "price");
                     form.Add(new StringContent(product.Stock.ToString()), "stock");
+                    form.Add(new StringContent(product.ImageURL ?? ""), "imageURL");
                     var response = await _httpClient.PutAsync($"{BASE_URLL}/Products/updateProduct/{productId}", form);
                     var responseContent = await response.Content.ReadAsStringAsync();
 

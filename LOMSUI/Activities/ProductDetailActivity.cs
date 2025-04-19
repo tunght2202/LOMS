@@ -10,7 +10,7 @@ namespace LOMSUI.Activities
     public class ProductDetailActivity : BaseActivity
     {
         private ImageView _imgProduct;
-        private EditText _etName, _etCode,
+        private EditText _etImageUrl,_etName, _etCode,
                        _etDescription, _etStock, _etPrice;
         private Button _btnSaveInfo;
         private ApiService _apiService;
@@ -44,7 +44,8 @@ namespace LOMSUI.Activities
         }
         private void InitViews()
         {
-            _imgProduct = FindViewById<ImageView>(Resource.Id.imgProduct);
+            _imgProduct =  FindViewById<ImageView>(Resource.Id.imgProduct);
+            _etImageUrl = FindViewById<EditText>(Resource.Id.etImageUrl);
             _etName = FindViewById<EditText>(Resource.Id.etName);
             _etCode = FindViewById<EditText>(Resource.Id.etCode);
             _etDescription = FindViewById<EditText>(Resource.Id.etDescription);
@@ -65,6 +66,7 @@ namespace LOMSUI.Activities
                 _etDescription.Text = _product.Description;
                 _etStock.Text = _product.Stock.ToString();
                 _etPrice.Text = product.Price.ToString("0");
+                _etImageUrl.Text = product.ImageURL;
 
                 Glide.With(this).Load(_product.ImageURL).Into(_imgProduct);
             });
@@ -79,12 +81,14 @@ namespace LOMSUI.Activities
             _product.Description = _etDescription.Text;
             _product.Stock = int.Parse(_etStock.Text);
             _product.Price = decimal.Parse(_etPrice.Text);
+            _product.ImageURL = _etImageUrl.Text;
 
             bool success = await _apiService.UpdateProductAsync(_productId, _product);
             if (success)
             {
 
                 Toast.MakeText(this, "Update Product successful!", ToastLength.Short).Show();
+                Finish();
             }
             else
             {
