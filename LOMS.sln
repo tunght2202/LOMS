@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOMSAPITEST", "LOMSAPITEST\LOMSAPITEST.csproj", "{B8893A22-D3C0-4113-B694-FA909092CCFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,8 +30,15 @@ Global
 		{49A8920B-C6A2-4693-98C3-67FDC49BD2B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49A8920B-C6A2-4693-98C3-67FDC49BD2B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{49A8920B-C6A2-4693-98C3-67FDC49BD2B9}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B8893A22-D3C0-4113-B694-FA909092CCFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8893A22-D3C0-4113-B694-FA909092CCFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8893A22-D3C0-4113-B694-FA909092CCFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8893A22-D3C0-4113-B694-FA909092CCFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9BCEBE49-DAED-48A4-A5AB-963FCD2640D7}
 	EndGlobalSection
 EndGlobal
