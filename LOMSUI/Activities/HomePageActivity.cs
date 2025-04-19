@@ -10,7 +10,7 @@ namespace LOMSUI.Activities
     public class HomePageActivity : Activity
     {
 
-        private TextView _txtTotalRevenue, _txtTotalOrders;
+        private TextView _txtTotalRevenue, _txtTotalOrders, _txtOrderCancel, _txtOrderReturn;
         private ApiService _apiService;
         private TextView _txtStartDate, _txtEndDate;
         private DateTime _startDate = DateTime.Now.AddDays(-7);
@@ -26,6 +26,8 @@ namespace LOMSUI.Activities
 
             _txtTotalRevenue = FindViewById<TextView>(Resource.Id.txtTotalRevenue);
             _txtTotalOrders = FindViewById<TextView>(Resource.Id.txtTotalOrders);
+            _txtOrderCancel = FindViewById<TextView>(Resource.Id.txtOrderCancel);
+            _txtOrderReturn = FindViewById<TextView>(Resource.Id.txtOrderReturn);
             _txtStartDate = FindViewById<TextView>(Resource.Id.txtStartDate);
             _txtEndDate = FindViewById<TextView>(Resource.Id.txtEndDate);
 
@@ -47,6 +49,9 @@ namespace LOMSUI.Activities
         {
             var revenueData = await _apiService.GetRevenueDataAsync();
             var totalOrders = await _apiService.GetTotalOrdersAsync();
+            var totalOrderCancel = await _apiService.GetTotalOrdersCancelledAsync();
+            var totalOrderReturn = await _apiService.GetTotalOrdersReturnedAsync();
+
 
             if (revenueData != null)
             {
@@ -56,7 +61,17 @@ namespace LOMSUI.Activities
 
             if (totalOrders >= 0)
             {
-                _txtTotalOrders.Text = $"{totalOrders:N0} đơn hàng";
+                _txtTotalOrders.Text = $"{totalOrders:N0}";
+            }
+
+            if(totalOrderCancel >= 0)
+            {
+                _txtOrderCancel.Text = $"{totalOrderCancel:N0}";
+            }
+
+            if (totalOrderReturn >= 0)
+            {
+                _txtOrderReturn.Text = $"{totalOrderReturn:N0}";
             }
         }
 

@@ -7,18 +7,18 @@ using LOMSUI.Services;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "OrderHistory")]
-    public class OrderHistoryActivity : BaseActivity
+    public class OrderCustomerActivity : BaseActivity
     {
         private RecyclerView _recyclerView;
         private TextView _txtNoOrders;
-        private OrderHistoryAdapter _adapter;
+        private OrderAdapter _adapter;
         private ApiService _apiService;
         private string _customerId;
 
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_order_history);
+            SetContentView(Resource.Layout.activity_order);
 
             _apiService = ApiServiceProvider.Instance;
 
@@ -41,7 +41,7 @@ namespace LOMSUI.Activities
                 return;
             }
 
-            _adapter = new OrderHistoryAdapter(this, orders);
+            _adapter = new OrderAdapter(this, orders);
             _adapter.OnViewDetailClick += order =>
             {
                 var intent = new Intent(this, typeof(OrderDetailActivity));

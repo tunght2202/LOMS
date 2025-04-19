@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace LOMSUI.Adapter
 {
-    public class OrderHistoryAdapter : RecyclerView.Adapter
+    public class OrderAdapter : RecyclerView.Adapter
     {
         private readonly List<OrderModel> _orders;
         private readonly Context _context;
         public event Action<OrderModel> OnViewDetailClick;
 
-        public OrderHistoryAdapter(Context context, List<OrderModel> orders)
+        public OrderAdapter(Context context, List<OrderModel> orders)
         {
             _context = context;
             _orders = orders;

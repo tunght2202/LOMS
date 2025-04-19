@@ -186,6 +186,47 @@ namespace LOMSUI.Services
                 return -1;
             }
         }
+
+        public async Task<int> GetTotalOrdersCancelledAsync()
+        {
+            try
+            {
+                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-cancelled"))
+                {
+                    if (!response.IsSuccessStatusCode) return -1;
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var cancelledResponse = JsonConvert.DeserializeObject<CancelledOrderResponse>(responseBody);
+                    return cancelledResponse?.TotalOrdersCancelled ?? -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching cancelled orders: {ex.Message}");
+                return -1;
+            }
+        }
+
+        public async Task<int> GetTotalOrdersReturnedAsync()
+        {
+            try
+            {
+                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-returned"))
+                {
+                    if (!response.IsSuccessStatusCode) return -1;
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var returnedResponse = JsonConvert.DeserializeObject<ReturnedOrderResponse>(responseBody);
+                    return returnedResponse?.TotalOrdersReturned ?? -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching returned orders: {ex.Message}");
+                return -1;
+            }
+        }
+
         public async Task<RevenueData> GetRevenueByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             try
