@@ -73,7 +73,10 @@ namespace LOMSAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(string commentId)
         {
-            var result = await _orderRepo.AddOrderAsync(commentId);
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            string accessToken = user.TokenFacbook;
+            var result = await _orderRepo.AddOrderAsync(commentId, accessToken);
             if (result)
             {
                 return Ok();
