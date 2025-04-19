@@ -82,6 +82,11 @@ namespace LOMSUI.Activities
 
             bool success = await _apiService.UpdateCustomerAsync(_customerId, _customer);
             Toast.MakeText(this, success ? "Update successful!" : "Update failed!", ToastLength.Short).Show();
+
+            if (success)
+            {
+                Finish();
+            }
         }
     }
 

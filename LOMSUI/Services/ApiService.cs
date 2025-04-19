@@ -186,8 +186,28 @@ namespace LOMSUI.Services
                 return -1;
             }
         }
+        public async Task<RevenueData> GetRevenueByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                string formattedStart = startDate.ToString("yyyy-MM-dd");
+                string formattedEnd = endDate.ToString("yyyy-MM-dd");
+                string url = $"{BASE_URLL}/Revenues/revenue-by-date?startDate={formattedStart}&endDate={formattedEnd}";
 
+                using (HttpResponseMessage response = await _httpClient.GetAsync(url))
+                {
+                    if (!response.IsSuccessStatusCode) return null;
 
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<RevenueData>(responseBody);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching revenue by date: {ex.Message}");
+                return null;
+            }
+        }
 
         public async Task<UserModels> GetUserProfileAsync(string token)
         {
@@ -313,11 +333,10 @@ namespace LOMSUI.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<List<ListProductModel>> GetListProductsAsync(string token)
+        public async Task<List<ListProductModel>> GetListProductsAsync()
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.GetAsync($"{BASE_URLL}/ListProducts/GetAllListProduct"); 
 
                 if (!response.IsSuccessStatusCode)
@@ -558,30 +577,26 @@ namespace LOMSUI.Services
             }
         }
 
-        //GetAllproduct
-        public async Task<List<ProductModel>> GetAllproduct()
+        public async Task<List<ProductModel>> GetAllProductsByUserAsync()
         {
-            string url = $"{BASE_URLL}/Products/GetProducts";
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/Products/GetAllProductsByUser");
 
                 if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"API error: {response.StatusCode} - {response.ReasonPhrase}");
-                    return new List<ProductModel>(); 
-                }
+                    return null;
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<List<ProductModel>>(json);
-                return data ?? new List<ProductModel>();
+                return JsonConvert.DeserializeObject<List<ProductModel>>(json);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching products: {ex.Message}");
-                return new List<ProductModel>();
+                Console.WriteLine($"[GetAllProductsByUserAsync] Error: {ex.Message}");
+                return null;
             }
         }
+
+
 
         public async Task<ProductModel> GetProductByIdAsync(int productId)
         {
@@ -609,8 +624,7 @@ namespace LOMSUI.Services
                     form.Add(new StringContent(product.Description), "description");
                     form.Add(new StringContent(product.Price.ToString()), "price");
                     form.Add(new StringContent(product.Stock.ToString()), "stock");
-                    form.Add(new StringContent(product.Status.ToString().ToLower()), "status");
-
+                    form.Add(new StringContent(product.ImageURL ?? ""), "imageURL");
                     var response = await _httpClient.PutAsync($"{BASE_URLL}/Products/updateProduct/{productId}", form);
                     var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -633,7 +647,6 @@ namespace LOMSUI.Services
                       { new StringContent(product.Description), "description" },
                       { new StringContent(product.Price.ToString()), "price" },
                       { new StringContent(product.Stock.ToString()), "stock" },
-                      { new StringContent(product.Status.ToString().ToLower()), "status" }
                };
 
             var imageContent = new StreamContent(imageStream);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Widget;
 using LOMSUI.Models;
@@ -17,7 +18,6 @@ namespace LOMSUI.Activities
     {
         private ImageView _imgProduct;
         private EditText _edtName, _edtDescription, _edtPrice, _edtStock;
-        private Switch _switchStatus;
         private Button _btnSave, _btnCancel;
         private Uri _imageUri;
         private Stream _imageStream;
@@ -33,7 +33,6 @@ namespace LOMSUI.Activities
             _edtDescription = FindViewById<EditText>(Resource.Id.edtDescripton);
             _edtPrice = FindViewById<EditText>(Resource.Id.productPriceEditText);
             _edtStock = FindViewById<EditText>(Resource.Id.edtStock);
-            _switchStatus = FindViewById<Switch>(Resource.Id.switchStatus);
             _btnSave = FindViewById<Button>(Resource.Id.saveButton);
             _btnCancel = FindViewById<Button>(Resource.Id.cancelButton);
 
@@ -58,9 +57,25 @@ namespace LOMSUI.Activities
 
             if (requestCode == 101 && resultCode == Result.Ok && data != null)
             {
-                Android.Net.Uri androidUri = data.Data;
-                _imgProduct.SetImageURI(androidUri);
-                _imageStream = ContentResolver.OpenInputStream(androidUri);
+                var uri = data.Data;
+                _imgProduct.SetImageURI(uri);
+
+                using var input = ContentResolver.OpenInputStream(uri);
+                var options = new BitmapFactory.Options { InJustDecodeBounds = true };
+                BitmapFactory.DecodeStream(input, null, options);
+
+                int inSampleSize = Math.Max(options.OutHeight / 800, options.OutWidth / 800);
+                options.InSampleSize = inSampleSize > 0 ? inSampleSize : 1;
+                options.InJustDecodeBounds = false;
+
+                input.Close();
+                using var resizedStream = ContentResolver.OpenInputStream(uri);
+                var bitmap = BitmapFactory.DecodeStream(resizedStream, null, options);
+
+                var stream = new MemoryStream();
+                bitmap.Compress(Bitmap.CompressFormat.Jpeg, 70, stream);
+                stream.Seek(0, SeekOrigin.Begin);
+                _imageStream = stream;
             }
         }
 
@@ -78,7 +93,6 @@ namespace LOMSUI.Activities
                 Description = _edtDescription.Text,
                 Price = decimal.Parse(_edtPrice.Text),
                 Stock = int.Parse(_edtStock.Text),
-                Status = _switchStatus.Checked
             };
 
             var success = await _apiService.AddProductAsync(product, _imageStream, "product.jpg");

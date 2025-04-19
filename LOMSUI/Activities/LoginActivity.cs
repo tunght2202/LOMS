@@ -111,7 +111,6 @@ namespace LOMSUI
 
                 if (!string.IsNullOrEmpty(token))
                 {
-                    // Giải mã để lấy userID
                     var handler = new JwtSecurityTokenHandler();
                     var jwtToken = handler.ReadJwtToken(token);
                     string userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

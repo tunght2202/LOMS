@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:orientation="horizontal"
-    android:background="#50BD81">
+    android:background="#700A9600">
 
 	<LinearLayout
         android:id="@+id/statisticsLayout"
