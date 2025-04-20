@@ -20,8 +20,6 @@ namespace LOMSAPI.Controllers
         {
 
              string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-           // string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
-
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
 
@@ -69,7 +67,6 @@ namespace LOMSAPI.Controllers
         {
 
              string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-           // string userId = "ee885e76-69a9-4255-b00c-8ad38443f9b5";
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("UserID not found in token.");
             try
