@@ -44,7 +44,7 @@ namespace LOMSAPI.Controllers
 
         // Thanh Tùng
         // Get List Product By User 
-        [HttpGet("GetAllProductsByUser/{userId}")]
+        [HttpGet("GetAllProductsByUser")]
         public async Task<ActionResult<ProductModel>> GetAllProductsByUser()
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
