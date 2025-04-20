@@ -555,7 +555,7 @@ namespace LOMSUI.Services
             }
         }
 
-        //GetAllproduct
+        // GetAllproduct 
         public async Task<List<ProductModel>> GetAllproduct()
         {
             string url = $"{BASE_URLL}/Products/GetProducts";
@@ -568,13 +568,63 @@ namespace LOMSUI.Services
                     var data = JsonConvert.DeserializeObject<List<ProductModel>>(json);
                     return data ?? new List<ProductModel>();
                 }
+                else
+                {
+                    Console.WriteLine($"Error fetching all products: {response.StatusCode}");
+                    return new List<ProductModel>();
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching live streams from Facebook: {ex.Message}");
+                Console.WriteLine($"Error fetching all products: {ex.Message}");
+                return new List<ProductModel>();
             }
-            return new List<ProductModel>();
         }
+
+        // GetAllProductByUserAsync (lấy tất cả sản phẩm của người dùng)
+        public async Task<List<ProductModel>> GetAllProductsByUserAsync()
+        {
+            string url = $"{BASE_URLL}/Products/GetAllProductByUser";
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<List<ProductModel>>(json);
+                    return data ?? new List<ProductModel>();
+                }
+                else
+                {
+                    Console.WriteLine($"Error fetching products by user: {response.StatusCode}");
+                    return new List<ProductModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching products by user: {ex.Message}");
+                return new List<ProductModel>();
+            }
+        }
+
+        // AddMoreProductIntoListProductAsync (thêm sản phẩm vào danh sách)
+        public async Task<HttpResponseMessage> AddMoreProductIntoListProductAsync(int listProductId, List<int> productIds)
+        {
+            string url = $"{BASE_URLL}/ListProducts/{listProductId}/AddProducts"; // Điều chỉnh URL API của bạn
+            try
+            {
+                var content = JsonConvert.SerializeObject(productIds);
+                var body = new StringContent(content, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(url, body);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding products to list {listProductId}: {ex.Message}");
+                return new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
         // Phương thức chung để thực hiện yêu cầu GET và deserialize response
         protected async Task<T> GetAsync<T>(string endpoint)
         {
@@ -599,17 +649,53 @@ namespace LOMSUI.Services
             }
         }
 
-        // Phương thức API để lấy tất cả đơn hàng
-        // GET /api/Orders
-        public async Task<List<OrderModel>> GetAllOrders()
+        // GET /api/Orders/User
+        public async Task<List<OrderModel>> GetUserOrdersAsync()
         {
             try
             {
-                return await GetAsync<List<OrderModel>>("Orders");
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/User");
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<OrderModel>>(json);
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                Android.Util.Log.Error("ApiService", $"Lỗi khi gọi GetAllOrders: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"API request failed (GetUserOrders): {ex.Message}");
+                return null;
+            }
+        }
+
+        // GET /api/Orders/livestream/{liveStreamID}
+        public async Task<List<OrderModel>> GetLiveStreamOrdersAsync(string liveStreamID)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/livestream/{liveStreamID}");
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<OrderModel>>(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"API request failed (GetLiveStreamOrders): {ex.Message}");
+                return null;
+            }
+        }
+
+        // GET /api/Orders/customer/{customerId}
+        public async Task<List<OrderModel>> GetCustomerOrdersAsync(string customerId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/customer/{customerId}");
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<OrderModel>>(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"API request failed (GetCustomerOrders): {ex.Message}");
                 return null;
             }
         }
@@ -632,7 +718,7 @@ namespace LOMSUI.Services
                 }
                 else
                 {
-                    // Xử lý lỗi
+                    // error
                     var errorContent = await response.Content.ReadAsStringAsync();
                     System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
                     return false;
@@ -657,6 +743,47 @@ namespace LOMSUI.Services
             catch (HttpRequestException ex)
             {
                 System.Diagnostics.Debug.WriteLine($"API request failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        // GetAllproduct (ListProductActivity)
+        public async Task<List<ProductModel>> GetAllProduct()
+        {
+            string url = $"{BASE_URLL}/Products/GetProducts";
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<List<ProductModel>>(json);
+                    return data ?? new List<ProductModel>();
+                }
+                else
+                {
+                    Console.WriteLine($"Error fetching all products: {response.StatusCode}");
+                    return new List<ProductModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching all products: {ex.Message}");
+                return new List<ProductModel>();
+            }
+        }
+
+        //create new list product
+        public async Task<HttpResponseMessage> AddNewListProductAsync(string listProductName)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"{BASE_URLL}/ListProducts/AddNewListProduct/{listProductName}", null);
+                return response;
+            }
+            catch (HttpRequestException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"API request failed (AddNewListProduct): {ex.Message}");
                 return null;
             }
         }

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f0f0f0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#00a880"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LOMS"
+            android:textSize="20sp"
+            android:textColor="#000"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Danh Sách Hiện Tại"
+            android:textSize="20sp"
+            android:textColor="#000"
+            android:gravity="center"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#e0e0e0"
+        android:padding="8dp">
+
+        <!--<TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="STT"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:gravity="center" />-->
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="Tên Danh Sách"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:text="Sản phẩm"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/currentListsListView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_weight="1"
+        android:divider="#cccccc"
+        android:dividerHeight="1dp" />
+
+    <include layout="@layout/layout_bottom_nav" />
+
+</LinearLayout>

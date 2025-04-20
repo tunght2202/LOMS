@@ -22,7 +22,7 @@ namespace LOMSUI.Activities
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_listproductxml);
+            SetContentView(Resource.Layout.activity_productxml);
 
             BottomNavHelper.SetupFooterNavigation(this);
 
@@ -44,49 +44,24 @@ namespace LOMSUI.Activities
             _addProductButton.Click += (s, e) =>
             {
                 Toast.MakeText(this, "Chuyển đến màn thêm sản phẩm", ToastLength.Short).Show();
-                 //StartActivity(typeof(AddNewProductActivity));
+                //StartActivity(typeof(AddNewProductActivity));
             };
             _createNewListButton.Click += (sender, e) =>
             {
                 Intent intent = new Intent(this, typeof(CreateNewSalesListActivity));
                 StartActivity(intent);
             };
-            _viewCurrentListsButton.Click += OnViewCurrentListsButtonClick; 
+            _viewCurrentListsButton.Click += OnViewCurrentListsButtonClick;
 
             await LoadProductDataAsync();
         }
-        private async void OnViewCurrentListsButtonClick(object sender, EventArgs e)
+        private void OnViewCurrentListsButtonClick(object sender, EventArgs e)
         {
-            await LoadSalesListsAsync();
+            Intent intent = new Intent(this, typeof(CurrentListViewActivity));
+            StartActivity(intent);
         }
 
-        //Load list product for sales
-        private async Task LoadSalesListsAsync()
-        {
-            var salesLists = await _apiService.GetAllListProduct();
-
-            RunOnUiThread(() =>
-            {
-                if (salesLists != null && salesLists is System.Collections.Generic.List<ListProductModel> && ((List<ListProductModel>)salesLists).Count > 0)
-                {
-
-                    var listView = new ListView(this);
-                    listView.Adapter = new SalesListAdapter(this, (List<ListProductModel>)salesLists);
-
-                    new AlertDialog.Builder(this)
-                        .SetTitle("Danh sách hiện tại")
-                        .SetView(listView)
-                        .SetPositiveButton("Đóng", (dialog, which) =>
-                        {
-                            ((Android.Content.IDialogInterface)dialog).Dismiss();
-                        });
-                }
-                else
-                {
-                    Toast.MakeText(this, "Không có danh sách sản phẩm nào.", ToastLength.Short).Show();
-                }
-            });
-        }
+        
         private async Task LoadProductDataAsync()
         {
             var products = await _apiService.GetAllproduct();

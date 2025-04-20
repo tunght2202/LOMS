@@ -64,7 +64,7 @@ namespace LOMSUI.Activities
             List<OrderModel> orders = null;
             if (string.IsNullOrEmpty(status))
             {
-                orders = await _apiService.GetAllOrders();
+                orders = await _apiService.GetUserOrdersAsync();
             }
 
             if (orders != null)

@@ -31,7 +31,6 @@
             android:layout_marginTop="8dp" />
     </LinearLayout>
 
-    <!-- Input fields -->
     <LinearLayout
         android:id="@+id/inputLayout"
         android:layout_width="match_parent"
@@ -40,7 +39,6 @@
         android:padding="16dp"
         android:layout_below="@id/headerLayout">
 
-        <!-- Tên danh sách -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,26 +53,9 @@
             android:hint="Ví dụ: Danh sách ca sáng, Danh sách ca chiều, Danh sách ca tối"
             android:textSize="14sp" />
 
-        <!-- Ghi chú -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Ghi chú và mô tả"
-            android:textSize="16sp"
-            android:textColor="#000" />
-
-        <EditText
-            android:id="@+id/editTextDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Ví dụ: Mô tả chi tiết các sản phẩm trong phiên live này."
-            android:gravity="top|start"
-            android:minHeight="80dp"
-            android:textSize="14sp" />
+        
     </LinearLayout>
 
-    <!-- Button layout ngay trên thanh bottom nav -->
     <LinearLayout
         android:id="@+id/buttonLayout"
         android:layout_width="match_parent"
@@ -88,7 +69,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hủy Danh Sách"
+            android:text="Cancel List"
             android:backgroundTint="#f44336"
             android:textColor="#fff"
             android:layout_marginEnd="8dp" />
@@ -98,13 +79,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tạo Danh Sách"
+            android:text="Create List"
             android:backgroundTint="#4CAF50"
             android:textColor="#fff"
             android:layout_marginStart="8dp" />
     </LinearLayout>
 
-    <!-- Bottom navigation -->
     <include
         android:id="@+id/bottomNav"
         layout="@layout/layout_bottom_nav"

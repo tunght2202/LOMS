@@ -18,7 +18,7 @@ namespace LOMSAPI.Controllers
         {
             _context = context;
         }
-        // Thanh Tùng
+        // Thanh Tùng 1
         // Get all List Product 
             [HttpGet("GetAllListProduct")]
             public async Task<IActionResult> GetAllListProduct()
@@ -39,7 +39,7 @@ namespace LOMSAPI.Controllers
             
                 return Ok(result);
             }
-        // Thanh Tùng
+        // Thanh Tùng 2
         // Get List Product by Name 
 
         [HttpGet("GetListProductByName/{listProductName}")]
@@ -71,7 +71,7 @@ namespace LOMSAPI.Controllers
             return Ok(result);
         }
 
-        // Thanh Tùng
+        // Thanh Tùng 3
         // Get all List Product 
         [HttpGet("GetProductFromListProductById/{listProductId}")]
         public async Task<IActionResult> GetProductFromListProductById(int listProductId)
@@ -84,7 +84,7 @@ namespace LOMSAPI.Controllers
             return Ok(listListProduct);
         }
 
-        // Thanh Tùng
+        // Thanh Tùng 4
         // Add new list product
         [HttpPost("AddNewListProduct/{listProductName}")]
         public async Task<IActionResult> AddNewListProduct(string listProductName)
@@ -97,7 +97,7 @@ namespace LOMSAPI.Controllers
             return Ok("Add Sucessfull");
         }
 
-        // Thanh Tùng
+        // Thanh Tùng 5
         // Add product into list product
         [HttpPost("AddMoreProductIntoListProduct/{listProductId}")]
         public async Task<IActionResult> AddMoreProductIntoListProduct(int listProductId,[FromBody] List<int> listProduct)
@@ -123,7 +123,7 @@ namespace LOMSAPI.Controllers
             return Ok("Add successfull");
         }
 
-        // Thanh Tùng
+        // Thanh Tùng 6
         // Delete list product out List Product 
         [HttpDelete("DeleteProducInListProduct/{listProductId}")]
         public async Task<IActionResult> DeleteProducInListProduct(int listProductId, [FromBody] List<int> listProductIds)
