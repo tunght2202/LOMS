@@ -4,6 +4,7 @@ using LOMSUI.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using LOMSAPI.Models;
+using System.Buffers.Text;
 
 namespace LOMSUI.Services
 {
@@ -460,6 +461,28 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<List<OrderModel>> GetOrdersByUserIdAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/Orders/User");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var orders = JsonConvert.DeserializeObject<List<OrderModel>>(json);
+                    return orders ?? new List<OrderModel>();
+                }
+                else
+                {
+                    return new List<OrderModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when calling API to get orders: {ex.Message}");
+                return new List<OrderModel>();
+            }
+        }
 
         public async Task<List<OrderModel>> GetOrdersByCustomerIdAsync(string customerId)
         {
@@ -548,6 +571,21 @@ namespace LOMSUI.Services
                 var error = await response.Content.ReadAsStringAsync();
                 return (false, $"{error}");
             }
+        }
+        public async Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status)
+        {
+          
+                
+                var url = $"{BASE_URLL}/Orders/status/{orderId}";
+
+                var content = new MultipartFormDataContent
+                  {
+                      { new StringContent(((int)status).ToString()), "status" }
+                  };
+
+                var response = await _httpClient.PutAsync(url, content);
+                return response.IsSuccessStatusCode;
+
         }
 
         public async Task<bool> CheckListProductExistsAsync(string liveStreamId)

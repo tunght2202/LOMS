@@ -49,6 +49,9 @@ namespace LOMSUI.Activities
             {
                 if (currentTab != "sell")
                 {
+                    var intent = new Intent(activity, typeof(OrderListActivity));
+                    intent.PutExtra("Type", "ByUser");
+                    activity.StartActivity(intent);
                 }
             };
 

@@ -56,7 +56,8 @@ namespace LOMSUI.Activities
 
             txtOrderHistory.Click += (s, e) =>
             {
-                var intent = new Intent(this, typeof(OrderCustomerActivity));
+                var intent = new Intent(this, typeof(OrderListActivity));
+                intent.PutExtra("Type", "ByCustomer");
                 intent.PutExtra("customerId", _customer.CustomerID);
                 StartActivity(intent);
             };

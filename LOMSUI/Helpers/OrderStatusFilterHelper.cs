@@ -33,8 +33,8 @@ namespace LOMSUI.Helpers
             _confirmedLayout.Click += (s, e) => _onStatusSelected?.Invoke("Confirmed", _confirmedLayout);
             _shippedLayout.Click += (s, e) => _onStatusSelected?.Invoke("Shipped", _shippedLayout);
             _deliveredLayout.Click += (s, e) => _onStatusSelected?.Invoke("Delivered", _deliveredLayout);
-            _returnLayout.Click += (s, e) => _onStatusSelected?.Invoke("Canceled", _returnLayout);
-            _cancelLayout.Click += (s, e) => _onStatusSelected?.Invoke("Returned", _cancelLayout);
+            _returnLayout.Click += (s, e) => _onStatusSelected?.Invoke("Returned", _returnLayout);
+            _cancelLayout.Click += (s, e) => _onStatusSelected?.Invoke("Canceled", _cancelLayout);
 
         }
 

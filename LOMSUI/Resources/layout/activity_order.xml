@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-	<LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#00a880"
         android:gravity="center">
 
-		<ImageView
+        <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -18,129 +18,137 @@
             android:layout_marginBottom="10dp"
             android:src="@drawable/logo_loms" />
 
-	</LinearLayout>
-	<LinearLayout
+    </LinearLayout>
+
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#00a880"
         android:layout_marginBottom="20dp"
-		android:orientation="horizontal"
-        android:background="#00a880">
+        android:scrollbars="none">
 
-		<LinearLayout
-            android:id="@+id/PendingLayout"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:padding="8dp"
-			android:background="@drawable/footer_tab_background"
-            android:focusable="true"
-            android:gravity="center">
-			<TextView
-                android:id="@+id/txtPending"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Pending"
-				android:textColor="@android:color/white"
-                android:textSize="14sp" />
-		</LinearLayout>
+            android:orientation="horizontal">
 
-		<LinearLayout
-            android:id="@+id/ConfirmedLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-			android:background="@drawable/footer_tab_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center">
-
-			<TextView
-                android:id="@+id/txtConfirmed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Confirmed"
-				android:textColor="@android:color/white"
-                android:textSize="14sp" />
-		</LinearLayout>
-
-		<LinearLayout
-            android:id="@+id/ShippedLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-			android:background="@drawable/footer_tab_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center">
-			<TextView
-                android:id="@+id/txtShipped"
+            <LinearLayout
+                android:id="@+id/PendingLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Shipped"
-				android:textColor="@android:color/white"
-                android:textSize="14sp" />
-		</LinearLayout>
+                android:clickable="true"
+                android:padding="14dp"
+                android:background="@drawable/footer_tab_background"
+                android:focusable="true"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/txtPending"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Pending"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-		<LinearLayout
-            android:id="@+id/DeliveredLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:gravity="center"
-		    android:background="@drawable/footer_tab_background"
-            android:clickable="true"
-            android:focusable="true">
-
-
-			<TextView
-                android:id="@+id/txtDelivered"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/ConfirmedLayout"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delivered"
-                android:textSize="14sp"
-				android:textColor="@android:color/white"/>
-		</LinearLayout>
-		<LinearLayout
-            android:id="@+id/CancelLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:gravity="center"
-			android:background="@drawable/footer_tab_background"
-            android:clickable="true"
-            android:focusable="true">
+                android:padding="14dp"
+                android:background="@drawable/footer_tab_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/txtConfirmed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Confirmed"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-
-			<TextView
-                android:id="@+id/txtCancel"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/ShippedLayout"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Return"
-                android:textSize="14sp"
-				android:textColor="@android:color/white"/>
-		</LinearLayout>
-		<LinearLayout
-            android:id="@+id/ReturnLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:gravity="center"
-			android:background="@drawable/footer_tab_background"
-            android:clickable="true"
-            android:focusable="true">
+                android:padding="14dp"
+                android:background="@drawable/footer_tab_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/txtShipped"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Shipped"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-
-			<TextView
-                android:id="@+id/txtReturn"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/DeliveredLayout"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancel"
-                android:textSize="14sp"
-				android:textColor="@android:color/white"/>
-		</LinearLayout>
-	</LinearLayout>
+                android:padding="14dp"
+                android:gravity="center"
+                android:background="@drawable/footer_tab_background"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:id="@+id/txtDelivered"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Delivered"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ReturnLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="14dp"
+                android:gravity="center"
+                android:background="@drawable/footer_tab_background"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:id="@+id/txtReturn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Returned"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/CancelLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="14dp"
+                android:gravity="center"
+                android:background="@drawable/footer_tab_background"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:id="@+id/txtCancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Canceled"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
 
-	<TextView
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <TextView
         android:id="@+id/txtNoOrders"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -149,13 +157,13 @@
         android:gravity="center"
         android:layout_marginTop="16dp"
         android:visibility="gone" />
-	
-	<androidx.recyclerview.widget.RecyclerView
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewOrders"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="16dp"
         android:scrollbars="vertical" />
-
+	<include layout="@layout/layout_bottom_nav"/>
 </LinearLayout>
