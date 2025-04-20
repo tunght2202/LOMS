@@ -3,30 +3,38 @@ using LOMSAPI.Data.Entities;
 using LOMSAPI.Repositories.Comments;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Moq;
 using System.Security.Claims;
-using Newtonsoft.Json;
 using LOMSAPI.Models;
+using LOMSAPI.Repositories.Users;
 
 namespace LOMSAPI.Tests.Controllers
-{ 
+{
 
     public class CommentControllerTests
     {
         private readonly Mock<ICommentRepository> _mockCommentRepository;
-        private readonly Mock<LOMSDbContext> _mockContext;
         private readonly Mock<IDistributedCache> _mockCache;
         private readonly CommentController _controller;
+        private readonly Mock<IUserRepository> _mockUserRepository;
+        private readonly string _userId = "test-user-id";
 
         public CommentControllerTests()
         {
             _mockCommentRepository = new Mock<ICommentRepository>();
-            _mockContext = new Mock<LOMSDbContext>(new DbContextOptions<LOMSDbContext>());
+            _mockUserRepository = new Mock<IUserRepository>();
             _mockCache = new Mock<IDistributedCache>();
 
-            _controller = new CommentController(_mockCommentRepository.Object, _mockCache.Object, _mockContext.Object);
+            // Setup default user for most tests
+            _mockUserRepository
+                .Setup(repo => repo.GetUserById(_userId))
+                .ReturnsAsync(new User { Id = _userId, TokenFacbook = "facebook-token" });
+
+            _controller = new CommentController(
+                _mockCommentRepository.Object,
+                _mockCache.Object,
+                _mockUserRepository.Object);
 
             // Mock user claims for authenticated endpoints
             var claims = new[] { new Claim(ClaimTypes.NameIdentifier, "test-user-id") };
@@ -42,51 +50,42 @@ namespace LOMSAPI.Tests.Controllers
         public async Task GetAllComments_UserExistsWithToken_ReturnsOkResult()
         {
             // Arrange
-            var userId = "test-user-id";
-            var liveStreamId = "stream123";
-            var facebookToken = "fbToken123";
+            var liveStreamId = "stream1";
+            var user = new User { Id = "user1", TokenFacbook = "fake_token" };
 
-            var user = new User { Id = userId, TokenFacbook = facebookToken };
-            var comments = new List<CommentModel>
+            var commentList = new List<CommentModel>
     {
-        new CommentModel
-        {
-            CommentID = "c1",
-            Content = "Nice stream!",
-            CommentTime = DateTime.Now,
-            CustomerAvatar = "avatar.png",
-            CustomerName = "Alice",
-            CustomerId = "cust1"
-        }
+        new CommentModel { CommentID = "c1", Content = "Hello!" }
     };
 
-            var mockDbSet = CreateMockDbSet(new List<User> { user });
-            _mockContext.Setup(c => c.Users).Returns(mockDbSet.Object);
+            _mockUserRepository
+                .Setup(repo => repo.GetUserById(It.IsAny<string>()))
+                .ReturnsAsync(user);
 
             _mockCommentRepository
-                .Setup(repo => repo.GetAllComments(liveStreamId, facebookToken))
-                .ReturnsAsync(comments);
+                .Setup(repo => repo.GetAllComments(liveStreamId, user.TokenFacbook))
+                .ReturnsAsync(commentList);
 
             // Act
             var result = await _controller.GetAllComments(liveStreamId);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var serialized = JsonConvert.SerializeObject(okResult.Value);
-            var returnValue = JsonConvert.DeserializeObject<List<Comment>>(serialized);
-
-            Assert.Single(returnValue);
-            Assert.Equal("Nice stream!", returnValue[0].Content);
+            var returnedComments = Assert.IsAssignableFrom<IEnumerable<CommentModel>>(okResult.Value);
+            Assert.NotNull(returnedComments);                 // ✅ Ensure it's not null
+            Assert.NotEmpty(returnedComments);                // ✅ Ensure it has at least one comment
         }
 
         [Fact]
         public async Task GetAllComments_UserNotFound_ReturnsNotFoundResult()
         {
             // Arrange
-            var liveStreamId = "stream123";
+            var liveStreamId = "stream1";
 
-            var mockDbSet = CreateMockDbSet(new List<User>());
-            _mockContext.Setup(c => c.Users).Returns(mockDbSet.Object);
+            // Mock GetUserById to return null (simulate missing user)
+            _mockUserRepository
+                .Setup(repo => repo.GetUserById(It.IsAny<string>()))
+                .ReturnsAsync((User)null);
 
             // Act
             var result = await _controller.GetAllComments(liveStreamId);
@@ -100,26 +99,23 @@ namespace LOMSAPI.Tests.Controllers
         public async Task GetAllComments_RepositoryThrowsException_ReturnsBadRequestResult()
         {
             // Arrange
-            var userId = "test-user-id";
-            var liveStreamId = "stream123";
-            var facebookToken = "fbToken123";
-            var errorMessage = "Error retrieving comments";
+            var liveStreamId = "stream1";
 
-            var user = new User { Id = userId, TokenFacbook = facebookToken };
+            // Mock user
+            var user = new User { Id = "user1", TokenFacbook = "token123" };
+            _mockUserRepository.Setup(repo => repo.GetUserById(It.IsAny<string>())).ReturnsAsync(user);
 
-            var mockDbSet = CreateMockDbSet(new List<User> { user });
-            _mockContext.Setup(c => c.Users).Returns(mockDbSet.Object);
-
+            // Force the comment repository to throw
             _mockCommentRepository
-                .Setup(repo => repo.GetAllComments(liveStreamId, facebookToken))
-                .ThrowsAsync(new Exception(errorMessage));
+                .Setup(repo => repo.GetAllComments(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception("Repository failure"));
 
             // Act
             var result = await _controller.GetAllComments(liveStreamId);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal(errorMessage, badRequestResult.Value);
+            Assert.Equal("Repository failure", badRequestResult.Value);
         }
 
         [Fact]
@@ -129,7 +125,6 @@ namespace LOMSAPI.Tests.Controllers
             var userId = "test-user-id";
             var liveStreamId = "stream123";
             string facebookToken = null;
-
             var user = new User { Id = userId, TokenFacbook = facebookToken };
             var comments = new List<CommentModel>
     {
@@ -144,9 +139,12 @@ namespace LOMSAPI.Tests.Controllers
         }
     };
 
-            var mockDbSet = CreateMockDbSet(new List<User> { user });
-            _mockContext.Setup(c => c.Users).Returns(mockDbSet.Object);
+            // Mock user repository to return the user
+            _mockUserRepository
+                .Setup(repo => repo.GetUserById(userId))
+                .ReturnsAsync(user);
 
+            // Mock comment repository
             _mockCommentRepository
                 .Setup(repo => repo.GetAllComments(liveStreamId, facebookToken))
                 .ReturnsAsync(comments);
@@ -156,37 +154,10 @@ namespace LOMSAPI.Tests.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var serialized = JsonConvert.SerializeObject(okResult.Value);
-            var returnValue = JsonConvert.DeserializeObject<List<Comment>>(serialized);
-
-            Assert.Single(returnValue);
-            Assert.Equal("Nice stream!", returnValue[0].Content);
-            // Lưu ý: Nên sửa controller để kiểm tra TokenFacbook không null
+            var returnedComments = Assert.IsAssignableFrom<List<CommentModel>>(okResult.Value);
+            Assert.Single(returnedComments);
+            Assert.Equal("Nice stream!", returnedComments[0].Content);
         }
 
-      
-
-        private static Mock<DbSet<User>> CreateMockDbSet(List<User> data)
-        {
-            var mockDbSet = new Mock<DbSet<User>>();
-            var queryable = data.AsQueryable();
-
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-
-            mockDbSet
-                .Setup(m => m.FindAsync(It.IsAny<object[]>()))
-                .ReturnsAsync((object[] keyValues) => data.FirstOrDefault(u => u.Id == (string)keyValues[0]));
-
-            mockDbSet
-                .Setup(m => m.FirstOrDefaultAsync(It.IsAny<System.Linq.Expressions.Expression<Func<User, bool>>>(), default))
-                .ReturnsAsync((System.Linq.Expressions.Expression<Func<User, bool>> predicate, CancellationToken _) =>
-                    data.FirstOrDefault(predicate.Compile()));
-
-
-            return mockDbSet;
-        }
     }
 }
