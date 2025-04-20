@@ -216,7 +216,10 @@ namespace LOMSAPI.Repositories.Orders
         {
             var orders = await _context.Orders
                         .Include(o => o.Product)
-                        .Where(o => o.CommentID.Equals(userID))
+                        .Include(o => o.Comment)
+                        .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.LiveStream)
+                        .Where(o => o.Comment.LiveStreamCustomer.LiveStream.UserID.Equals(userID))
                         .ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
