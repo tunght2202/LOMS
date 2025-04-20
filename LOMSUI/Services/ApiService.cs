@@ -12,6 +12,8 @@ using Xamarin.Essentials;
 using System.Collections.Generic;
 using System.Net.Http.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace LOMSUI.Services
 {
@@ -573,6 +575,90 @@ namespace LOMSUI.Services
             }
             return new List<ProductModel>();
         }
+        // Phương thức chung để thực hiện yêu cầu GET và deserialize response
+        protected async Task<T> GetAsync<T>(string endpoint)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(endpoint);
+                response.EnsureSuccessStatusCode();
 
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return System.Text.Json.JsonSerializer.Deserialize<T>(content, options); 
+            }
+            catch (HttpRequestException ex)
+            {
+                Android.Util.Log.Error("ApiService", $"Lỗi HTTP GET đến {endpoint}: {ex.Message}");
+                return default;
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                Android.Util.Log.Error("ApiService", $"Lỗi Deserialize JSON từ {endpoint}: {ex.Message}");
+                return default;
+            }
+        }
+
+        // Phương thức API để lấy tất cả đơn hàng
+        // GET /api/Orders
+        public async Task<List<OrderModel>> GetAllOrders()
+        {
+            try
+            {
+                return await GetAsync<List<OrderModel>>("Orders");
+            }
+            catch (Exception ex)
+            {
+                Android.Util.Log.Error("ApiService", $"Lỗi khi gọi GetAllOrders: {ex.Message}");
+                return null;
+            }
+        }
+
+        //add list product for livestream
+        public async Task<bool> AddNewListProductAsync(string listProductName, ProductModel product)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(product);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var url = $"{BASE_URLL}/api/ListProducts/AddNewListProduct/{(listProductName)}";
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    
+                    return true; 
+                }
+                else
+                {
+                    // Xử lý lỗi
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception calling API: {ex.Message}");
+                return false;
+            }
+        }
+        //get all list product
+        public async Task<object> GetAllListProduct()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"{BASE_URLL}/ListProducts/GetAllListProduct");
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<ListProductModel>>(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"API request failed: {ex.Message}");
+                return null;
+            }
+        }
     }
 }
