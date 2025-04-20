@@ -9,7 +9,7 @@ using System.Security.Claims;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.Users;
 
-namespace LOMSAPI.Tests.Controllers
+namespace LOMSAPITEST
 {
 
     public class CommentControllerTests

@@ -10,7 +10,7 @@ using Moq;
 using System.Security.Claims;
 using Newtonsoft.Json;
 
-namespace LOMSAPI.Tests.Controllers
+namespace LOMSAPITEST
 {
     public class OrdersControllerTests
     {
