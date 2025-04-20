@@ -13,8 +13,9 @@ namespace LOMSAPI.Repositories.Orders
         Task<IEnumerable<OrderModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID);
         Task<OrderModel?> GetOrderByIdAsync(int orderId);
         Task<bool> OrderExistsAsync(int orderId);
-        Task<bool> AddOrderAsync(string commentId);
+        Task<bool> AddOrderAsync(string commentId, string TokenFacbook);
         Task<int> UpdateOrderAsync(OrderModel order);
         Task<int> UpdateStatusOrderAsync(int orderID, OrderStatus newStatus);
+        Task<bool> PrinTest();
     }
 }

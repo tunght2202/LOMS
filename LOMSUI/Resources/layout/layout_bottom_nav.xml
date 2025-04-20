@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:orientation="horizontal"
-    android:background="#50BD81">
+    android:background="#700A9600">
 
 	<LinearLayout
         android:id="@+id/statisticsLayout"
@@ -13,7 +13,11 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@drawable/footer_tab_background"
+        android:clickable="true"
+        android:focusable="true">
+
 
 		<ImageView
             android:id="@+id/statisticsImageView"
@@ -37,7 +41,11 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@drawable/footer_tab_background"
+        android:clickable="true"
+        android:focusable="true">
+
 
 		<ImageView
             android:id="@+id/sellImageView"
@@ -61,7 +69,10 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@drawable/footer_tab_background"
+        android:clickable="true"
+        android:focusable="true">
 
 		<ImageView
             android:id="@+id/productsImageView"
@@ -85,7 +96,11 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@drawable/footer_tab_background"
+        android:clickable="true"
+        android:focusable="true">
+
 
 		<ImageView
             android:id="@+id/customersImageView"
@@ -109,13 +124,16 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@drawable/footer_tab_background"
+        android:clickable="true"
+        android:focusable="true">
 
 		<ImageView
             android:id="@+id/menuImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/menuhome"
+            android:src="@drawable/menucustom"
             android:layout_marginTop="8dp" />
 
 		<TextView

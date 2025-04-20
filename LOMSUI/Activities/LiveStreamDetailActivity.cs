@@ -10,37 +10,45 @@ using System;
 namespace LOMSUI
 {
     [Activity(Label = "Livestream Details")]
-    public class LiveStreamDetailActivity : Activity
+    public class LiveStreamDetailActivity : BaseActivity
     {
         private TextView _txtTitle, _txtStatus, _txtStartTime;
-        private Button _btnViewComments, _btnViewCustomers, _btnViewOrders, _btnSetupListProduct;
-        private Spinner _spinnerListProduct;
+        private Button _btnViewComments, _btnViewCustomers,
+                       _btnViewOrders, _btnSetupListProduct;
+        private ToggleButton _toggleAutoCreateOrder;
+        private bool _isAutoCreating = false;
+        private CancellationTokenSource _cancellationTokenSource;
 
+        private Spinner _spinnerListProduct;
         private string _liveStreamId;
         private string _title;
         private string _status;
         private string _startTime;
-        private string _token;
-        private readonly ApiService _apiService = new ApiService();
+        private  ApiService _apiService = new ApiService();
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_livestream_detail);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            //BottomNavHelper.SetupFooterNavigation(this);
 
             _txtTitle = FindViewById<TextView>(Resource.Id.txtLiveTitle);
             _txtStatus = FindViewById<TextView>(Resource.Id.txtLiveStatus);
             _txtStartTime = FindViewById<TextView>(Resource.Id.txtLiveStartTime);
             _btnSetupListProduct = FindViewById<Button>(Resource.Id.btnSetupListProduct);
+            _toggleAutoCreateOrder = FindViewById<ToggleButton>(Resource.Id.toggleAutoOrder);
             _spinnerListProduct = FindViewById<Spinner>(Resource.Id.spinnerListProduct);
             _btnViewComments = FindViewById<Button>(Resource.Id.btnViewComments);
             _btnViewCustomers = FindViewById<Button>(Resource.Id.btnViewCustomers);
             _btnViewOrders = FindViewById<Button>(Resource.Id.btnViewOrders);
 
+
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");
-            _token = GetSharedPreferences("auth", FileCreationMode.Private).GetString("token", null);
+
+            _apiService = ApiServiceProvider.Instance;
+
+
 
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");
             _title = Intent.GetStringExtra("Title");
@@ -54,6 +62,32 @@ namespace LOMSUI
             await LoadListProducts();
 
             _btnSetupListProduct.Click += async (s, e) => await SetupListProduct();
+
+            _toggleAutoCreateOrder.CheckedChange += async (s, e) =>
+            {
+                bool hasListProduct = await _apiService.CheckListProductExistsAsync(_liveStreamId);
+
+                if (!hasListProduct)
+                {
+                    Toast.MakeText(this, "Product list not set up for livestream!", ToastLength.Long).Show();
+                    _toggleAutoCreateOrder.Checked = false;
+                    return;
+                }
+
+                if (e.IsChecked)        
+                {
+                    _isAutoCreating = true;
+                    _cancellationTokenSource = new CancellationTokenSource();
+                    StartAutoCreateLoop(_cancellationTokenSource.Token);
+                    Toast.MakeText(this, "Started automatic order creation!", ToastLength.Short).Show();
+                }
+                else
+                {
+                    _isAutoCreating = false;
+                    _cancellationTokenSource?.Cancel();
+                    Toast.MakeText(this, "Stopped automatic order creation.", ToastLength.Short).Show();
+                }
+            };
 
 
             _btnViewComments.Click += (s, e) =>
@@ -83,9 +117,12 @@ namespace LOMSUI
         {
             try
             {
-                var listProducts = await _apiService.GetListProductsAsync(_token);
+                var listProducts = await _apiService.GetListProductsAsync();
 
-                var adapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleSpinnerItem, listProducts.Select(lp => lp.ListProductName).ToList());
+                var displayList = new List<string> { "Not Select" };
+                displayList.AddRange(listProducts.Select(lp => lp.ListProductName));
+
+                var adapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleSpinnerItem, displayList);
                 adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
                 _spinnerListProduct.Adapter = adapter;
             }
@@ -94,6 +131,7 @@ namespace LOMSUI
                 Toast.MakeText(this, "Error loading products: " + ex.Message, ToastLength.Long).Show();
             }
         }
+
 
         private async Task SetupListProduct()
         {
@@ -107,10 +145,15 @@ namespace LOMSUI
 
             try
             {
-                var listProducts = await _apiService.GetListProductsAsync(_token);
-                var selectedListProduct = listProducts[selectedIndex];
+                int listProductId = 0;
+                    
+                if (selectedIndex > 0)
+                {
+                    var listProducts = await _apiService.GetListProductsAsync();
+                    listProductId = listProducts[selectedIndex - 1].ListProductId;
+                }
 
-                var success = await _apiService.SetupListProductAsync(_liveStreamId, selectedListProduct.ListProductId);
+                var success = await _apiService.SetupListProductAsync(_liveStreamId, listProductId);
 
                 Toast.MakeText(this, success ? "ListProduct setup successfully!" : "Failed to setup ListProduct.", ToastLength.Short).Show();
             }
@@ -119,6 +162,40 @@ namespace LOMSUI
                 Toast.MakeText(this, "Error setting up ListProduct: " + ex.Message, ToastLength.Long).Show();
             }
         }
+
+
+        private async void StartAutoCreateLoop(CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    var (isSuccess, message) = await _apiService.CreateOrdersFromCommentsAsync(_liveStreamId);
+
+                    if (isSuccess)
+                    {
+                        RunOnUiThread(() =>
+                        {
+                            Toast.MakeText(this, message, ToastLength.Short).Show();
+                        });
+                    }
+
+                    await Task.Delay(4000, token); 
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("Auto creation stopped.");
+            }
+            catch (Exception ex)
+            {
+                RunOnUiThread(() =>
+                {
+                    Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long).Show();
+                });
+            }
+        }
+
 
     }
 }

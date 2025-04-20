@@ -3,6 +3,7 @@ using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
 
@@ -71,14 +72,17 @@ namespace LOMSAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(string commentId)
         {
-            var result = await _orderRepo.AddOrderAsync(commentId);
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            string accessToken = user.TokenFacbook;
+            var result = await _orderRepo.AddOrderAsync(commentId, accessToken);
             if (result)
             {
                 return Ok();
             }
             return BadRequest("Can't create this order");
         }
-
+         
 
         [HttpPost("CreateOrderFromComments/LiveStreamID/{liveStreamId}")]
         public async Task<IActionResult> CreateOrderFromComments(string liveStreamId)
@@ -104,6 +108,12 @@ namespace LOMSAPI.Controllers
         {
             var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
             return result > 0 ? Ok() : NotFound("Can;t update status of this order");
+        }
+        [HttpPut("TestPrint")]
+        public async Task<IActionResult> TestPrint()
+        {
+            await _orderRepo.PrinTest();
+            return Ok("Test print success");
         }
     }
 }

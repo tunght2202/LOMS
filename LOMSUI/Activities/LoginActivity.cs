@@ -106,21 +106,21 @@ namespace LOMSUI
             try
             {
                 var loginModel = new LoginModel { Email = email, Password = password };
-                string token = await _apiService.LoginAsync(loginModel);
+
+                string token = await ApiServiceProvider.Instance.LoginAsync(loginModel);
 
                 if (!string.IsNullOrEmpty(token))
                 {
-
                     var handler = new JwtSecurityTokenHandler();
                     var jwtToken = handler.ReadJwtToken(token);
                     string userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
+                    ApiServiceProvider.SetToken(token);
 
                     var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
                     var editor = prefs.Edit();
                     editor.PutString("token", token);
                     editor.PutString("userID", userId);
-
 
                     if (cbRememberMe.Checked)
                     {
@@ -156,6 +156,7 @@ namespace LOMSUI
                 Toast.MakeText(this, "Error: " + ex.Message, ToastLength.Long).Show();
             }
         }
+
     }
 
 }
