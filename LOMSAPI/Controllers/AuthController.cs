@@ -1,18 +1,11 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
-using System.Net.Mail;
-using System.Net;
-using Newtonsoft.Json;
 using LOMSAPI.Repositories.Users;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using Azure.Core;
 
 namespace LOMSAPI.Controllers
 {

@@ -1,14 +1,11 @@
-﻿using Android.App;
-using Android.OS;
-using Android.Views;
-using Android.Widget;
+﻿using Android.Views;
 using LOMSUI.Adapter;
 using LOMSUI.Services;
-using System.Threading.Tasks;
 using LOMSUI.Models;
 using Android.Content;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
+using Xamarin.Essentials;
 
 namespace LOMSUI.Activities
 {
@@ -21,7 +18,7 @@ namespace LOMSUI.Activities
         private TextView _noProductsTextView;
         private Button _addProductButton;
         private SwipeRefreshLayout _swipeRefreshLayout;
-
+        private string _userId;
         private List<ProductModel> _products = new List<ProductModel>();
 
 
@@ -39,6 +36,8 @@ namespace LOMSUI.Activities
 
             _productRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
+              _userId = Preferences.Get("userID", "");
+
             _apiService = ApiServiceProvider.Instance;
        
             _addProductButton.Click += (s, e) =>
@@ -49,7 +48,7 @@ namespace LOMSUI.Activities
 
             _swipeRefreshLayout.Refresh += async (s, e) =>
             {
-                LoadProductDataAsync();
+                 LoadProductDataAsync();
                 _swipeRefreshLayout.Refreshing = false;
             };
             await LoadProductDataAsync();
@@ -59,10 +58,8 @@ namespace LOMSUI.Activities
         {
             try
             {
-                var products = await _apiService.GetAllproduct();
+                var products = await _apiService.GetAllProductsByUserAsync();
 
-                RunOnUiThread(() =>
-                {
                     if (products != null && products.Count > 0)
                     {
                         _noProductsTextView.Visibility = ViewStates.Gone;
@@ -84,7 +81,6 @@ namespace LOMSUI.Activities
                     {
                         _noProductsTextView.Visibility = ViewStates.Visible;
                     }
-                });
             }
             catch (Exception ex)
             {

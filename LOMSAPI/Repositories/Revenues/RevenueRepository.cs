@@ -134,5 +134,17 @@ namespace LOMSAPI.Repositories.Revenues
                 throw new InvalidOperationException("Error counting total returned orders", ex);
             }
         }
-    }
+        public Task<int> GetTotalOrederDelivered()
+        {
+            try
+            {
+                return _context.Orders.CountAsync(o => o.Status == OrderStatus.Delivered);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here in a real application
+                throw new InvalidOperationException("Error counting total delivered orders", ex);
+            }
+            }
+        }
 }
