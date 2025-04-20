@@ -57,7 +57,7 @@ namespace LOMSAPI.Repositories.Products
                 Name = product.Name,
                 Price = product.Price,
                 Stock = product.Stock,
-                Status = product.Status,
+                Status = true,
             };
         }
         public async Task<IEnumerable<ProductModel>> GetAllProducts()
@@ -91,7 +91,7 @@ namespace LOMSAPI.Repositories.Products
                 .FindAsync(userId);
             if (getUser == null) { throw new Exception("this user not exit!"); }
             var getProductByUser = await _context.Products
-                .Where( p => p.UserID == userId)
+                .Where( p => (p.UserID == userId ) && (p.Status == true ))
                 .ToListAsync();
             var productList =  getProductByUser.Select(x => MapToModel(x)).ToList();
             return productList;
@@ -107,6 +107,7 @@ namespace LOMSAPI.Repositories.Products
             var product = MapToPostEntity(postProduct);
             product.ImageURL = imageUrl;
             product.UserID = userId;
+            product.Status = true;
             await _context.Products.AddAsync(product);
             return await _context.SaveChangesAsync();
 

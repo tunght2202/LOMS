@@ -6,8 +6,8 @@
     public string CustomerID { get; set; }
     public string CustomerName { get; set; }
     public string LiveStreamID { get; set; }
-    public string AvatarUrl { get; set; }
-
+    public string customerAvatar { get; set; }
+        
     public string GetFormattedTime()
     {
         TimeSpan timeDiff = DateTime.UtcNow - CommentTime.ToUniversalTime();

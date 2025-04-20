@@ -2,6 +2,7 @@
 using Azure;
 using Azure.Core;
 using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
@@ -13,7 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-
+using LOMSAPI.Services;
 namespace LOMSAPI.Repositories.Orders
 {
     public class OrderRepository : IOrderRepository
@@ -31,6 +32,7 @@ namespace LOMSAPI.Repositories.Orders
             _httpClient = httpClient;
             _listProductRepository = listProductRepository;
             _configuration = configuration;
+
             _print = print;
         }
 
@@ -115,7 +117,7 @@ namespace LOMSAPI.Repositories.Orders
             return await _context.Orders.AnyAsync(o => o.OrderID == orderId);
         }
         // order thủ công 
-        public async Task<bool> AddOrderAsync(string commentId)
+        public async Task<bool> AddOrderAsync(string commentId, string TokenFacbook)
         {
             try
             {
@@ -127,15 +129,36 @@ namespace LOMSAPI.Repositories.Orders
                     .Include(c => c.LiveStreamCustomer)
                     .ThenInclude(c => c.Customer)
                     .FirstOrDefaultAsync(c => c.CommentID == commentId);
-                var inforPrint = new PrintInfo()
+                string text = string.Empty;
+                if ((commentorder.LiveStreamCustomer.Customer.Address== null) 
+                    || (commentorder.LiveStreamCustomer.Customer.PhoneNumber == null))
                 {
+                    text = "Your order from\n" +
+                                       $"Comment : {commentorder.Content}\n" +
+                                       "has been successfully created.\n" +
+                                       "Please provide your address and phone number for shipping!";
+                }
+                else
+                {
+                    text = "Your order from\n" +
+                                       $"Comment : {commentorder.Content}\n" +
+                                       "has been successfully created.\n" +
+                                       "Thank you so much for your purchase!";
+                }
+                 var resultSendMessage = await SendMessage2Async(commentorder.LiveStreamCustomer.CustomerID, TokenFacbook, text);
+                if (!resultSendMessage)
+                {
+                    return false;
+                }
+                var inforprint = new PrintInfo()
+                {
+                    NoiDungCommment = commentorder.Content,
                     TenKhach = commentorder.LiveStreamCustomer.Customer.FacebookName,
                     ThoiGian = commentorder.CommentTime,
-                    NoiDungCommment = commentorder.Content,
                     DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
                     SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
                 };
-                _print.PrintCustomerLabel("COM5", inforPrint);
+                _print.PrintCustomerLabel("com5", inforprint);
                 return true;
             }
             catch (Exception ex)
@@ -273,15 +296,36 @@ namespace LOMSAPI.Repositories.Orders
                                 };
                                 var customer = await _context.Customers
                                     .FirstOrDefaultAsync(c => c.CustomerID.Equals(comment.LiveStreamCustomer.CustomerID));
-                                if (customer.Address != null && customer.PhoneNumber != null)
+
+                                var text = string.Empty;
+                                if (customer.Address != null || customer.PhoneNumber != null)
                                 {
                                     newOrder.Status = OrderStatus.Confirmed;
+
+                                    text = "Your order has been successfully created\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Order creation time : {comment.CommentTime}\n" +
+                                       $"Customer : {customer.FacebookName}";
+
                                 }
-                                    
-                                    await _context.Orders.AddAsync(newOrder);
+                                else
+                                {
+                                    text = "Your order has been successfully created\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Order creation time : {comment.CommentTime}\n" +
+                                       $"Customer : {customer.FacebookName}\n" +
+                                       "Please provide your address and phone number for shipping!";
+                                }
+
+                                var resultSendMessage = await SendMessage2Async(customer.CustomerID, TokenFacbook, text);
+                                if (!resultSendMessage)
+                                {
+                                    continue;
+                                }
+                                await _context.Orders.AddAsync(newOrder);
                                     await _context.SaveChangesAsync();
                                     result++;
-                                await SendMessageAsync(customer.CustomerID, TokenFacbook, newOrder.OrderID);
+                            //    await SendMessageAsync(customer.CustomerID, TokenFacbook, newOrder.OrderID);
 
                                 var ordernew = await _context.Orders
                                     .FirstOrDefaultAsync(Orders => Orders.CommentID.Equals(comment.CommentID));
@@ -296,7 +340,7 @@ namespace LOMSAPI.Repositories.Orders
                                     DiaChi = customer.Address,
                                     SoDienThoai = customer.PhoneNumber
                                 };
-                                _print.PrintCustomerLabel("COM4", printInfo);
+                                _print.PrintCustomerLabel("COM5", printInfo);
 
                             }
                             }
@@ -312,6 +356,36 @@ namespace LOMSAPI.Repositories.Orders
                 Console.WriteLine($"Error: {ex.Message}");
                 return 0;
             }
+        }
+
+        private async Task<bool> SendMessage2Async(string customerId, string TokenFacbook, string messageSend)
+        {
+            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={TokenFacbook}";
+
+
+                var payload = new
+                {
+                    recipient = new { id = customerId},
+                    message = new
+                    {
+                        text = messageSend
+                    },
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            
         }
 
         private async Task SendMessageAsync(string customerId, string TokenFacbook, int OrderId)
@@ -382,6 +456,21 @@ namespace LOMSAPI.Repositories.Orders
             }  
         }
 
-
+        public Task<bool> PrinTest()
+        {
+            var printInfo = new PrintInfo()
+            {
+                MaSo = "123",
+                TenKhach = "LOMS APP",
+                ThoiGian = DateTime.Now,
+                NoiDungCommment = "Thank you",
+                SanPham = "Test product X1",
+                TongGia = "10.0000 VND",
+                DiaChi = "FPT University",
+                SoDienThoai = "0123456789"
+            };
+            _print.PrintCustomerLabel("COM5", printInfo);
+            return Task.FromResult(true);
+        }
     }
 }

@@ -16,7 +16,7 @@ using LOMSUI.Activities;
 namespace LOMSUI
 {
     [Activity(Label = "Live Streams")]
-    public class LiveStreamActivity : Activity
+    public class LiveStreamActivity : BaseActivity
     {
         private SwipeRefreshLayout _swipeRefreshLayout;
         private RecyclerView _recyclerView;
@@ -30,23 +30,15 @@ namespace LOMSUI
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_live_stream);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+           // BottomNavHelper.SetupFooterNavigation(this);
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
             _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);
             _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
-                
+
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
-            // Khởi tạo ApiService và set token từ SharedPreferences
-            _apiService = new ApiService();
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            string token = prefs.GetString("token", null);
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                _apiService.SetToken(token);
-            }
+            _apiService = ApiServiceProvider.Instance;
 
             _swipeRefreshLayout.Refresh += async (s, e) =>
             {
@@ -56,15 +48,7 @@ namespace LOMSUI
 
             await LoadLiveStreams();
         }
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                Finish(); 
-                return true;
-            }
-            return base.OnOptionsItemSelected(item);
-        }
+
         private async Task LoadLiveStreams()
         {
             _liveStreams = await _apiService.GetAllLiveStreams();

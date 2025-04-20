@@ -4,15 +4,15 @@ using Android.OS;
 using Android.Widget;
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "ListProductActivity")]
-    public class ListProductActivity : Activity
+    [Activity(Label = "ListProduct")]
+    public class ListProductActivity : BaseActivity
     {
         private Button addProductButton;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.listproduct);
+            SetContentView(Resource.Layout.activity_product);
 
             addProductButton = FindViewById<Button>(Resource.Id.addProductButton);
 

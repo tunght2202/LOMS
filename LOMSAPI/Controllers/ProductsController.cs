@@ -43,10 +43,12 @@ namespace LOMSAPI.Controllers
 
         // Thanh Tùng
         // Get List Product By User 
-        [HttpGet("GetAllProductsByUser/{userId}")]
-        public async Task<ActionResult<ProductModel>> GetAllProductsByUser()
+        [HttpGet("GetAllProductsByUser")]
+        public async Task<ActionResult<IEnumerable<ProductModel>>> GetAllProductsByUser()
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId)) return Unauthorized("Missing user info");
 
             var product = await _productRepository.GetAllProductsByUser(userId);
             if (product == null)
@@ -55,6 +57,7 @@ namespace LOMSAPI.Controllers
             }
             return Ok(product);
         }
+
 
         // Thanh Tùng
         // Add new product 

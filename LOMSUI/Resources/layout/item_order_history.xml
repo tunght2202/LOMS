@@ -62,7 +62,7 @@
             android:id="@+id/btnViewOrderDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chi tiết"
+            android:text="Detail"
             android:backgroundTint="#2196F3"
             android:textColor="@android:color/white"
             android:textSize="12sp" />
