@@ -6,8 +6,8 @@ namespace LOMSUI.Activities;
 [Activity(Label = "FacebookToken")]
 public class FacebookTokenActivity : BaseActivity
 {
-        private EditText etTokenCode;
-        private Button updateTokenButton;
+        private EditText etTokenCode, etPageCode;
+        private Button updateTokenButton, updatePageButton;
         private ApiService _apiService;
 
     protected override void OnCreate(Bundle? savedInstanceState)
@@ -19,8 +19,17 @@ public class FacebookTokenActivity : BaseActivity
         etTokenCode = FindViewById<EditText>(Resource.Id.etTokenCode);
         updateTokenButton = FindViewById<Button>(Resource.Id.updateTokenButton);
 
+        etPageCode = FindViewById<EditText>(Resource.Id.etPageId);
+        updatePageButton = FindViewById<Button>(Resource.Id.updatePageButton);
+
         _apiService = ApiServiceProvider.Instance;
 
+
+        updatePageButton.Click += async (s, e) =>
+        {
+            string pageId = etPageCode.Text.Trim();
+            await UpdatePage(pageId);
+        };
 
         updateTokenButton.Click += async (s, e) =>
         {
@@ -28,6 +37,20 @@ public class FacebookTokenActivity : BaseActivity
             await UpdateToken(token);
         };
 
+
+    }
+
+    public async Task UpdatePage(string pageId)
+    {
+        var success = await _apiService.UpdateFacebookPageAsync(pageId);
+        if (success)
+        {
+            Toast.MakeText(this, "Page update successful!", ToastLength.Short).Show();
+        }
+        else
+        {
+            Toast.MakeText(this, "Error while updating Page.", ToastLength.Short).Show();
+        }
 
     }
 
@@ -44,6 +67,8 @@ public class FacebookTokenActivity : BaseActivity
         }
 
     }
+
+
 
 
 }
