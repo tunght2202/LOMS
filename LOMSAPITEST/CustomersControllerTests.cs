@@ -140,17 +140,30 @@ namespace LOMSAPITEST
             // Arrange
             var userId = "user123";
             var customers = new List<GetCustomerModel>
-            {
-                new GetCustomerModel { CustomerID = "customer1", FacebookName = "Customer 1", SuccessfulDeliveries = 3, FailedDeliveries = 0 },
-                new GetCustomerModel { CustomerID = "customer2", FacebookName = "Customer 2", SuccessfulDeliveries = 2, FailedDeliveries = 1 }
-            };
+    {
+        new GetCustomerModel { CustomerID = "customer1", FacebookName = "Customer 1", SuccessfulDeliveries = 3, FailedDeliveries = 0 },
+        new GetCustomerModel { CustomerID = "customer2", FacebookName = "Customer 2", SuccessfulDeliveries = 2, FailedDeliveries = 1 }
+    };
 
             _mockCustomerRepository
                 .Setup(repo => repo.GetCustomersByUserIdAsync(userId))
                 .ReturnsAsync(customers);
 
+            // Mock ClaimsPrincipal with userId
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, userId)
+    };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
             // Act
-            var result = await _controller.GetByUserID(userId);
+            var result = await _controller.GetByUserID();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -176,10 +189,23 @@ namespace LOMSAPITEST
 
             _mockCustomerRepository
                 .Setup(repo => repo.GetCustomersByUserIdAsync(userId))
-                .ReturnsAsync((List<GetCustomerModel>)null);
+                .ReturnsAsync((List<GetCustomerModel>?)null); // explicitly return null
+
+            // Mock ClaimsPrincipal with userId
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, userId)
+    };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
 
             // Act
-            var result = await _controller.GetByUserID(userId);
+            var result = await _controller.GetByUserID();
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);

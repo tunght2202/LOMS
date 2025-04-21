@@ -19,11 +19,11 @@ namespace LOMSUI.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.listofproductsadded);
+            //SetContentView(Resource.Layout.listofproductsadded);
 
-            productsListView = FindViewById<ListView>(Resource.Id.productsListView);
+     /*       productsListView = FindViewById<ListView>(Resource.Id.productsListView);
             currentListButton = FindViewById<Button>(Resource.Id.currentListButton);
-            createSaleListButton = FindViewById<Button>(Resource.Id.createSaleListButton);
+            createSaleListButton = FindViewById<Button>(Resource.Id.createSaleListButton);*/
             backButton = FindViewById<ImageView>(Resource.Id.backButton);
 
             // Tạo dữ liệu mẫu cho ListView
@@ -93,20 +93,20 @@ namespace LOMSUI.Activities
 
                 ListOfProductAddedModel product = productList[position];
 
-                TextView sttTextView = view.FindViewById<TextView>(Resource.Id.sttHeaderTextView);
+              /*  TextView sttTextView = view.FindViewById<TextView>(Resource.Id.sttHeaderTextView);
                 TextView nameTextView = view.FindViewById<TextView>(Resource.Id.productNameHeaderTextView);
                 ImageView imageView = view.FindViewById<ImageView>(Resource.Id.imageHeaderTextView);
                 TextView priceTextView = view.FindViewById<TextView>(Resource.Id.priceHeaderTextView);
-                TextView quantityTextView = view.FindViewById<TextView>(Resource.Id.quantityHeaderTextView);
+                TextView quantityTextView = view.FindViewById<TextView>(Resource.Id.quantityHeaderTextView);*/
                 //Button addButton = view.FindViewById<Button>(Resource.Id.addButton);
                 //Button editButton = view.FindViewById<Button>(Resource.Id.editButton);
                 //Button deleteButton = view.FindViewById<Button>(Resource.Id.deleteButton);
 
-                sttTextView.Text = product.STT.ToString();
+         /*       sttTextView.Text = product.STT.ToString();
                 nameTextView.Text = product.Name;
                 // Load ảnh từ đường dẫn product.ImagePath vào imageView
                 priceTextView.Text = product.Price.ToString();
-                quantityTextView.Text = product.Quantity.ToString();
+                quantityTextView.Text = product.Quantity.ToString();*/
 
                 //addButton.Click += (sender, e) =>
                 //{

@@ -77,13 +77,16 @@ namespace LOMSUI.Activities
 
             productListLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Danh sách sản phẩm", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(ProductActivity));
+                StartActivity(intent);
             };
 
             orderManagementLayout.Click += (sender, e) =>
             {
-               
-                Toast.MakeText(this, "Quản lý đơn hàng", ToastLength.Short).Show();
+
+                var intent = new Intent(this, typeof(OrderListActivity));
+                intent.PutExtra("Type", "ByUser");
+                StartActivity(intent);
             };
 
             liveManagement.Click += (sender, e) =>
