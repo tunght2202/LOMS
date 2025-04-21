@@ -51,6 +51,7 @@ namespace LOMSUI.Activities
             };
         }
 
+
         private async Task LoadCurrentListsAsync()
         {
             var currentListsObject = await _apiService.GetAllListProduct();
