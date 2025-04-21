@@ -23,7 +23,6 @@ namespace LOMSUI
         private Button _loginButton;
         private Button _registerButton;
         private CheckBox cbRememberMe;
-        private readonly ApiService _apiService = new ApiService();
         private List<string> emailList;
 
         protected override void OnCreate(Bundle savedInstanceState)
