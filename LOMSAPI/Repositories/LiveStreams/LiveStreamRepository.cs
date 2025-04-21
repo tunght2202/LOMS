@@ -8,16 +8,13 @@ namespace LOMSAPI.Repositories.LiveStreams
     {
         private readonly LOMSDbContext _context;
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
         private string _accessToken;
         private string _pageId;
 
-        public LiveStreamRepository(LOMSDbContext context, HttpClient httpClient, IConfiguration configuration)
+        public LiveStreamRepository(LOMSDbContext context, HttpClient httpClient)
         {
             _context = context;
-            _httpClient = httpClient;
-            _configuration = configuration;
-            _pageId = _configuration["Facebook:PageId"] ?? throw new ArgumentNullException("Page ID không được cấu hình.");
+            _httpClient = httpClient;                      
         }
 
         public async Task<int> DeleteLiveStream(string liveStreamId)
@@ -41,13 +38,15 @@ namespace LOMSAPI.Repositories.LiveStreams
 
             // Fetch the user's Facebook token from the database
             var user = await _context.Users
-                .Where(u => u.Id == userId)
-                .Select(u => new { u.TokenFacbook })
-                .FirstOrDefaultAsync();
+                 .Where(u => u.Id == userId)
+                 .Select(u => new { u.TokenFacbook, u.PageId })
+                 .FirstOrDefaultAsync();
 
-            if (user == null || string.IsNullOrEmpty(user.TokenFacbook))
-                throw new UnauthorizedAccessException("User not found or no Facebook token available.");
+            if (user == null || string.IsNullOrEmpty(user.TokenFacbook) || string.IsNullOrEmpty(user.PageId))
+                throw new UnauthorizedAccessException("User not found, no Facebook token, or no Page ID available.");
+
             _accessToken = user.TokenFacbook;
+            _pageId = user.PageId;
             var liveStreamsFromFacebook = new List<LiveStream>();
             string apiUrl = $"https://graph.facebook.com/v22.0/{_pageId}/live_videos?fields=id,title,creation_time,status,embed_html,permalink_url&access_token={_accessToken}";
 
