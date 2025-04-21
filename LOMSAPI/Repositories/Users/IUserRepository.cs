@@ -16,5 +16,6 @@ namespace LOMSAPI.Repositories.Users
         Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model);
         Task<bool> UpdateUserProfile(VerifyOtpModel model, User user);
         Task<bool> UpdateTokenFacbook(string token,string userid);
+        Task<User> GetUserById(string userId);
     }
 }
