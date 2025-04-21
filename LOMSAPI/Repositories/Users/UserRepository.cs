@@ -20,7 +20,7 @@ namespace LOMSAPI.Repositories.Users
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly CloudinaryService _cloudinaryService;
-         
+
         public UserRepository(UserManager<User> userManager, SignInManager<User> signInManager
             , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService)
         {
@@ -72,7 +72,7 @@ namespace LOMSAPI.Repositories.Users
                 ImageURL = imageUrl,
                 Address = model.Address,
                 Sex = model.Gender,
-                
+
             };
 
             var passwordHasher = new PasswordHasher<User>();
@@ -157,7 +157,7 @@ namespace LOMSAPI.Repositories.Users
             var cachedOtp = await _cache.GetStringAsync($"OTP_RESET_{userEmail}");
             if (cachedOtp == null || cachedOtp != model.OtpCode) return false;
 
-            
+
             await _cache.SetStringAsync($"Verified_{userEmail}", "true", new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
@@ -224,7 +224,7 @@ namespace LOMSAPI.Repositories.Users
                 var userInfo = new User();
                 if (model.UserName != null)
                 {
-                    
+
                     user.UserName = model.UserName;
                     userInfo.UserName = model.UserName;
                 }
@@ -289,7 +289,7 @@ namespace LOMSAPI.Repositories.Users
                 Console.WriteLine(ex);
                 return false;
             }
-            
+
             return true;
 
         }
@@ -364,6 +364,18 @@ namespace LOMSAPI.Repositories.Users
         public async Task<User> GetUserById(string userId)
         {
             return await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
+        public async Task<bool> UpdatePageId(string pageId, string userId)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return false;
+            }
+            user.PageId = pageId;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
+            return true;
         }
     }
 }
