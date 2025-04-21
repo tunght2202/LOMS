@@ -106,7 +106,8 @@ namespace LOMSUI
 
             _btnViewOrders.Click += (s, e) =>
             {
-                var intent = new Intent(this, typeof(OrdersInLiveActivity));
+                var intent = new Intent(this, typeof(OrderListActivity));
+                intent.PutExtra("Type", "ByLive");  
                 intent.PutExtra("LiveStreamID", _liveStreamId);
                 StartActivity(intent);
             };

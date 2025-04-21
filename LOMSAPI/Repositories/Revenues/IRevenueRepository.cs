@@ -2,6 +2,7 @@
 {
     public interface IRevenueRepository
     {
+
         Task<decimal> GetTotalRevenue(string userid); // Tổng doanh thu
         Task<int> GetTotalOrders(string userid); // Tổng số lượng đơn hàng
         Task<decimal> GetRevenueByLivestreamId(string userid, string livestreamId); // Doanh thu của một phiên livestream

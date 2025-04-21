@@ -213,7 +213,6 @@ namespace LOMSAPI.Repositories.Orders
                         .ToListAsync();
             return orders.Select(o => MapToModel(o));
         }
-
         public async Task<int> CreateOrderFromComments(string liveStreamId, string TokenFacbook)
         {
             try

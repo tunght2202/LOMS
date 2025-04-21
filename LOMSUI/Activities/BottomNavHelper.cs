@@ -49,6 +49,7 @@ namespace LOMSUI.Activities
             {
                 if (currentTab != "sell")
                 {
+                  
                 }
             };
 
