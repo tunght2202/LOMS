@@ -6,16 +6,15 @@ namespace LOMSUI.Activities;
 [Activity(Label = "FacebookToken")]
 public class FacebookTokenActivity : BaseActivity
 {
-    private EditText etTokenCode;
-    private Button updateTokenButton;
-    private ApiService _apiService;
+        private EditText etTokenCode;
+        private Button updateTokenButton;
+        private ApiService _apiService;
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_facebook_token);
 
-       // BottomNavHelper.SetupFooterNavigation(this);
 
         etTokenCode = FindViewById<EditText>(Resource.Id.etTokenCode);
         updateTokenButton = FindViewById<Button>(Resource.Id.updateTokenButton);

@@ -80,6 +80,23 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> UpdateFacebookPageAsync(string pageid)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsync($"{BASE_URL}/update-token-facebook?pageid={pageid}", null);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Update Page Response: {responseBody}");
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating Facebook Page: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<bool> RequestOtpAsync(ForgotPasswordModel model)
         {
              return await SendPostRequestAsync("reset-password-request", model);
