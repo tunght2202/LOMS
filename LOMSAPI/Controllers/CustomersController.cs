@@ -1,8 +1,6 @@
-﻿using LOMSAPI.Data.Entities;
-using LOMSAPI.Models;
+﻿using LOMSAPI.Models;
 using LOMSAPI.Repositories.Customers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
