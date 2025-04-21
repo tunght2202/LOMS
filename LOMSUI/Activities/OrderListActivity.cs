@@ -30,10 +30,8 @@ namespace LOMSUI.Activities
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_order);
-            BottomNavHelper.SetupFooterNavigation(this, "sell");
 
             _apiService = ApiServiceProvider.Instance;
-
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewOrders);
             _txtNoOrders = FindViewById<TextView>(Resource.Id.txtNoOrders);

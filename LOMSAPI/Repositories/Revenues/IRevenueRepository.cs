@@ -8,5 +8,7 @@
         Task<decimal> GetRevenueByDateRange(DateTime startDate, DateTime endDate);
         Task<int> GetTotalOrederCancelled(); // Tổng số lượng đơn hàng đã hủy
         Task<int> GetTotalOrederReturned(); // Tổng số lượng đơn hàng đã trả lại
+        Task<int> GetTotalOrederDelivered(); // Tổng số lượng đơn hàng đã giao
+
     }
 }

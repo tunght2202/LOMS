@@ -18,4 +18,10 @@
         public int TotalOrdersReturned { get; set; }
     }
 
+    public class DeliveredOrderResponse 
+    {
+        public int TotalOrdersDelivered { get; set; }
+    }
+
+
 }

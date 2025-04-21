@@ -188,6 +188,26 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<int> GetTotalOrdersDeliveredAsync()
+        {
+            try
+            {
+                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-delivered"))
+                {
+                    if (!response.IsSuccessStatusCode) return -1;
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var returnedResponse = JsonConvert.DeserializeObject<DeliveredOrderResponse>(responseBody);
+                    return returnedResponse?.TotalOrdersDelivered ?? -1;
+                }
+            }
+            catch (Exception ex)    
+            {
+                Console.WriteLine($"Error fetching returned orders: {ex.Message}");
+                return -1;
+            }
+        }
+
         public async Task<int> GetTotalOrdersCancelledAsync()
         {
             try
