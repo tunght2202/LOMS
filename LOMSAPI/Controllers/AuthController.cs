@@ -140,5 +140,20 @@ namespace LOMSAPI.Controllers
 
             return Ok(new { message = "Facebook token updated successfully!" });
         }
+        [HttpPut("update-page-id")]
+        public async Task<IActionResult> UpdatePageId(string pageId)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "User not authenticated" });
+            }
+            var result = await _userRepository.UpdatePageId(pageId, userId);
+            if (!result)
+            {
+                return BadRequest(new { message = "Error updating Page ID" });
+            }
+            return Ok(new { message = "Page ID updated successfully!" });
+        }
     }
 }
