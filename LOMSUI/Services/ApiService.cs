@@ -403,6 +403,7 @@ namespace LOMSUI.Services
             return false;
         }
 
+        //List Product
         public async Task<bool> SetupListProductAsync(string livestreamId, int listProductId)
         {
             var response = await _httpClient.PutAsync(
@@ -432,6 +433,64 @@ namespace LOMSUI.Services
                 Console.WriteLine($"Error in GetListProductsAsync: {ex.Message}");
                 return new List<ListProductModel>(); 
             }
+        }
+
+        public async Task<bool> AddNewListProductAsync(string listProductName)
+        {
+            var response = await _httpClient.PostAsync($"{BASE_URLL}/ListProducts/AddNewListProduct/{listProductName}", null);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> AddMoreProductIntoListProductAsync(int listProductId, List<int> productIds)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(productIds);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{BASE_URLL}/ListProducts/AddMoreProductIntoListProduct/{listProductId}", content);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AddMoreProductIntoListProductAsync] Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteListProductAsync(int listProductId)
+        {
+            var response = await _httpClient.DeleteAsync($"{BASE_URLL}/ListProducts/DeleteListProduct/{listProductId}");
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> DeleteProductsInListAsync(int listProductId, List<int> listProductIds)
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri($"{BASE_URLL}/ListProducts/DeleteProducInListProduct/{listProductId}"),
+                Content = new StringContent(JsonConvert.SerializeObject(listProductIds), Encoding.UTF8, "application/json")
+            };
+
+            var response = await _httpClient.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+
+
+        public async Task<List<ProductModel>> GetProductsFromListProductAsync(int listProductId)
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URLL}/ListProducts/GetProductFromListProductById/{listProductId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"API failed: {response.StatusCode}");
+                return new List<ProductModel>(); 
+            }
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<ProductModel>>(responseContent);
         }
 
 
@@ -789,7 +848,6 @@ namespace LOMSUI.Services
                 return false;
             }
         }
-
 
 
     }

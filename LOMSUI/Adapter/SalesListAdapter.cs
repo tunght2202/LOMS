@@ -1,20 +1,22 @@
 ﻿using Android.Content;
 using Android.Views;
-using Android.Widget;
 using AndroidX.RecyclerView.Widget;
 using LOMSUI.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace LOMSUI.Adapters
+namespace LOMSUI.Adapter
 {
     public class SalesListAdapter : RecyclerView.Adapter
     {
         private readonly List<ListProductModel> _items;
         private readonly Context _context;
 
-        public event Action<ListProductModel> OnProductClick;
-        public event Action<ListProductModel> OnAddClick;
+        public event Action<ListProductModel> OnViewProductClick;
+        public event Action<ListProductModel> OnDeleteClick;
 
         public SalesListAdapter(Context context, List<ListProductModel> items)
         {
@@ -31,8 +33,8 @@ namespace LOMSUI.Adapters
                 var item = _items[position];
                 viewHolder.TxtNameList.Text = item.ListProductName;
 
-                viewHolder.BtnProduct.Click += (s, e) => OnProductClick?.Invoke(item);
-                viewHolder.BtnAdd.Click += (s, e) => OnAddClick?.Invoke(item);
+                viewHolder.BtnViewProduct.Click += (s, e) => OnViewProductClick?.Invoke(item);
+                viewHolder.BtnDelete.Click += (s, e) => OnDeleteClick?.Invoke(item);
             }
         }
 
@@ -52,14 +54,14 @@ namespace LOMSUI.Adapters
         class SalesListViewHolder : RecyclerView.ViewHolder
         {
             public TextView TxtNameList { get; }
-            public Button BtnProduct { get; }
-            public Button BtnAdd { get; }
+            public Button BtnViewProduct { get; }
+            public Button BtnDelete { get; }
 
             public SalesListViewHolder(View itemView) : base(itemView)
             {
                 TxtNameList = itemView.FindViewById<TextView>(Resource.Id.txtNameList);
-                BtnProduct = itemView.FindViewById<Button>(Resource.Id.productInListProduct);
-                BtnAdd = itemView.FindViewById<Button>(Resource.Id.btnAddProductInLProduct);
+                BtnViewProduct = itemView.FindViewById<Button>(Resource.Id.productInListProduct);
+                BtnDelete = itemView.FindViewById<Button>(Resource.Id.btnDeleteListProduct);
             }
         }
     }
