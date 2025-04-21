@@ -157,6 +157,7 @@ namespace LOMSAPI.Repositories.Revenues
             }
         }
 
+
         public async Task<int> GetTotalOrederDelivered(string userid)       
         {
             try

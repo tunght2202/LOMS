@@ -30,7 +30,7 @@ namespace LOMSUI
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_live_stream);
 
-           // BottomNavHelper.SetupFooterNavigation(this);
+            BottomNavHelper.SetupFooterNavigation(this, "sell");
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
             _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);

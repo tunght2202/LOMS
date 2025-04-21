@@ -49,7 +49,8 @@ namespace LOMSUI.Activities
             {
                 if (currentTab != "sell")
                 {
-                  
+                    Intent intent = new Intent(activity, typeof(LiveStreamActivity));
+                    activity.StartActivity(intent);
                 }
             };
 
