@@ -15,11 +15,7 @@ namespace LOMSAPI.Controllers
         {
             _liveStreamRepositories = liveStreamRepositories;
         }
-
-        /// <summary>
-        /// Api to get all livestreams from Facebook API
-        /// </summary>
-        /// <returns></returns>
+        
         [HttpGet("facebook")] // Lấy từ Facebook API
         public async Task<IActionResult> GetAllLiveStreamsFromFacebook()
         {

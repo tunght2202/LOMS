@@ -360,5 +360,10 @@ namespace LOMSAPI.Repositories.Users
             if (!result.Succeeded) return false;
             return true;
         }
+
+        public async Task<User> GetUserById(string userId)
+        {
+            return await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
     }
 }

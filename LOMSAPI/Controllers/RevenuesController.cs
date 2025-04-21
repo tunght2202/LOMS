@@ -1,4 +1,5 @@
-﻿using LOMSAPI.Repositories.Revenues;
+﻿using System.Security.Claims;
+using LOMSAPI.Repositories.Revenues;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -49,7 +50,7 @@ namespace LOMSAPI.Controllers
         {
             // Lấy UserID từ token
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var revenue = await _revenueRepository.GetRevenueByLivestreamId(userId, livestreamId);
+            var revenue = await _revenueRepository.GetRevenueByLivestreamId(userId,livestreamId);
             return Ok(new { LiveStreamRevenue = revenue });
         }
         /// <summary>
@@ -68,7 +69,7 @@ namespace LOMSAPI.Controllers
                 return BadRequest("Start date must be before end date.");
             }
 
-            var revenue = await _revenueRepository.GetRevenueByDateRange(userId, startDate, endDate);
+            var revenue = await _revenueRepository.GetRevenueByDateRange(userId,startDate, endDate);
             return Ok(new { StartDate = startDate, EndDate = endDate, TotalRevenue = revenue });
         }
         [HttpGet("total-orders-cancelled")]
