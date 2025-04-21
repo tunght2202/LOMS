@@ -2,6 +2,7 @@
 using LOMSAPI.Repositories.Revenues;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
@@ -87,7 +88,6 @@ namespace LOMSAPI.Controllers
             var totalReturned = await _revenueRepository.GetTotalOrederReturned(userId);
             return Ok(new { TotalOrdersReturned = totalReturned });
         }
-
         [HttpGet("total-orders-delivered")]
         public async Task<IActionResult> GetTotalOrdersDelivered()
         {
