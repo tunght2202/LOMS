@@ -156,7 +156,8 @@ namespace LOMSAPI.Repositories.Revenues
                 throw new InvalidOperationException("Error counting total returned orders", ex);
             }
         }
-        public async Task<int> GetTotalOrederDelivered(string userid)
+
+        public async Task<int> GetTotalOrederDelivered(string userid)       
         {
             try
             {
@@ -171,6 +172,7 @@ namespace LOMSAPI.Repositories.Revenues
                 // Log the exception here in a real application
                 throw new InvalidOperationException("Error counting total delivered orders", ex);
             }
+
             }
         }
 }

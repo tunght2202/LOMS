@@ -87,6 +87,7 @@ namespace LOMSAPI.Controllers
             var totalReturned = await _revenueRepository.GetTotalOrederReturned(userId);
             return Ok(new { TotalOrdersReturned = totalReturned });
         }
+
         [HttpGet("total-orders-delivered")]
         public async Task<IActionResult> GetTotalOrdersDelivered()
         {

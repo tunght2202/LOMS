@@ -138,7 +138,7 @@ namespace LOMSUI.Activities
             {
                 if (comments == null || comments.Count == 0)
                 {
-                    recyclerViewComments.Visibility = Android.Views.ViewStates.Visible;
+                    recyclerViewComments.Visibility = Android.Views.ViewStates.Gone;
                     txtNoComments.Visibility = Android.Views.ViewStates.Visible;
                     txtNoComments.Text = "No comments!";
 
