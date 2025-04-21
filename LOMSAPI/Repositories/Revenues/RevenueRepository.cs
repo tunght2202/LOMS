@@ -120,7 +120,7 @@ namespace LOMSAPI.Repositories.Revenues
             }
         }
 
-        public Task<int> GetTotalOrederCancelled(string userid)
+        public async Task<int> GetTotalOrederCancelled(string userid)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace LOMSAPI.Repositories.Revenues
                 throw new InvalidOperationException("Error counting total canceled orders", ex);
             }
         }
-        public Task<int> GetTotalOrederReturned(string userid)
+        public async Task<int> GetTotalOrederReturned(string userid)
         {
             try
             {
@@ -157,7 +157,7 @@ namespace LOMSAPI.Repositories.Revenues
             }
         }
         
-        public Task<int> GetTotalOrederDelivered(string userid)
+        public async Task<int> GetTotalOrederDelivered(string userid)
 
         {
             try
