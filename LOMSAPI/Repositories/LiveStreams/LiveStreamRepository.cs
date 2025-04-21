@@ -14,7 +14,7 @@ namespace LOMSAPI.Repositories.LiveStreams
         public LiveStreamRepository(LOMSDbContext context, HttpClient httpClient)
         {
             _context = context;
-            _httpClient = httpClient;                      
+            _httpClient = httpClient;
         }
 
         public async Task<int> DeleteLiveStream(string liveStreamId)
@@ -36,11 +36,10 @@ namespace LOMSAPI.Repositories.LiveStreams
             if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
                 throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
 
-            // Fetch the user's Facebook token from the database
             var user = await _context.Users
-                 .Where(u => u.Id == userId)
-                 .Select(u => new { u.TokenFacbook, u.PageId })
-                 .FirstOrDefaultAsync();
+                .Where(u => u.Id == userId)
+                .Select(u => new { u.TokenFacbook, u.PageId })
+                .FirstOrDefaultAsync();
 
             if (user == null || string.IsNullOrEmpty(user.TokenFacbook) || string.IsNullOrEmpty(user.PageId))
                 throw new UnauthorizedAccessException("User not found, no Facebook token, or no Page ID available.");
@@ -48,19 +47,21 @@ namespace LOMSAPI.Repositories.LiveStreams
             _accessToken = user.TokenFacbook;
             _pageId = user.PageId;
             var liveStreamsFromFacebook = new List<LiveStream>();
+            var liveStreamIdsFromFacebook = new HashSet<string>();
+
             string apiUrl = $"https://graph.facebook.com/v22.0/{_pageId}/live_videos?fields=id,title,creation_time,status,embed_html,permalink_url&access_token={_accessToken}";
 
             try
             {
-                // Lấy tất cả LivestreamID hiện có trong DB với StatusDelete = false
                 var existingLiveStreams = await _context.LiveStreams
                     .Where(ls => ls.UserID == userId && !ls.StatusDelete)
                     .ToListAsync();
-                // Lấy tất cả LivestreamID hiện có trong DB (bao gồm cả đã xóa và chưa xóa)
-                var allExistingIds = await _context.LiveStreams
+
+                var allExisting = await _context.LiveStreams
                     .Where(ls => ls.UserID == userId)
-                    .Select(ls => ls.LivestreamID)
                     .ToListAsync();
+
+                var allExistingIds = allExisting.Select(ls => ls.LivestreamID).ToList();
                 var existingIds = existingLiveStreams.Select(ls => ls.LivestreamID).ToList();
 
                 while (!string.IsNullOrEmpty(apiUrl))
@@ -76,22 +77,24 @@ namespace LOMSAPI.Repositories.LiveStreams
 
                     string jsonResponse = await response.Content.ReadAsStringAsync();
                     var parsedLiveStreams = ParseLiveStreams(jsonResponse, userId);
+
                     foreach (var liveStream in parsedLiveStreams)
                     {
-                        // Kiểm tra xem livestream đã tồn tại trong DB chưa (dù xóa hay chưa xóa)
+                        liveStreamIdsFromFacebook.Add(liveStream.LivestreamID);
+
                         if (allExistingIds.Contains(liveStream.LivestreamID))
                         {
-                            // Nếu đã tồn tại và chưa bị xóa, cập nhật trạng thái
-                            var existingLiveStream = existingLiveStreams.FirstOrDefault(ls => ls.LivestreamID == liveStream.LivestreamID);
+                            var existingLiveStream = existingLiveStreams
+                                .FirstOrDefault(ls => ls.LivestreamID == liveStream.LivestreamID);
+
                             if (existingLiveStream != null)
                             {
                                 UpdateLiveStreamStatus(existingLiveStream, liveStream);
                             }
-                            // Nếu đã bị xóa (StatusDelete = true), bỏ qua và không thêm lại
+                            // Nếu đã bị xóa trước đó, không thêm lại
                         }
                         else
                         {
-                            // Nếu chưa tồn tại trong DB, thêm mới
                             liveStreamsFromFacebook.Add(liveStream);
                             allExistingIds.Add(liveStream.LivestreamID);
                         }
@@ -103,11 +106,21 @@ namespace LOMSAPI.Repositories.LiveStreams
                              ? next.GetString() : null;
                 }
 
-                // Lưu các livestream mới vào DB
+                // Tìm và đánh dấu xóa những livestream không còn tồn tại trên Facebook
+                var streamsToDelete = allExisting
+                    .Where(ls => !liveStreamIdsFromFacebook.Contains(ls.LivestreamID) && !ls.StatusDelete)
+                    .ToList();
+
+                _context.LiveStreams.RemoveRange(streamsToDelete);
+
                 await SaveLiveStreamsToDb(liveStreamsFromFacebook);
 
-                // Trả về danh sách kết hợp: livestream từ DB (chưa xóa) + livestream mới từ Facebook
-                return existingLiveStreams.Concat(liveStreamsFromFacebook);
+                // Lưu trạng thái xóa
+                await _context.SaveChangesAsync();
+
+                return existingLiveStreams.Concat(liveStreamsFromFacebook)
+                    .OrderByDescending(c => c.StartTime)
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -193,5 +206,5 @@ namespace LOMSAPI.Repositories.LiveStreams
 
             return liveStream; // Trả về null nếu không tìm thấy
         }
-    }   
+    }
 }
