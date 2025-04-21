@@ -30,7 +30,6 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.register);
 
-            // Find UI elements
             _usernameEditText = FindViewById<EditText>(Resource.Id.usernameEditText);
             _phoneEditText = FindViewById<EditText>(Resource.Id.phoneEditText);
             _emailEditText = FindViewById<EditText>(Resource.Id.emailEditText);
@@ -49,11 +48,9 @@ namespace LOMSUI.Activities
                 return;
             }
 
-            // Attach event listeners
             _registerButton.Click += RegisterButton_Click;
             _backButton.Click += BackButton_Click;
 
-            // Populate gender spinner
             ArrayAdapter<string> genderAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleSpinnerDropDownItem, Resources.GetStringArray(Resource.Array.gender_options));
             _genderSpinner.Adapter = genderAdapter;
         }
