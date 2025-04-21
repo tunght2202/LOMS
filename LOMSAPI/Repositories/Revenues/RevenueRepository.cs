@@ -12,7 +12,7 @@ namespace LOMSAPI.Repositories.Revenues
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<decimal> GetTotalRevenue()
+        public async Task<decimal> GetTotalRevenue(string userid)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace LOMSAPI.Repositories.Revenues
             }
         }
 
-        public async Task<int> GetTotalOrders()
+        public async Task<int> GetTotalOrders(string userid)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace LOMSAPI.Repositories.Revenues
         //Note: This method needs LiveStreamCustomerID which wasn't in the original Order entity
         // I'll comment it out and provide an alternative
 
-        public async Task<decimal> GetRevenueByLivestreamId(string livestreamId)
+        public async Task<decimal> GetRevenueByLivestreamId(string userid, string livestreamId)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace LOMSAPI.Repositories.Revenues
 
 
         // Alternative version using ProductID instead
-        public async Task<decimal> GetRevenueByProductId(int productId)
+        public async Task<decimal> GetRevenueByProductId(string userid, int productId)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace LOMSAPI.Repositories.Revenues
             }
         }
 
-        public async Task<decimal> GetRevenueByDateRange(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetRevenueByDateRange(string userid, DateTime startDate, DateTime endDate)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace LOMSAPI.Repositories.Revenues
             }
         }
 
-        public Task<int> GetTotalOrederCancelled()
+        public Task<int> GetTotalOrederCancelled(string userid)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace LOMSAPI.Repositories.Revenues
                 throw new InvalidOperationException("Error counting total canceled orders", ex);
             }
         }
-        public Task<int> GetTotalOrederReturned()
+        public Task<int> GetTotalOrederReturned(string userid)
         {
             try
             {
@@ -134,8 +134,9 @@ namespace LOMSAPI.Repositories.Revenues
                 throw new InvalidOperationException("Error counting total returned orders", ex);
             }
         }
+        
+        public Task<int> GetTotalOrederDelivered(string userid)
 
-        public Task<int> GetTotalOrederDelivered()
         {
             try
             {
