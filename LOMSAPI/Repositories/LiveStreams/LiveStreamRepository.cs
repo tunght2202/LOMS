@@ -111,8 +111,6 @@ namespace LOMSAPI.Repositories.LiveStreams
                     .Where(ls => !liveStreamIdsFromFacebook.Contains(ls.LivestreamID) && !ls.StatusDelete)
                     .ToList();
 
-
-
                 foreach (var stream in streamsToDelete)
                 {
                     stream.StatusDelete = true; // hoặc _context.LiveStreams.Remove(stream) nếu muốn xóa cứng
