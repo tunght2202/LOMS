@@ -50,7 +50,7 @@ namespace LOMSAPI.Controllers
         {
             // Lấy UserID từ token
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var revenue = await _revenueRepository.GetRevenueByLivestreamId(userId,livestreamId);
+            var revenue = await _revenueRepository.GetRevenueByLivestreamId(userId, livestreamId);
             return Ok(new { LiveStreamRevenue = revenue });
         }
         /// <summary>
@@ -69,7 +69,7 @@ namespace LOMSAPI.Controllers
                 return BadRequest("Start date must be before end date.");
             }
 
-            var revenue = await _revenueRepository.GetRevenueByDateRange(userId,startDate, endDate);
+            var revenue = await _revenueRepository.GetRevenueByDateRange(userId, startDate, endDate);
             return Ok(new { StartDate = startDate, EndDate = endDate, TotalRevenue = revenue });
         }
         [HttpGet("total-orders-cancelled")]
@@ -94,6 +94,38 @@ namespace LOMSAPI.Controllers
             // Lấy UserID từ token
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var totalDelivered = await _revenueRepository.GetTotalOrederDelivered(userId);
+            return Ok(new { TotalOrdersDelivered = totalDelivered });
+        }
+        [HttpGet("total-orders-by-livestream/{livestreamId}")]
+        public async Task<IActionResult> GetTotalOrdersByLivestreamId(string livestreamId)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var totalOrders = await _revenueRepository.GetTotalOrderByLivestreamId(userId, livestreamId);
+            return Ok(new { TotalOrders = totalOrders });
+        }
+        [HttpGet("total-orders-cancelled-by-livestream/{livestreamId}")]
+        public async Task<IActionResult> GetTotalOrdersCancelledByLivestreamId(string livestreamId)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var totalCancelled = await _revenueRepository.GetTotalOrederCancelledByLivestreamId(userId, livestreamId);
+            return Ok(new { TotalOrdersCancelled = totalCancelled });
+        }
+        [HttpGet("total-orders-returned-by-livestream/{livestreamId}")]
+        public async Task<IActionResult> GetTotalOrdersReturnedByLivestreamId(string livestreamId)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var totalReturned = await _revenueRepository.GetTotalOrederReturnedByLivestreamId(userId, livestreamId);
+            return Ok(new { TotalOrdersReturned = totalReturned });
+        }
+        [HttpGet("total-orders-delivered-by-livestream/{livestreamId}")]
+        public async Task<IActionResult> GetTotalOrdersDeliveredByLivestreamId(string livestreamId)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var totalDelivered = await _revenueRepository.GetTotalOrederDeliveredByLivestreamId(userId, livestreamId);
             return Ok(new { TotalOrdersDelivered = totalDelivered });
         }
     }
