@@ -57,11 +57,15 @@ namespace LOMSAPI.Repositories.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image)
+        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile? image)
         {
             User userExist = await _userManager.FindByEmailAsync(model.Email);
             if (userExist != null) return false;
-            string imageUrl = await _cloudinaryService.UploadImageAsync(image);
+            string imageUrl = null;
+            if (image != null)
+            {
+                imageUrl = await _cloudinaryService.UploadImageAsync(image);
+            }
             var user = new User
             {
                 UserName = model.UserName,
