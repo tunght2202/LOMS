@@ -14,5 +14,6 @@ namespace LOMSAPI.Data.Entities
         public string? PageId { get; set; }
         public virtual ICollection<LiveStream> LiveStreams { get; set; }
         public virtual ICollection<Product> Products { get; set; }
+        public virtual ICollection<ListProduct> ListProducts { get; set; }
     }
 }
