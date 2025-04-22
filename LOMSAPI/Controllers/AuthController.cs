@@ -107,12 +107,21 @@ namespace LOMSAPI.Controllers
             if (user == null) return BadRequest("Can't find the user");
             var result = await _userRepository.UpdateUserProfileRequest(user, model);
             if (!result) return BadRequest("Error in information editing!");
-            if (model.Email != null)
+            if (model.Email != null && model.Password != null)
             {
-                return Ok(new { message = "Please enter email verification code." });
+                return Ok(new { message = "Please enter email verification code to change email and password." });
             }
+            else if (model.Email != null && model.Password == null)
+            {
+                return Ok(new { message = "Please enter email verification code to change email." });
+            }
+            else if (model.Email == null && model.Password != null)
+            {
+                return Ok(new { message = "Please enter email verification code to change password." });
+            }
+            
             return Ok(new { message = "Information edited successfully." });
-        }
+            }
         [HttpPut("update-userProfie")]
         public async Task<IActionResult> UpdateProfile(VerifyOtpModel OTP)
         {

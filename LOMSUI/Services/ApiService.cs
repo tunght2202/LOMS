@@ -12,9 +12,9 @@ namespace LOMSUI.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private const string BASE_URL = "https://10.0.2.2:7112/api/Auth";
-        private const string BASE_URLL = "https://10.0.2.2:7112/api";
-
+        private const string BASE_URL = "https://10.22.64.140:7112/api/Auth";
+        private const string BASE_URLL = "https://10.22.64.140:7112/api";
+        
         public ApiService(HttpClient httpClient = null)
         {
             _httpClient = httpClient ?? CreateDefaultHttpClient();
