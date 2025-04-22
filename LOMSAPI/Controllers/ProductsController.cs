@@ -1,5 +1,4 @@
-﻿using LOMSAPI.Data.Entities;
-using LOMSAPI.Models;
+﻿using LOMSAPI.Models;
 using LOMSAPI.Repositories.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +21,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Get all Product 
         [HttpGet("GetProducts")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductModel>>> GetProducts()
         {
             return Ok(await _productRepository.GetAllProducts());
         }
