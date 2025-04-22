@@ -12,7 +12,6 @@ namespace LOMSUI.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private const string BASE_URL = "https://10.0.2.2:7112/api/Auth";
         private const string BASE_URLL = "https://10.0.2.2:7112/api";
 
         public ApiService(HttpClient httpClient = null)
@@ -39,7 +38,7 @@ namespace LOMSUI.Services
                 string json = JsonConvert.SerializeObject(login);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/login-account-request", content))
+                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/login-account-request", content))
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -84,7 +83,7 @@ namespace LOMSUI.Services
                         content.Add(imageContent, "Avatar", "avatar.jpg");
                     }
 
-                    using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
+                    using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content))
                     {
                         string responseBody = await response.Content.ReadAsStringAsync();
                         Console.WriteLine($"[API] register-account-request with avatar Response: {response.StatusCode} - {responseBody}");
@@ -108,7 +107,7 @@ namespace LOMSUI.Services
                 string json = JsonConvert.SerializeObject(registerModel);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
+                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content))
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"[API] register-account-request Response: {response.StatusCode} - {responseBody}");
@@ -130,7 +129,7 @@ namespace LOMSUI.Services
         {
             try
             {
-                var response = await _httpClient.PutAsync($"{BASE_URL}/update-token-facebook?token={token}", null);
+                var response = await _httpClient.PutAsync($"{BASE_URLL}/Auth/update-token-facebook?token={token}", null);
                 var responseBody = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Update Token Response: {responseBody}");
 
@@ -147,7 +146,7 @@ namespace LOMSUI.Services
         {
             try
             {
-                var response = await _httpClient.PutAsync($"{BASE_URL}/update-page-id?pageId={pageid}", null);
+                var response = await _httpClient.PutAsync($"{BASE_URLL}/Auth/update-page-id?pageId={pageid}", null);
                 var responseBody = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Update Page Response: {responseBody}");
 
@@ -162,17 +161,17 @@ namespace LOMSUI.Services
 
         public async Task<bool> RequestOtpAsync(ForgotPasswordModel model)
         {
-             return await SendPostRequestAsync("reset-password-request", model);
+             return await SendPostRequestAsync("Auth/reset-password-request", model);
         }
         public async Task<bool> VerifyOtpAsync(VerifyOtpModel model)
         {
-            return await SendPostRequestAsync("reset-password-verify-otp", model, checkMessage: "OTP valid. You can reset your password.");
+            return await SendPostRequestAsync("Auth/reset-password-verify-otp", model, checkMessage: "OTP valid. You can reset your password.");
         }
 
         public async Task<bool> ResetPasswordAsync(ResetPasswordModel model) 
         {
 
-            return await SendPostRequestAsync("reset-password", model);
+            return await SendPostRequestAsync("Auth/reset-password", model);
         }
 
         private async Task<bool> SendPostRequestAsync(string endpoint, object model, string checkMessage = null)
@@ -181,7 +180,7 @@ namespace LOMSUI.Services
             {
                 var json = JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var url = $"{BASE_URL.TrimEnd('/')}/{endpoint.TrimStart('/')}";
+                var url = $"{BASE_URLL.TrimEnd('/')}/{endpoint.TrimStart('/')}";
 
                 using (var response = await _httpClient.PostAsync(url, content))
                 {
@@ -211,7 +210,7 @@ namespace LOMSUI.Services
                 var json = JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{BASE_URL}/register-account", content);
+                var response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account", content);
                 response.EnsureSuccessStatusCode();
 
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -358,10 +357,83 @@ namespace LOMSUI.Services
                 return null;
             }
         }
+        //RevenueByLivestream
+        public async Task<RevenueLivestream> GetRevenueByLivestream(string livestreamId)
+        {
+            try
+            {
+                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/livestream-revenue/{livestreamId}"))
+                {
+                    if (!response.IsSuccessStatusCode) return null;
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<RevenueLivestream>(responseBody);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching revenue data: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int> GetTotalOrdersByLivestreamIdAsync(string livestreamId)
+        {
+            try
+            {
+                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-by-livestream/{livestreamId}"))
+                {
+                    if (!response.IsSuccessStatusCode) return -1;
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var cancelledResponse = JsonConvert.DeserializeObject<OrderLive>(responseBody);
+                    return cancelledResponse?.totalOrders ?? -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching revenue data: {ex.Message}");
+                return -1;
+            }
+        }
+
+        public async Task<int> GetTotalOrdersCancelledByLivestreamIdAsync(string livestreamId)
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-cancelled-by-livestream/{livestreamId}");
+            if (!response.IsSuccessStatusCode)
+                return 0;
+
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<CancelledOrderLive>(content);
+            return result?.totalOrdersCancelled ?? 0;
+        }
+
+        public async Task<int> GetTotalOrdersReturnedByLivestreamIdAsync(string livestreamId)
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-returned-by-livestream/{livestreamId}");
+            if (!response.IsSuccessStatusCode)
+                return 0;
+
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ReturnedOrderLive>(content);
+            return result?.totalOrdersReturned ?? 0;
+        }
+
+        public async Task<int> GetTotalOrdersDeliveredByLivestreamIdAsync(string livestreamId)
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-delivered-by-livestream/{livestreamId}");
+            if (!response.IsSuccessStatusCode)
+                return 0;
+
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<DeliveredOrderLive>(content);
+            return result?.totalOrdersDelivered ?? 0;
+        }
+
 
         public async Task<UserModels> GetUserProfileAsync()
         {
-            string url = $"{BASE_URL}/user-profile";
+            string url = $"{BASE_URLL}/Auth/user-profile";
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -789,7 +861,7 @@ namespace LOMSUI.Services
             if (!string.IsNullOrEmpty(model.Password))
                 content.Add(new StringContent(model.Password), "Password");
 
-            var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfile-request", content);
+            var response = await _httpClient.PutAsync($"{BASE_URLL}/Auth/update-userProfile-request", content);
             var responseContent = await response.Content.ReadAsStringAsync();
 
             return responseContent;
@@ -804,7 +876,7 @@ namespace LOMSUI.Services
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.PutAsync($"{BASE_URL}/update-userProfie", content);
+                var response = await _httpClient.PutAsync($"{BASE_URLL}/Auth/update-userProfie", content);
 
                 var responseContent = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"API Response: {responseContent}");
