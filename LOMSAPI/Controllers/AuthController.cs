@@ -41,7 +41,7 @@ namespace LOMSAPI.Controllers
 
         [HttpPost("register-account-request")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterRequest([FromForm] RegisterRequestModel model, IFormFile Avatar)
+        public async Task<IActionResult> RegisterRequest([FromForm] RegisterRequestModel model, IFormFile? Avatar)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
