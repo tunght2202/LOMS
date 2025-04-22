@@ -57,7 +57,7 @@ namespace LOMSUI.Activities
             {
                 var intent = new Intent(this, typeof(AddProductSalesListActivity));
                 intent.PutExtra("ListProductId", _listproductId);
-                StartActivity(intent);
+                StartActivityForResult(intent, 100);
             };
 
             _swipeRefreshLayout.Refresh += async (s, e) =>
@@ -84,7 +84,10 @@ namespace LOMSUI.Activities
                     _adapter = new ProductAdapter(this, products);
                     _productRecyclerView.SetAdapter(_adapter);
 
-                   // _adapter.OnDeleteClick += product => ShowDeleteConfirmationDialog(product);
+                    _adapter.OnDeleteClick += product =>
+                    {
+                        ShowDeleteConfirmationDialog(_listproductId, new List<int> { product.ProductID });
+                    };
 
                     _adapter.OnViewDetailClick += product =>
                     {
@@ -116,8 +119,8 @@ namespace LOMSUI.Activities
 
                 if (success)
                 {
-                    _salesLists.RemoveAll(lp => listProductIds.Contains(lp.ListProductId));
-                    _adapter.NotifyDataSetChanged();
+                    _products.RemoveAll(p => listProductIds.Contains(p.ProductID));
+                    _adapter?.NotifyDataSetChanged();
                 }
             });
 
@@ -125,6 +128,16 @@ namespace LOMSUI.Activities
 
             AlertDialog dialog = builder.Create();
             dialog.Show();
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == 100 && resultCode == Result.Ok)
+            {
+                    _ = LoadProductDataAsync();
+            }
         }
 
     }

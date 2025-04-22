@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using LOMSAPI.Models;
 using System.Buffers.Text;
+using Android.Media.TV;
 
 namespace LOMSUI.Services
 {
@@ -60,6 +61,43 @@ namespace LOMSUI.Services
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        public async Task<bool> RegisterWithAvatarAsync(RegisterModel registerModel, Stream imageStream)
+        {
+            try
+            {
+                using (var content = new MultipartFormDataContent())
+                {
+                    content.Add(new StringContent(registerModel.Username), "UserName");
+                    content.Add(new StringContent(registerModel.PhoneNumber), "PhoneNumber");
+                    content.Add(new StringContent(registerModel.Email), "Email");
+                    content.Add(new StringContent(registerModel.Password), "Password");
+                    content.Add(new StringContent(registerModel.Gender), "Gender");
+                    content.Add(new StringContent(registerModel.Address), "Address");
+
+                    if (imageStream != null)
+                    {
+                        var imageContent = new StreamContent(imageStream);
+                        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+                        content.Add(imageContent, "Avatar", "avatar.jpg");
+                    }
+
+                    using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"[API] register-account-request with avatar Response: {response.StatusCode} - {responseBody}");
+
+                        var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                        return responseData?.success ?? response.IsSuccessStatusCode;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] register-account-request with avatar: {ex.Message}");
+                return false;
             }
         }
 
@@ -165,6 +203,38 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> VerifyOtpRegisterAsync(VerifyOtpRegisModel model)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{BASE_URL}/register-account", content);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error (Verify OTP): {ex.Message}");
+                return false;
+            }
+            catch (Newtonsoft.Json.JsonException ex)
+            {
+                Console.WriteLine($"JSON Error (Verify OTP): {ex.Message}");
+                return false;
+            }
+        }
+
+        private class ApiResponse
+        {
+
+            [JsonProperty("message")]
+            public string Message { get; set; }
+        }
 
         public async Task<RevenueData> GetRevenueDataAsync()
         {

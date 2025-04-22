@@ -38,11 +38,12 @@ namespace LOMSUI.Activities
                     Toast.MakeText(this, "Please select at least one product", ToastLength.Short).Show();
                     return;
                 }
-
+            
                 var success = await _apiService.AddMoreProductIntoListProductAsync(_listProductId, selectedProductIds);
                 if (success)
                 {
                     Toast.MakeText(this, "Product added to list", ToastLength.Short).Show();
+                    SetResult(Result.Ok);
                     Finish();
                 }
                 else
@@ -54,18 +55,28 @@ namespace LOMSUI.Activities
 
         private async Task LoadProducts()
         {
-            var products = await _apiService.GetAllProductsByUserAsync();
-            if (products == null || !products.Any())
+            var allProducts = await _apiService.GetAllProductsByUserAsync();
+            var existingProducts = await _apiService.GetProductsFromListProductAsync(_listProductId);
+
+            var filteredProducts = allProducts
+                .Where(p => !existingProducts.Any(ep => ep.ProductID == p.ProductID))
+                .ToList();
+
+            if (filteredProducts == null || !filteredProducts.Any())
             {
                 _noProductsTextView.Visibility = ViewStates.Visible;
+                _addButton.Enabled = false; 
                 return;
             }
 
             _noProductsTextView.Visibility = ViewStates.Gone;
+            _addButton.Enabled=true;
+
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
-            _adapter = new AddProductSalesListAdapter(products);
+            _adapter = new AddProductSalesListAdapter(filteredProducts);
             _recyclerView.SetAdapter(_adapter);
         }
+
     }
 }
 
