@@ -16,13 +16,14 @@ namespace LOMSAPI.Repositories.Revenues
         {
             try
             {
-                // Assuming there's a Price property in Product since OrderDetails isn't available
+                // Find revenue from all delivered orders for products owned by this user
                 return await _context.Orders
                     .Where(o => o.Status == OrderStatus.Delivered)
                     .Join(_context.Products,
                         order => order.ProductID,
                         product => product.ProductID,
                         (order, product) => new { order, product })
+                    .Where(op => op.product.UserID == userid)
                     .SumAsync(op => op.product.Price * op.order.Quantity);
             }
             catch (Exception ex)
@@ -36,7 +37,13 @@ namespace LOMSAPI.Repositories.Revenues
         {
             try
             {
-                return await _context.Orders.CountAsync();
+              return await _context.Products
+             .Where(p => p.UserID == userid)
+             .Join(_context.Orders,
+                 product => product.ProductID,
+                 order => order.ProductID,
+                 (product, order) => order)
+             .CountAsync();
             }
             catch (Exception ex)
             {
@@ -58,6 +65,7 @@ namespace LOMSAPI.Repositories.Revenues
                         order => order.ProductID,
                         product => product.ProductID,
                         (order, product) => new { order, product })
+                       .Where(op => op.product.UserID == userid)
                     .SumAsync(op => op.product.Price * op.order.Quantity);
             }
             catch (Exception ex)
@@ -78,6 +86,7 @@ namespace LOMSAPI.Repositories.Revenues
                         order => order.ProductID,
                         product => product.ProductID,
                         (order, product) => new { order, product })
+                       .Where(op => op.product.UserID == userid)
                     .SumAsync(op => op.product.Price * op.order.Quantity);
             }
             catch (Exception ex)
@@ -101,6 +110,7 @@ namespace LOMSAPI.Repositories.Revenues
                         order => order.ProductID,
                         product => product.ProductID,
                         (order, product) => new { order, product })
+                       .Where(op => op.product.UserID == userid)
                     .SumAsync(op => op.product.Price * op.order.Quantity);
             }
             catch (Exception ex)
@@ -110,11 +120,17 @@ namespace LOMSAPI.Repositories.Revenues
             }
         }
 
-        public Task<int> GetTotalOrederCancelled(string userid)
+        public async Task<int> GetTotalOrederCancelled(string userid)
         {
             try
             {
-                return _context.Orders.CountAsync(o => o.Status == OrderStatus.Canceled);
+                return await _context.Products
+              .Where(p => p.UserID == userid)
+              .Join(_context.Orders,
+                  product => product.ProductID,
+                  order => order.ProductID,
+                  (product, order) => order)
+              .CountAsync(o => o.Status == OrderStatus.Canceled);
             }
             catch (Exception ex)
             {
@@ -122,11 +138,17 @@ namespace LOMSAPI.Repositories.Revenues
                 throw new InvalidOperationException("Error counting total canceled orders", ex);
             }
         }
-        public Task<int> GetTotalOrederReturned(string userid)
+        public async Task<int> GetTotalOrederReturned(string userid)
         {
             try
             {
-                return _context.Orders.CountAsync(o => o.Status == OrderStatus.Returned);
+                return await _context.Products
+             .Where(p => p.UserID == userid)
+             .Join(_context.Orders,
+                 product => product.ProductID,
+                 order => order.ProductID,
+                 (product, order) => order)
+             .CountAsync(o => o.Status == OrderStatus.Returned);
             }
             catch (Exception ex)
             {
@@ -134,13 +156,17 @@ namespace LOMSAPI.Repositories.Revenues
                 throw new InvalidOperationException("Error counting total returned orders", ex);
             }
         }
-        
-        public Task<int> GetTotalOrederDelivered(string userid)
 
+
+        public async Task<int> GetTotalOrederDelivered(string userid)       
         {
             try
             {
-                return _context.Orders.CountAsync(o => o.Status == OrderStatus.Delivered);
+                return await _context.Products.Where(p => p.UserID == userid)
+                    .Join(_context.Orders, product => product.ProductID,
+                    order => order.ProductID, 
+                    (product, order) => order)
+                    .CountAsync(o => o.Status == OrderStatus.Delivered);
             }
             catch (Exception ex)
             {

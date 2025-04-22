@@ -44,10 +44,7 @@ namespace LOMSUI
             _btnViewOrders = FindViewById<Button>(Resource.Id.btnViewOrders);
 
 
-            _liveStreamId = Intent.GetStringExtra("LiveStreamID");
-
             _apiService = ApiServiceProvider.Instance;
-
 
 
             _liveStreamId = Intent.GetStringExtra("LiveStreamID");

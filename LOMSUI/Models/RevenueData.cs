@@ -23,5 +23,11 @@
         public int TotalOrdersDelivered { get; set; }
     }
 
+    public class LivestreamRevenueResponse
+    {
+        public decimal LiveStreamRevenue { get; set; }
+    }
+
+
 
 }

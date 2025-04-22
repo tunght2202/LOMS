@@ -49,12 +49,12 @@ namespace LOMSUI.Activities
             };
             _addListProductButton.Click += (s, e) =>
             {
-                var intent = new Intent(this, typeof(CreateNewSalesListActivity));
+                var intent = new Intent(this, typeof(AddSalesListActivity));
                 StartActivity(intent);
             };
             _viewListProductButton.Click += (s, e) =>
             {
-                var intent = new Intent(this, typeof(AddNewProductActivity));
+                var intent = new Intent(this, typeof(SalesListActivity));
                 StartActivity(intent);
             };
 
