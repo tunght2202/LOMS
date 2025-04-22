@@ -8,6 +8,8 @@ namespace LOMSUI.Activities
     [Activity(Label = "Menu")]
     public class MenuActivity : Activity
     {
+        private ApiService _apiService;
+        private string _token;
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -29,15 +31,9 @@ namespace LOMSUI.Activities
             LinearLayout privacyPolicyLayout = FindViewById<LinearLayout>(Resource.Id.privacyPolicyLayout);
             LinearLayout termsOfUseLayout = FindViewById<LinearLayout>(Resource.Id.termsOfUseLayout);
 
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            string token = prefs.GetString("token", null);
+            _apiService = ApiServiceProvider.Instance;
 
-            if (!string.IsNullOrEmpty(token))
-            {
-                try
-                {
-                    var apiService = new ApiService();
-                    var user = await apiService.GetUserProfileAsync(token); 
+                    var user = await _apiService.GetUserProfileAsync(); 
 
                     if (user != null)
                     {
@@ -51,12 +47,7 @@ namespace LOMSUI.Activities
                                  .Into(ImageView);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Toast.MakeText(this, "Error loading user information: " + ex.Message, ToastLength.Long).Show();
-                }
-            }
+        
 
             userInfoSection.Click += (s, e) =>
             {

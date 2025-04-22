@@ -359,11 +359,9 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<UserModels> GetUserProfileAsync(string token)
+        public async Task<UserModels> GetUserProfileAsync()
         {
             string url = $"{BASE_URL}/user-profile";
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -769,7 +767,7 @@ namespace LOMSUI.Services
 
 
 
-        public async Task<string> UpdateUserProfileRequestAsync(UserModels model, string token)
+        public async Task<string> UpdateUserProfileRequestAsync(UserModels model)
         {
             var content = new MultipartFormDataContent();
 
