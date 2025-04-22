@@ -332,7 +332,15 @@ namespace LOMSAPI.Repositories.Orders
                                     DiaChi = customer.Address,
                                     SoDienThoai = customer.PhoneNumber
                                 };
-                                _print.PrintCustomerLabel("COM5", printInfo);
+                                try
+                                {
+                                    _print.PrintCustomerLabel("COM5", printInfo);
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    continue;
+                                }
 
                             }
                         }

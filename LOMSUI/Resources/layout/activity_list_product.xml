@@ -6,6 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:background="#00a880"
         android:gravity="center">
 
@@ -18,14 +19,21 @@
             android:src="@drawable/logo_loms" />
 
     </LinearLayout>
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22dp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:text="Sales List"/>
     <LinearLayout
         android:id="@+id/productContentLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         android:orientation="vertical"
-        android:background="#ffffff"
         android:padding="16dp">
 
         <TextView
@@ -40,12 +48,12 @@
             android:visibility="gone" />
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/listProductRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:scrollbars="vertical"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listProductRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="vertical"/>
     </LinearLayout>
 
 
