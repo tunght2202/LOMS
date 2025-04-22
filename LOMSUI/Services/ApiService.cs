@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using LOMSAPI.Models;
 using System.Buffers.Text;
+using Android.Media.TV;
 
 namespace LOMSUI.Services
 {
@@ -63,6 +64,43 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> RegisterWithAvatarAsync(RegisterModel registerModel, Stream imageStream)
+        {
+            try
+            {
+                using (var content = new MultipartFormDataContent())
+                {
+                    content.Add(new StringContent(registerModel.Username), "UserName");
+                    content.Add(new StringContent(registerModel.PhoneNumber), "PhoneNumber");
+                    content.Add(new StringContent(registerModel.Email), "Email");
+                    content.Add(new StringContent(registerModel.Password), "Password");
+                    content.Add(new StringContent(registerModel.Gender), "Gender");
+                    content.Add(new StringContent(registerModel.Address), "Address");
+
+                    if (imageStream != null)
+                    {
+                        var imageContent = new StreamContent(imageStream);
+                        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+                        content.Add(imageContent, "Avatar", "avatar.jpg");
+                    }
+
+                    using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"[API] register-account-request with avatar Response: {response.StatusCode} - {responseBody}");
+
+                        var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                        return responseData?.success ?? response.IsSuccessStatusCode;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] register-account-request with avatar: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<bool> UpdateFacebookTokenAsync(string token)
         {
             try
@@ -76,6 +114,23 @@ namespace LOMSUI.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating Facebook token: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateFacebookPageAsync(string pageid)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsync($"{BASE_URL}/update-page-id?pageId={pageid}", null);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Update Page Response: {responseBody}");
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating Facebook Page: {ex.Message}");
                 return false;
             }
         }
@@ -148,6 +203,38 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> VerifyOtpRegisterAsync(VerifyOtpRegisModel model)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{BASE_URL}/register-account", content);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API Error (Verify OTP): {ex.Message}");
+                return false;
+            }
+            catch (Newtonsoft.Json.JsonException ex)
+            {
+                Console.WriteLine($"JSON Error (Verify OTP): {ex.Message}");
+                return false;
+            }
+        }
+
+        private class ApiResponse
+        {
+
+            [JsonProperty("message")]
+            public string Message { get; set; }
+        }
 
         public async Task<RevenueData> GetRevenueDataAsync()
         {
@@ -386,6 +473,7 @@ namespace LOMSUI.Services
             return false;
         }
 
+        //List Product
         public async Task<bool> SetupListProductAsync(string livestreamId, int listProductId)
         {
             var response = await _httpClient.PutAsync(
@@ -415,6 +503,64 @@ namespace LOMSUI.Services
                 Console.WriteLine($"Error in GetListProductsAsync: {ex.Message}");
                 return new List<ListProductModel>(); 
             }
+        }
+
+        public async Task<bool> AddNewListProductAsync(string listProductName)
+        {
+            var response = await _httpClient.PostAsync($"{BASE_URLL}/ListProducts/AddNewListProduct/{listProductName}", null);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> AddMoreProductIntoListProductAsync(int listProductId, List<int> productIds)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(productIds);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{BASE_URLL}/ListProducts/AddMoreProductIntoListProduct/{listProductId}", content);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AddMoreProductIntoListProductAsync] Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteListProductAsync(int listProductId)
+        {
+            var response = await _httpClient.DeleteAsync($"{BASE_URLL}/ListProducts/DeleteListProduct/{listProductId}");
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> DeleteProductsInListAsync(int listProductId, List<int> listProductIds)
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri($"{BASE_URLL}/ListProducts/DeleteProducInListProduct/{listProductId}"),
+                Content = new StringContent(JsonConvert.SerializeObject(listProductIds), Encoding.UTF8, "application/json")
+            };
+
+            var response = await _httpClient.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+
+
+        public async Task<List<ProductModel>> GetProductsFromListProductAsync(int listProductId)
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URLL}/ListProducts/GetProductFromListProductById/{listProductId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"API failed: {response.StatusCode}");
+                return new List<ProductModel>(); 
+            }
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<ProductModel>>(responseContent);
         }
 
 
@@ -772,7 +918,6 @@ namespace LOMSUI.Services
                 return false;
             }
         }
-
 
 
     }

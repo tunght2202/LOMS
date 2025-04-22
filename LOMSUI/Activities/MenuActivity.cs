@@ -67,13 +67,19 @@ namespace LOMSUI.Activities
             logoutButton.Click += (sender, e) =>
             {
                 var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-                prefs.Edit().Remove("token").Apply(); 
+                var editor = prefs.Edit();
+                editor.Remove("token");
+                editor.Remove("email");
+                editor.Remove("password");
+                editor.Remove("rememberMe");
+                editor.Apply();
 
                 Intent intent = new Intent(this, typeof(LoginActivity));
                 intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.NewTask);
                 StartActivity(intent);
                 Finish();
             };
+
 
             productListLayout.Click += (sender, e) =>
             {
