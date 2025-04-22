@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Bumptech.Glide;
+using LOMSUI.Activities.IntroductActivity;
 using LOMSUI.Services;
 
 namespace LOMSUI.Activities
@@ -25,7 +26,6 @@ namespace LOMSUI.Activities
             LinearLayout helpLayout = FindViewById<LinearLayout>(Resource.Id.helpLinearLayout);
             LinearLayout aboutLayout = FindViewById<LinearLayout>(Resource.Id.aboutLinearLayout);
             LinearLayout fanpageLinkLayout = FindViewById<LinearLayout>(Resource.Id.fanpageLinkLayout);
-            LinearLayout printerConnectionLayout = FindViewById<LinearLayout>(Resource.Id.printerConnectionLayout);
             LinearLayout privacyPolicyLayout = FindViewById<LinearLayout>(Resource.Id.privacyPolicyLayout);
             LinearLayout termsOfUseLayout = FindViewById<LinearLayout>(Resource.Id.termsOfUseLayout);
 
@@ -103,12 +103,14 @@ namespace LOMSUI.Activities
 
             helpLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Trợ giúp", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(HelpActivity));
+                StartActivity(intent);
             };
 
             aboutLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Giới thiệu", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(AboutActivity));
+                StartActivity(intent);
             };
 
             fanpageLinkLayout.Click += (sender, e) =>
@@ -116,20 +118,16 @@ namespace LOMSUI.Activities
                 Intent intent = new Intent(this, typeof(FacebookTokenActivity));
                 StartActivity(intent);
             };
-
-            printerConnectionLayout.Click += (sender, e) =>
-            {
-                Toast.MakeText(this, "Kết nối máy in", ToastLength.Short).Show();
-            };
-
             privacyPolicyLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Chính sách bảo mật", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(PrivacyActivity));
+                StartActivity(intent);
             };
 
             termsOfUseLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Điều khoản sử dụng", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(TermOfUserActivity));
+                StartActivity(intent);
             };
 
         }

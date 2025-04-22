@@ -101,6 +101,31 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<bool> RegisterAsync(RegisterModel registerModel)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(registerModel);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[API] register-account-request Response: {response.StatusCode} - {responseBody}");
+
+                    if (!response.IsSuccessStatusCode) return false;
+
+                    var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                    return responseData?.success ?? true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] register-account-request: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<bool> UpdateFacebookTokenAsync(string token)
         {
             try
@@ -178,31 +203,7 @@ namespace LOMSUI.Services
         }
 
 
-        public async Task<bool> RegisterAsync(RegisterModel registerModel)
-        {
-            try
-            {
-                string json = JsonConvert.SerializeObject(registerModel);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URL}/register-account-request", content))
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[API] register-account-request Response: {response.StatusCode} - {responseBody}");
-
-                    if (!response.IsSuccessStatusCode) return false;
-
-                    var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
-                    return responseData?.success ?? true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ERROR] register-account-request: {ex.Message}");
-                return false;
-            }
-        }
-
+    
         public async Task<bool> VerifyOtpRegisterAsync(VerifyOtpRegisModel model)
         {
             try
