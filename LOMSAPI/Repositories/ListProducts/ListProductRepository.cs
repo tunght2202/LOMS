@@ -13,9 +13,10 @@ namespace LOMSAPI.Repositories.ListProducts
             _context = context;
         }
 
-        public async Task<IEnumerable<ListProductModel>> GetAllListProduct()
+        public async Task<IEnumerable<ListProductModel>> GetAllListProduct(string userId)
         {
             var listProduct = await _context.ListProducts
+                .Where(x => x.UserID.Equals(userId))
                 .Select(x => new ListProductModel()
                 {
                     ListProductId = x.ListProductId,
@@ -76,7 +77,7 @@ namespace LOMSAPI.Repositories.ListProducts
             return result;
         }
 
-        public async Task<int> AddNewListProduct(string listProductName)
+        public async Task<int> AddNewListProduct(string listProductName, string userId)
         {
             if (listProductName == null)
             {
@@ -84,7 +85,8 @@ namespace LOMSAPI.Repositories.ListProducts
             }
             var listProduct = new ListProduct()
             {
-                ListProductName = listProductName
+                ListProductName = listProductName,
+                UserID = userId
             };
             await _context.ListProducts.AddAsync(listProduct);
             return await _context.SaveChangesAsync();

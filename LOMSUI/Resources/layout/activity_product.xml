@@ -26,6 +26,16 @@
         android:orientation="vertical"
         android:background="#ffffff"
         android:padding="16dp">
+		 <TextView
+            android:id="@+id/tvListProductName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:layout_marginBottom="16dp"
+            android:layout_gravity="center"
+            android:text="Title"
+            android:visibility="gone"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/noProductsTextView"

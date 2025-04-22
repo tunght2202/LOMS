@@ -81,6 +81,12 @@ namespace LOMSAPI.Data.Entities
                 .HasForeignKey(o => o.ProductID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<ListProduct>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.ListProducts)
+                .HasForeignKey(p => p.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Product>()
                 .HasOne(p => p.user)
                 .WithMany(u => u.Products)
