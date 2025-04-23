@@ -5,7 +5,7 @@ using LOMSUI.Services;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "AddProductInSaleList")]
+    [Activity(Label = "Add Product Sale List")]
     public class AddProductSalesListActivity : BaseActivity
     {
         private RecyclerView _recyclerView;

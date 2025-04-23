@@ -4,18 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-	<LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-		<LinearLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#00a880"
             android:layout_marginBottom="30dp"
             android:gravity="center">
 
-			<ImageView
+            <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
@@ -23,25 +23,25 @@
                 android:layout_marginBottom="10dp"
                 android:src="@drawable/logo_loms" />
 
-		</LinearLayout>
+        </LinearLayout>
 
-		<Button
-		  android:id="@+id/tvRevenueLive"
-		  android:layout_width="wrap_content"
-		  android:textSize="16sp"
-		  android:text="Revenues"
-		  android:textStyle="bold"
-		  android:layout_marginRight="20dp"
-		  android:layout_gravity="right"
-		  android:textColor="#185901"
-		  android:layout_height="wrap_content"/>
-		
-		<LinearLayout
+        <Button
+            android:id="@+id/tvRevenueLive"
+            android:layout_width="wrap_content"
+            android:textSize="16sp"
+            android:text="Revenues"
+            android:textStyle="bold"
+            android:layout_marginRight="20dp"
+            android:layout_gravity="right"
+            android:textColor="#185901"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
-			<TextView
+            <TextView
                 android:id="@+id/txtLiveTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,66 +52,74 @@
                 android:layout_marginBottom="8dp" />
 
 			<TextView
-                android:id="@+id/txtLiveStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Status: Live"
-                android:background="@android:color/holo_red_light"
-                android:textColor="@android:color/white"
-                android:padding="4dp"
-                android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
+			  android:id="@+id/txtLiveStatus"
+			  android:layout_width="wrap_content"
+			  android:layout_height="wrap_content"
+			  android:text="Status: Live"
+			  android:padding="4dp"
+			  android:textStyle="bold"
+			  android:textSize="16sp"
+			  android:layout_marginBottom="8dp" />
 
-			<TextView
+            <TextView
                 android:id="@+id/txtLiveStartTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Start: 01-04-2025 10:00 AM"
-				android:textStyle="bold"
+                android:textStyle="bold"
                 android:textSize="16sp"
                 android:layout_marginBottom="24dp" />
 
-			<TextView
-			   android:id="@+id/txtStreamTitle"
-			   android:layout_width="wrap_content"
-			   android:layout_height="wrap_content"
-			   android:text="Livestream Product"
-			   android:textColor="@android:color/black"
-			   android:layout_marginBottom="10dp"
-			   android:textStyle="bold" />
-
-			<Spinner
-                android:id="@+id/spinnerListProduct"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"/>
+				android:orientation="horizontal">
 
-			<Button
-                android:id="@+id/btnSetupListProduct"
+                <TextView
+                    android:id="@+id/txtStreamTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sales List"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="10dp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerListProduct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"/>
+
+                <Button
+                    android:id="@+id/btnSetupListProduct"
+                    android:layout_width="150dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#009688"
+                    android:text="Setup" />
+
+            </LinearLayout>
+
+            <ToggleButton
+                android:id="@+id/toggleAutoOrder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#009688"
-                android:text="Setup" />
+                android:textOn="Stop Auto Create Order"
+                android:textOff="Start Auto Create Order"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#00BCD4"
+                android:textColor="@android:color/white"/>
 
-			<ToggleButton
-			   android:id="@+id/toggleAutoOrder"
-			   android:layout_width="wrap_content"
-			   android:layout_height="wrap_content"
-			   android:textOn="Stop Auto Create Order"
-			   android:textOff="Start Auto Create Order"
-			   android:layout_marginTop="12dp"
-			   android:backgroundTint="#00BCD4"
-			   android:textColor="@android:color/white"/>
-
-		</LinearLayout>
+        </LinearLayout>
 
 
-		<LinearLayout
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center">
-			<Button
+            <Button
                 android:id="@+id/btnViewComments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,7 +128,7 @@
                 android:backgroundTint="@android:color/holo_blue_dark"
                 android:textColor="@android:color/white"/>
 
-			<Button
+            <Button
                 android:id="@+id/btnViewCustomers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -128,16 +136,16 @@
                 android:backgroundTint="@android:color/holo_green_dark"
                 android:textColor="@android:color/white" />
 
-			<Button
-			   android:id="@+id/btnViewOrders"
-			   android:layout_width="wrap_content"
-			   android:layout_height="wrap_content"
-			   android:text="Orders"
-			   android:layout_marginLeft="10dp"
-			   android:backgroundTint="#009688"
-			   android:textColor="@android:color/white" />
+            <Button
+                android:id="@+id/btnViewOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Orders"
+                android:layout_marginLeft="10dp"
+                android:backgroundTint="#009688"
+                android:textColor="@android:color/white" />
 
-		</LinearLayout>
-	</LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

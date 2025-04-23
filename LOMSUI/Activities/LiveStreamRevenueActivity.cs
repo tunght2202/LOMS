@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "LiveStreamRevenue")]
+    [Activity(Label = "LiveStream Revenue")]
     public class LiveStreamRevenueActivity : BaseActivity
     {
         private TextView _txtTotalRevenueLive, _txtTotalOrdersLive,
