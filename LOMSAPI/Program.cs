@@ -140,7 +140,10 @@ builder.Services.AddAuthentication(opt =>
             IssuerSigningKey = new SymmetricSecurityKey(signingKeyBytes)
         };
     });
-
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+{
+    opt.TokenLifespan = TimeSpan.FromMinutes(1); // Giới hạn token reset chỉ sống 10 phút
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
