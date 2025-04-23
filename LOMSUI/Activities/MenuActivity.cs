@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Bumptech.Glide;
+using LOMSUI.Activities.IntroductActivity;
 using LOMSUI.Services;
 
 namespace LOMSUI.Activities
@@ -7,6 +8,8 @@ namespace LOMSUI.Activities
     [Activity(Label = "Menu")]
     public class MenuActivity : Activity
     {
+        private ApiService _apiService;
+        private string _token;
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -25,19 +28,12 @@ namespace LOMSUI.Activities
             LinearLayout helpLayout = FindViewById<LinearLayout>(Resource.Id.helpLinearLayout);
             LinearLayout aboutLayout = FindViewById<LinearLayout>(Resource.Id.aboutLinearLayout);
             LinearLayout fanpageLinkLayout = FindViewById<LinearLayout>(Resource.Id.fanpageLinkLayout);
-            LinearLayout printerConnectionLayout = FindViewById<LinearLayout>(Resource.Id.printerConnectionLayout);
             LinearLayout privacyPolicyLayout = FindViewById<LinearLayout>(Resource.Id.privacyPolicyLayout);
             LinearLayout termsOfUseLayout = FindViewById<LinearLayout>(Resource.Id.termsOfUseLayout);
 
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            string token = prefs.GetString("token", null);
+            _apiService = ApiServiceProvider.Instance;
 
-            if (!string.IsNullOrEmpty(token))
-            {
-                try
-                {
-                    var apiService = new ApiService();
-                    var user = await apiService.GetUserProfileAsync(token); 
+                    var user = await _apiService.GetUserProfileAsync(); 
 
                     if (user != null)
                     {
@@ -51,12 +47,7 @@ namespace LOMSUI.Activities
                                  .Into(ImageView);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Toast.MakeText(this, "Error loading user information: " + ex.Message, ToastLength.Long).Show();
-                }
-            }
+        
 
             userInfoSection.Click += (s, e) =>
             {
@@ -103,12 +94,14 @@ namespace LOMSUI.Activities
 
             helpLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Trợ giúp", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(HelpActivity));
+                StartActivity(intent);
             };
 
             aboutLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Giới thiệu", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(AboutActivity));
+                StartActivity(intent);
             };
 
             fanpageLinkLayout.Click += (sender, e) =>
@@ -116,20 +109,16 @@ namespace LOMSUI.Activities
                 Intent intent = new Intent(this, typeof(FacebookTokenActivity));
                 StartActivity(intent);
             };
-
-            printerConnectionLayout.Click += (sender, e) =>
-            {
-                Toast.MakeText(this, "Kết nối máy in", ToastLength.Short).Show();
-            };
-
             privacyPolicyLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Chính sách bảo mật", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(PrivacyActivity));
+                StartActivity(intent);
             };
 
             termsOfUseLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Điều khoản sử dụng", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(TermOfUserActivity));
+                StartActivity(intent);
             };
 
         }

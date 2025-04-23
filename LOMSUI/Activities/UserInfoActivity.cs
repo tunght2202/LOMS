@@ -1,5 +1,4 @@
-﻿using Android.App;
-using Android.Content;
+﻿using Android.Content;
 using Android.OS;
 using Android.Widget;
 using Android.Provider;
@@ -21,41 +20,22 @@ namespace LOMSUI.Activities
                          _passwordEditText, _confirmPasswordEditText;
         private Spinner _genderSpinner;
         private Button _updateButton;
-
         private ApiService _apiService;
-        private string _token; 
 
         protected override async void OnCreate(Bundle savedInstanceState)   
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_user_info);
 
-            _token = ApiServiceProvider.Token;
-
             _apiService = ApiServiceProvider.Instance;
-
-            ActionBar.SetDisplayHomeAsUpEnabled(true);
-            ActionBar.SetHomeButtonEnabled(true);
 
             InitViews();
-
-            _apiService = ApiServiceProvider.Instance;
-
 
             await LoadUserInfo();
 
             _updateButton.Click += async (s, e) => await UpdateUserInfo();
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                Finish();
-                return true;
-            }
-            return base.OnOptionsItemSelected(item);
-        }
         private void InitViews()
         {
             _userNameEditText = FindViewById<EditText>(Resource.Id.usernameEditText);
@@ -76,7 +56,7 @@ namespace LOMSUI.Activities
         {
             try
             {
-                var user = await _apiService.GetUserProfileAsync(_token);
+                var user = await _apiService.GetUserProfileAsync();
                 if (user != null)
                 {
                     _userNameEditText.Text = user.UserName;
@@ -118,7 +98,7 @@ namespace LOMSUI.Activities
                     Address = address,
                     Gender = gender,
                     Password = password
-                }, _token);
+                });
 
                 if (result.Contains("Please enter email verification code."))
                 {
