@@ -63,67 +63,77 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<bool> RegisterWithAvatarAsync(RegisterModel registerModel, Stream imageStream)
+
+        public async Task<RegisterResult> RegisterAsync(RegisterModel model, Android.Net.Uri imageUri)
         {
+            var result = new RegisterResult();
+
             try
             {
                 using (var content = new MultipartFormDataContent())
                 {
-                    content.Add(new StringContent(registerModel.Username), "UserName");
-                    content.Add(new StringContent(registerModel.PhoneNumber), "PhoneNumber");
-                    content.Add(new StringContent(registerModel.Email), "Email");
-                    content.Add(new StringContent(registerModel.Password), "Password");
-                    content.Add(new StringContent(registerModel.Gender), "Gender");
-                    content.Add(new StringContent(registerModel.Address), "Address");
+                    content.Add(new StringContent(model.Username), "Username");
+                    content.Add(new StringContent(model.PhoneNumber), "PhoneNumber");
+                    content.Add(new StringContent(model.Email), "Email");
+                    content.Add(new StringContent(model.Password), "Password");
+                    content.Add(new StringContent(model.Address), "Address");
+                    content.Add(new StringContent(model.Gender), "Gender");
+                    content.Add(new StringContent(model.FullName), "FullName");
 
-                    if (imageStream != null)
+                    if (imageUri != null)
                     {
-                        var imageContent = new StreamContent(imageStream);
-                        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
-                        content.Add(imageContent, "Avatar", "avatar.jpg");
+                        using (var stream = Application.Context.ContentResolver.OpenInputStream(imageUri))
+                        {
+                            var imageContent = new StreamContent(stream);
+                            imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+                            content.Add(imageContent, "Avatar", "avatar.jpg");
+                        }
                     }
 
-                    using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content))
+                    using (var response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content))
                     {
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"[API] register-account-request with avatar Response: {response.StatusCode} - {responseBody}");
+                        var responseBody = await response.Content.ReadAsStringAsync();
 
-                        var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
-                        return responseData?.success ?? response.IsSuccessStatusCode;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            result.IsSuccess = true;
+                            return result;
+                        }
+
+                        var errorJson = JsonConvert.DeserializeObject<JObject>(responseBody);
+                        var errors = errorJson["errors"] as JObject;
+
+                        if (errors != null)
+                        {
+                            foreach (var field in errors.Properties())
+                            {
+                                foreach (var msg in field.Value)
+                                {
+                                    result.Errors.Add($"{field.Name}: {msg}");
+                                }
+                            }
+                        }
+                        else if (errorJson["message"] != null)
+                        {
+                            result.Errors.Add(errorJson["message"].ToString());
+                        }
+                        else if (errorJson["title"] != null)
+                        {
+                            result.Errors.Add(errorJson["title"].ToString());
+                        }
+
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] register-account-request with avatar: {ex.Message}");
-                return false;
+                result.Errors.Add($"Exception: {ex.Message}");
             }
+
+            return result;
         }
 
-        public async Task<bool> RegisterAsync(RegisterModel registerModel)
-        {
-            try
-            {
-                string json = JsonConvert.SerializeObject(registerModel);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                using (HttpResponseMessage response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content))
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[API] register-account-request Response: {response.StatusCode} - {responseBody}");
-
-                    if (!response.IsSuccessStatusCode) return false;
-
-                    var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
-                    return responseData?.success ?? true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ERROR] register-account-request: {ex.Message}");
-                return false;
-            }
-        }
 
         public async Task<bool> UpdateFacebookTokenAsync(string token)
         {
