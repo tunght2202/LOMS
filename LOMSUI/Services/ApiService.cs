@@ -12,7 +12,7 @@ namespace LOMSUI.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private const string BASE_URLL = "https://10.0.2.2:7112/api";
+        private const string BASE_URLL = "https://00e8-118-70-211-238.ngrok-free.app/api";
 
         public ApiService(HttpClient httpClient = null)
         {
