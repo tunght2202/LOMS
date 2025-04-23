@@ -1,6 +1,6 @@
 namespace LOMSUI.Activities.IntroductActivity;
 
-[Activity(Label = "HelpActivity")]
+[Activity(Label = "Help")]
 public class HelpActivity : BaseActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)

@@ -1,6 +1,6 @@
 namespace LOMSUI.Activities.IntroductActivity;
 
-[Activity(Label = "PrivacyActivity")]
+[Activity(Label = "Privacy Policy")]
 public class PrivacyActivity : BaseActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)
