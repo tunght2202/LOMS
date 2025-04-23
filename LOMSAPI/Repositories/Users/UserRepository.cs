@@ -57,10 +57,10 @@ namespace LOMSAPI.Repositories.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile? image)
+        public async Task<(bool success, string message)> RegisterRequestAsync(RegisterRequestModel model, IFormFile? image)
         {
             User userExist = await _userManager.FindByEmailAsync(model.Email);
-            if (userExist != null) return false;
+            if (userExist != null) return (false, "Email is existed. Please use another email");
             string imageUrl = null;
             if (image != null)
             {
@@ -101,7 +101,7 @@ namespace LOMSAPI.Repositories.Users
 
             await SendEmailAsync(user.Email, "Verify account", $"Your OTP code is: {otpCode}");
 
-            return true;
+            return (true, "Please check email for otp code!");
         }
 
         public async Task<bool> RegisterAccountAsync(VerifyOtpModel model)
