@@ -127,12 +127,19 @@ namespace LOMSUI.Activities
                     AvatarData = _avatarImageData
                 };
 
-                bool isSuccess = await _apiService.RegisterAsync(registerModel, _selectedImageUri);
+                var result = await _apiService.RegisterAsync(registerModel, _selectedImageUri);
 
-                if (isSuccess)
+                if (result.IsSuccess)
                 {
                     Toast.MakeText(this, "Registration successful. Please check your email for OTP code.", ToastLength.Long).Show();
                     StartActivity(new Intent(this, typeof(VerifyOtpRegisterActivity)).PutExtra("email", email));
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        Toast.MakeText(this, error, ToastLength.Long).Show();
+                    }
                 }
             }
             catch (Exception ex)
@@ -140,7 +147,6 @@ namespace LOMSUI.Activities
                 Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long).Show();
             }
         }
-
 
         private void BackButton_Click(object sender, EventArgs e)
         {

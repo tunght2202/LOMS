@@ -64,13 +64,15 @@ namespace LOMSUI.Services
         }
 
 
-        public async Task<bool> RegisterAsync(RegisterModel model, Android.Net.Uri imageUri)
+        public async Task<RegisterResult> RegisterAsync(RegisterModel model, Android.Net.Uri imageUri)
         {
+            var result = new RegisterResult();
+
             try
             {
                 using (var content = new MultipartFormDataContent())
                 {
-                    content.Add(new StringContent(model.Username), "Username"); 
+                    content.Add(new StringContent(model.Username), "Username");
                     content.Add(new StringContent(model.PhoneNumber), "PhoneNumber");
                     content.Add(new StringContent(model.Email), "Email");
                     content.Add(new StringContent(model.Password), "Password");
@@ -80,7 +82,7 @@ namespace LOMSUI.Services
 
                     if (imageUri != null)
                     {
-                        using (Stream stream = Application.Context.ContentResolver.OpenInputStream(imageUri))
+                        using (var stream = Application.Context.ContentResolver.OpenInputStream(imageUri))
                         {
                             var imageContent = new StreamContent(stream);
                             imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
@@ -91,24 +93,46 @@ namespace LOMSUI.Services
                     using (var response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content))
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"[API] Register response: {response.StatusCode} - {responseBody}");
 
-                        var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            result.IsSuccess = true;
+                            return result;
+                        }
 
-                        string message = responseData?.message ?? "Registration failed.";
-                        Toast.MakeText(Application.Context, message, ToastLength.Long).Show();
+                        var errorJson = JsonConvert.DeserializeObject<JObject>(responseBody);
+                        var errors = errorJson["errors"] as JObject;
 
-                        return response.IsSuccessStatusCode;
+                        if (errors != null)
+                        {
+                            foreach (var field in errors.Properties())
+                            {
+                                foreach (var msg in field.Value)
+                                {
+                                    result.Errors.Add($"{field.Name}: {msg}");
+                                }
+                            }
+                        }
+                        else if (errorJson["message"] != null)
+                        {
+                            result.Errors.Add(errorJson["message"].ToString());
+                        }
+                        else if (errorJson["title"] != null)
+                        {
+                            result.Errors.Add(errorJson["title"].ToString());
+                        }
+
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] RegisterWithAvatarFormDataAsync: {ex.Message}");
-                Toast.MakeText(Application.Context, $"Error: {ex.Message}", ToastLength.Long).Show();
-                return false;
+                result.Errors.Add($"Exception: {ex.Message}");
             }
+
+            return result;
         }
+
 
 
         public async Task<bool> UpdateFacebookTokenAsync(string token)
