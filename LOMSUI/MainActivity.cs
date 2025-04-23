@@ -1,49 +1,104 @@
-﻿using Android.App;
-using Android.OS;
-using Android.Content;
+﻿using Android;
 using Android.Bluetooth;
-using LOMSUI.Services.ThermalPrinterService;
+using Android.Content.PM;
+using Android.OS;
 using LOMSUI.Services;
 namespace LOMSUI
 {
-    [Activity(Label = "@string/app_name")]
-    public class MainActivity : Activity
+    [Activity(Label = "Print", MainLauncher = true)]
+public class MainActivity : Activity
     {
-        protected override void OnCreate(Bundle? savedInstanceState)
+        const int BluetoothPermissionRequestCode = 1001;
+        BluetoothAdapter adapter;
+        BluetoothDevice device;
+
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
-            BluetoothAdapter adapter = BluetoothAdapter.DefaultAdapter;
             base.OnCreate(savedInstanceState);
+            SetContentView(Resource.Layout.activity_main);
 
-            SetContentView(Resource.Layout.activity_login);
+            InitBluetooth();
+            var printer = new ThermalPrinterService();
 
-            Button btnIn = FindViewById<Button>(Resource.Id.btnPrint);
-            btnIn.Click += async (s, e) =>
+            await printer.ConnectAsync(device);
+
+            var info = new PrintInfo
             {
-                var device = adapter.BondedDevices.FirstOrDefault(d => d.Name.Contains("PT"));
-                if (device == null)
+                MaDonHang = "100036478571801",
+                TenKhachHang = "Linh Phạm",
+                MaVach = "200300042",
+                NgayGio = DateTime.Now,
+                DiaChi = "48/15 Phạm Văn Xảo, Quận Tân Phú",
+                SoDienThoai = "0373389165"
+            };
+
+            await printer.PrintCustomerLabelAsync(info);
+
+        }
+
+        void InitBluetooth()
+        {
+            adapter = BluetoothAdapter.DefaultAdapter;
+
+            if (adapter == null)
+            {
+                Toast.MakeText(this, "Thiết bị không hỗ trợ Bluetooth", ToastLength.Long).Show();
+                return;
+            }
+
+            if (!adapter.IsEnabled)
+            {
+                var enableBtIntent = new Android.Content.Intent(BluetoothAdapter.ActionRequestEnable);
+                StartActivityForResult(enableBtIntent, 1);
+            }
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
+            {
+                if (CheckSelfPermission(Manifest.Permission.BluetoothConnect) != Permission.Granted)
                 {
-                    Toast.MakeText(this, "Không tìm thấy máy in PT", ToastLength.Long).Show();
+                    RequestPermissions(new string[]
+                    {
+                        Manifest.Permission.BluetoothConnect,
+                        Manifest.Permission.BluetoothScan
+                    }, BluetoothPermissionRequestCode);
                     return;
                 }
+            }
 
-                var printer = new BluetoothPrinter();
-                await printer.ConnectAsync(device); // device là thiết bị PT-280 đã paired
-                printer.PrintText("Cửa hàng Tinh Hoa\nCảm ơn quý khách!");
-                //await printer.ConnectAsync(device);
-
-                //var info = new PrintInfo
-                //{
-                //    MaDonHang = "100036478571801",
-                //    TenKhachHang = "Linh Phạm",
-                //    MaVach = "200300042",
-                //    NgayGio = DateTime.Now,
-                //    DiaChi = "48/15 Phạm Văn Xảo, Quận Tân Phú",
-                //    SoDienThoai = "0373389165"
-                //};
-
-                //await printer.PrintCustomerLabelAsync(info);
-            };
+            GetPrinterDevice();
         }
-    }
+
+        void GetPrinterDevice()
+        {
+            device = adapter.BondedDevices?.FirstOrDefault(d => d.Name.Contains("PT"));
+
+            if (device != null)
+            {
+                Toast.MakeText(this, $"Đã tìm thấy máy in: {device.Name}", ToastLength.Short).Show();
+                // Ở đây bạn có thể gọi printer.ConnectAsync(device) nếu đã có class BluetoothPrinter
+            }
+            else
+            {
+                Toast.MakeText(this, "Không tìm thấy máy in PT đã ghép nối", ToastLength.Short).Show();
+            }
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
+        {
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            if (requestCode == BluetoothPermissionRequestCode)
+            {
+                if (grantResults.Length > 0 && grantResults.All(r => r == Permission.Granted))
+                {
+                    Toast.MakeText(this, "Đã cấp quyền Bluetooth", ToastLength.Short).Show();
+                    GetPrinterDevice();
+                }
+                else
+                {
+                    Toast.MakeText(this, "Không được cấp quyền Bluetooth", ToastLength.Long).Show();
+                }
+            }
+        }
     }
 }
