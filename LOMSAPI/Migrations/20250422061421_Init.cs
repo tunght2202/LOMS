@@ -34,19 +34,6 @@ namespace LOMSAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ListProducts",
-                columns: table => new
-                {
-                    ListProductId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ListProductName = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ListProducts", x => x.ListProductId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -70,6 +57,8 @@ namespace LOMSAPI.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TokenFacbook = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PageId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -112,29 +101,19 @@ namespace LOMSAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LiveStreams",
+                name: "ListProducts",
                 columns: table => new
                 {
-                    LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ListProductId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ListProductID = table.Column<int>(type: "int", nullable: true),
-                    StreamURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StreamTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StatusDelete = table.Column<bool>(type: "bit", nullable: false)
+                    ListProductName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LiveStreams", x => x.LivestreamID);
+                    table.PrimaryKey("PK_ListProducts", x => x.ListProductId);
                     table.ForeignKey(
-                        name: "FK_LiveStreams_ListProducts_ListProductID",
-                        column: x => x.ListProductID,
-                        principalTable: "ListProducts",
-                        principalColumn: "ListProductId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_LiveStreams_Users_UserID",
+                        name: "FK_ListProducts_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -253,28 +232,32 @@ namespace LOMSAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LiveStreamCustomers",
+                name: "LiveStreams",
                 columns: table => new
                 {
-                    LiveStreamCustomerId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ListProductID = table.Column<int>(type: "int", nullable: true),
+                    StreamURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StreamTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StatusDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LiveStreamCustomers", x => x.LiveStreamCustomerId);
+                    table.PrimaryKey("PK_LiveStreams", x => x.LivestreamID);
                     table.ForeignKey(
-                        name: "FK_LiveStreamCustomers_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CustomerID",
+                        name: "FK_LiveStreams_ListProducts_ListProductID",
+                        column: x => x.ListProductID,
+                        principalTable: "ListProducts",
+                        principalColumn: "ListProductId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_LiveStreamCustomers_LiveStreams_LivestreamID",
-                        column: x => x.LivestreamID,
-                        principalTable: "LiveStreams",
-                        principalColumn: "LivestreamID",
+                        name: "FK_LiveStreams_Users_UserID",
+                        column: x => x.UserID,
+                        principalTable: "Users",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -301,6 +284,32 @@ namespace LOMSAPI.Migrations
                         column: x => x.ProductID,
                         principalTable: "Products",
                         principalColumn: "ProductID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LiveStreamCustomers",
+                columns: table => new
+                {
+                    LiveStreamCustomerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LivestreamID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CustomerID = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LiveStreamCustomers", x => x.LiveStreamCustomerId);
+                    table.ForeignKey(
+                        name: "FK_LiveStreamCustomers_Customers_CustomerID",
+                        column: x => x.CustomerID,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LiveStreamCustomers_LiveStreams_LivestreamID",
+                        column: x => x.LivestreamID,
+                        principalTable: "LiveStreams",
+                        principalColumn: "LivestreamID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -357,6 +366,11 @@ namespace LOMSAPI.Migrations
                 name: "IX_Comments_LiveStreamCustomerID",
                 table: "Comments",
                 column: "LiveStreamCustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ListProducts_UserID",
+                table: "ListProducts",
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LiveStreamCustomers_CustomerID",

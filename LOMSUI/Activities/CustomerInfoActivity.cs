@@ -7,7 +7,7 @@ using LOMSUI.Services;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Customer Information")]
-    public class CustomerInfoActivity : Activity
+    public class CustomerInfoActivity : BaseActivity
     {
         private ImageView _imgAvatar;
         private TextView _txtFacebookName;
@@ -21,8 +21,6 @@ namespace LOMSUI.Activities
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_customer_info);
-            ActionBar.SetDisplayHomeAsUpEnabled(true);
-            ActionBar.SetHomeButtonEnabled(true);
 
             _apiService = ApiServiceProvider.Instance; 
 
@@ -42,17 +40,6 @@ namespace LOMSUI.Activities
                 LoadCustomer(_customer);
             }
         }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                Finish(); 
-                return true;
-            }
-            return base.OnOptionsItemSelected(item);
-        }
-
         private void InitViews()
         {
             _imgAvatar = FindViewById<ImageView>(Resource.Id.imgAvatar);
@@ -69,7 +56,8 @@ namespace LOMSUI.Activities
 
             txtOrderHistory.Click += (s, e) =>
             {
-                var intent = new Intent(this, typeof(OrderHistoryActivity));
+                var intent = new Intent(this, typeof(OrderListActivity));
+                intent.PutExtra("Type", "ByCustomer");
                 intent.PutExtra("customerId", _customer.CustomerID);
                 StartActivity(intent);
             };
@@ -95,6 +83,11 @@ namespace LOMSUI.Activities
 
             bool success = await _apiService.UpdateCustomerAsync(_customerId, _customer);
             Toast.MakeText(this, success ? "Update successful!" : "Update failed!", ToastLength.Short).Show();
+
+            if (success)
+            {
+                Finish();
+            }
         }
     }
 

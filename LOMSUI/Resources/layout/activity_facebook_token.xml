@@ -19,6 +19,38 @@
 
     </LinearLayout>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18sp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Page"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPageId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Page code" />
+        <Button
+            android:id="@+id/updatePageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update Page"
+            android:layout_marginTop="18dp"
+            android:backgroundTint="#1FD872"
+            android:layout_gravity="bottom"
+            android:textColor="#FFFFFF"
+            />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -43,14 +75,14 @@
             android:id="@+id/updateTokenButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Update"
+            android:text="Update Token"
             android:layout_marginTop="18dp"
-            android:backgroundTint="#F08080"
+            android:backgroundTint="#427A9F"
             android:layout_gravity="bottom"
             android:textColor="#FFFFFF"
             />
     </LinearLayout>
-    
-    <include layout="@layout/layout_bottom_nav" />
 
+    <!--    <include layout="@layout/layout_bottom_nav" />
+    -->
 </LinearLayout>

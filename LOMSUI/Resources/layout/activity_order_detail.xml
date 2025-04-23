@@ -25,17 +25,16 @@
         android:layout_height="wrap_content"
         android:text="Detail"
         android:textStyle="bold"
-		android:textColor="@android:color/black"
+        android:textColor="@android:color/black"
         android:layout_gravity="center"
         android:textSize="30sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-        
+
         <TextView
             android:id="@+id/txtOrderCode"
             android:layout_width="match_parent"
@@ -99,8 +98,92 @@
             android:textSize="16sp"
             android:textColor="@android:color/holo_red_dark"/>
     </LinearLayout>
-    
-    <include layout="@layout/layout_bottom_nav" />
+    <LinearLayout
+        android:id="@+id/layoutPending"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:padding="16dp">
 
+        <Button
+            android:id="@+id/btnStatusCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#E91E63"
+            android:layout_marginRight="15dp"
+            android:text="Cancel"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnStatusComfimed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#17B857"
+            android:text="Confirm"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layoutConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnStatusCancell"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#E91E63"
+            android:layout_marginRight="15dp"
+            android:text="Cancel"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnStatusShipped"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#17B857"
+            android:text="Shipped"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layoutShipped"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnStatusReturn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#E91E63"
+            android:layout_marginRight="15dp"
+            android:text="Returned"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnStatusDelivered"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#17B857"
+            android:text="Delivered"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+    </LinearLayout>
 
 </LinearLayout>

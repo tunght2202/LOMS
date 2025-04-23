@@ -8,54 +8,92 @@ using System.Threading.Tasks;
 using LOMSUI.Models;
 using LOMSUI.Services;
 using LOMSUI.Activities;
+using Android.Graphics;
 
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Register")]
-    public class RegisterActivity : Activity
+    public class RegisterActivity : BaseActivity
     {
-        private EditText _usernameEditText;
-        private EditText _phoneEditText;
-        private EditText _emailEditText;
-        private EditText _passwordEditText;
-        private EditText _confirmPasswordEditText;
-        private EditText _addressEditText;
+        private EditText _usernameEditText, _phoneEditText, _emailEditText, _passwordEditText,
+                         _confirmPasswordEditText, _addressEditText, _fullNameEditText;
         private Spinner _genderSpinner;
-        private Button _backButton;
-        private Button _registerButton;
+        private Button _backButton, _registerButton;
+        private ImageView _avatarImageView;
         private readonly ApiService _apiService = new ApiService();
+        private Android.Net.Uri _selectedImageUri;
+        private byte[] _avatarImageData;
+
+        private const int PickImageId = 1000;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.register);
 
-            // Find UI elements
             _usernameEditText = FindViewById<EditText>(Resource.Id.usernameEditText);
             _phoneEditText = FindViewById<EditText>(Resource.Id.phoneEditText);
             _emailEditText = FindViewById<EditText>(Resource.Id.emailEditText);
             _passwordEditText = FindViewById<EditText>(Resource.Id.passwordEditText);
             _confirmPasswordEditText = FindViewById<EditText>(Resource.Id.confirmPasswordEditText);
+            _addressEditText = FindViewById<EditText>(Resource.Id.addressEditText);
             _genderSpinner = FindViewById<Spinner>(Resource.Id.genderSpinner);
+            _fullNameEditText = FindViewById<EditText>(Resource.Id.fullNameEditText);
             _backButton = FindViewById<Button>(Resource.Id.backButton);
             _registerButton = FindViewById<Button>(Resource.Id.registerButton);
+            _avatarImageView = FindViewById<ImageView>(Resource.Id.avatarImageView);
 
-            if (_usernameEditText == null || _phoneEditText == null || _emailEditText == null ||
-                _passwordEditText == null || _confirmPasswordEditText == null || _genderSpinner == null ||
-                _backButton == null || _registerButton == null)
-            {
-                Log.Error("RegisterActivity", "Error: One or more UI elements not found!");
-                Toast.MakeText(this, "Error loading UI components!", ToastLength.Long).Show();
-                return;
-            }
-
-            // Attach event listeners
-            _registerButton.Click += RegisterButton_Click;
-            _backButton.Click += BackButton_Click;
-
-            // Populate gender spinner
             ArrayAdapter<string> genderAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleSpinnerDropDownItem, Resources.GetStringArray(Resource.Array.gender_options));
             _genderSpinner.Adapter = genderAdapter;
+
+            _registerButton.Click += RegisterButton_Click;
+            _backButton.Click += BackButton_Click;
+            _avatarImageView.Click += AvatarImageView_Click;
+        }
+
+        private void AvatarImageView_Click(object sender, EventArgs e)
+        {
+            Intent intent = new Intent(Intent.ActionGetContent);
+            intent.SetType("image/*");
+            intent.AddCategory(Intent.CategoryOpenable);
+            StartActivityForResult(Intent.CreateChooser(intent, "Select Image"), 101);
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == 101 && resultCode == Result.Ok && data != null)
+            {
+                _selectedImageUri = data.Data;
+                _avatarImageData = ProcessAvatarImage(_selectedImageUri);
+                _avatarImageView.SetImageBitmap(BitmapFactory.DecodeByteArray(_avatarImageData, 0, _avatarImageData.Length));
+            }
+        }
+        private byte[] ProcessAvatarImage(Android.Net.Uri imageUri)
+        {
+            using (var input = ContentResolver.OpenInputStream(imageUri))
+            {
+                var options = new BitmapFactory.Options { InJustDecodeBounds = true };
+                BitmapFactory.DecodeStream(input, null, options);
+
+                int inSampleSize = Math.Max(options.OutHeight / 800, options.OutWidth / 800);
+                options.InSampleSize = inSampleSize > 0 ? inSampleSize : 1;
+                options.InJustDecodeBounds = false;
+
+                input.Close();
+
+                using (var resizedStream = ContentResolver.OpenInputStream(imageUri))
+                {
+                    Bitmap bitmap = BitmapFactory.DecodeStream(resizedStream, null, options);
+                    using (var stream = new MemoryStream())
+                    {
+                        bitmap.Compress(Bitmap.CompressFormat.Jpeg, 20, stream); 
+                        stream.Seek(0, SeekOrigin.Begin);
+                        return stream.ToArray();
+                    }
+                }
+            }
         }
 
         private async void RegisterButton_Click(object sender, EventArgs e)
@@ -63,16 +101,11 @@ namespace LOMSUI.Activities
             string username = _usernameEditText.Text?.Trim();
             string phone = _phoneEditText.Text?.Trim();
             string email = _emailEditText.Text?.Trim();
-            string password = _passwordEditText.Text.Trim();
-            string confirmPassword = _confirmPasswordEditText.Text.Trim();
+            string password = _passwordEditText.Text?.Trim();
+            string confirmPassword = _confirmPasswordEditText.Text?.Trim();
+            string address = _addressEditText.Text?.Trim();
             string gender = _genderSpinner.SelectedItem?.ToString();
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(email) ||
-                string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(gender))
-            {
-                Toast.MakeText(this, "Please fill in all fields", ToastLength.Short).Show();
-                return;
-            }
+            string fullName = _fullNameEditText.Text?.Trim();
 
             if (password != confirmPassword)
             {
@@ -85,30 +118,33 @@ namespace LOMSUI.Activities
                 var registerModel = new RegisterModel
                 {
                     Username = username,
-                    Phone = phone,
+                    PhoneNumber = phone,
                     Email = email,
                     Password = password,
-                    Gender = gender
+                    Address = address,
+                    Gender = gender,
+                    FullName = fullName,
+                    AvatarData = _avatarImageData
                 };
 
-                var result = await _apiService.RegisterAsync(registerModel);
+                var result = await _apiService.RegisterAsync(registerModel, _selectedImageUri);
 
-                if (result)
+                if (result.IsSuccess)
                 {
-                    Toast.MakeText(this, "Registration successful!", ToastLength.Short).Show();
-
-                    Intent intent = new Intent(this, typeof(LoginActivity));
-                    StartActivity(intent);
+                    Toast.MakeText(this, "Registration successful. Please check your email for OTP code.", ToastLength.Long).Show();
+                    StartActivity(new Intent(this, typeof(VerifyOtpRegisterActivity)).PutExtra("email", email));
                 }
                 else
                 {
-                    Toast.MakeText(this, "Registration failed!", ToastLength.Short).Show();
+                    foreach (var error in result.Errors)
+                    {
+                        Toast.MakeText(this, error, ToastLength.Long).Show();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("RegisterActivity", "Error during registration: " + ex.Message);
-                Toast.MakeText(this, "Error: " + ex.Message, ToastLength.Long).Show();
+                Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long).Show();
             }
         }
 
@@ -117,4 +153,5 @@ namespace LOMSUI.Activities
             Finish();
         }
     }
+
 }

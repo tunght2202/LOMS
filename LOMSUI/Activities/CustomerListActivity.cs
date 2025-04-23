@@ -8,8 +8,8 @@ using LOMSUI.Services;
 namespace LOMSUI.Activities
 {
 
-    [Activity(Label = "CustomerList")]
-    public class CustomerListActivity : Activity
+    [Activity(Label = "Customer List")]
+    public class CustomerListActivity : BaseActivity
     {
         private RecyclerView _recyclerView;
         private TextView _txtNoCustomers;
@@ -25,7 +25,7 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_customer_list);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            BottomNavHelper.SetupFooterNavigation(this, "customers");
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewCustomers);
             _txtNoCustomers = FindViewById<TextView>(Resource.Id.txtNoCustomers);

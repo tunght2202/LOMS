@@ -26,6 +26,16 @@
         android:orientation="vertical"
         android:background="#ffffff"
         android:padding="16dp">
+		 <TextView
+            android:id="@+id/tvListProductName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:layout_marginBottom="16dp"
+            android:layout_gravity="center"
+            android:text="Title"
+            android:visibility="gone"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/noProductsTextView"
@@ -38,13 +48,19 @@
             android:layout_marginBottom="16dp"
             android:visibility="gone" />
 
-        <ListView
-            android:id="@+id/productListView"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:divider="#cccccc"
-            android:dividerHeight="1dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/productRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scrollbars="vertical"/>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
         <Button
             android:id="@+id/addProductButton"
@@ -54,6 +70,33 @@
             android:backgroundTint="#87CEEB"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="12dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/addListProductButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="#4CAF50"
+            android:text="Create sales List"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/viewListProductButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#2196F3"
+            android:text="View Sales Lists"
+            android:textColor="#fff" />
 
     </LinearLayout>
 

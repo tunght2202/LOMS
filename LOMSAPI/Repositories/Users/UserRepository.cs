@@ -20,7 +20,7 @@ namespace LOMSAPI.Repositories.Users
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly CloudinaryService _cloudinaryService;
-         
+
         public UserRepository(UserManager<User> userManager, SignInManager<User> signInManager
             , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService)
         {
@@ -57,11 +57,15 @@ namespace LOMSAPI.Repositories.Users
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image)
+        public async Task<(bool success, string message)> RegisterRequestAsync(RegisterRequestModel model, IFormFile? image)
         {
             User userExist = await _userManager.FindByEmailAsync(model.Email);
-            if (userExist != null) return false;
-            string imageUrl = await _cloudinaryService.UploadImageAsync(image);
+            if (userExist != null) return (false, "Email is existed. Please use another email");
+            string imageUrl = null;
+            if (image != null)
+            {
+                imageUrl = await _cloudinaryService.UploadImageAsync(image);
+            }
             var user = new User
             {
                 UserName = model.UserName,
@@ -72,7 +76,7 @@ namespace LOMSAPI.Repositories.Users
                 ImageURL = imageUrl,
                 Address = model.Address,
                 Sex = model.Gender,
-                
+
             };
 
             var passwordHasher = new PasswordHasher<User>();
@@ -97,7 +101,7 @@ namespace LOMSAPI.Repositories.Users
 
             await SendEmailAsync(user.Email, "Verify account", $"Your OTP code is: {otpCode}");
 
-            return true;
+            return (true, "Please check email for otp code!");
         }
 
         public async Task<bool> RegisterAccountAsync(VerifyOtpModel model)
@@ -157,7 +161,7 @@ namespace LOMSAPI.Repositories.Users
             var cachedOtp = await _cache.GetStringAsync($"OTP_RESET_{userEmail}");
             if (cachedOtp == null || cachedOtp != model.OtpCode) return false;
 
-            
+
             await _cache.SetStringAsync($"Verified_{userEmail}", "true", new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
@@ -224,17 +228,10 @@ namespace LOMSAPI.Repositories.Users
                 var userInfo = new User();
                 if (model.UserName != null)
                 {
-                    
                     user.UserName = model.UserName;
                     userInfo.UserName = model.UserName;
                 }
 
-                if (model.Password != null)
-                {
-                    var passwordHasher = new PasswordHasher<User>();
-                    user.PasswordHash = passwordHasher.HashPassword(user, model.Password);
-                    userInfo.PasswordHash = passwordHasher.HashPassword(userInfo, model.Password);
-                }
                 if (model.PhoneNumber != null)
                 {
                     user.PhoneNumber = model.PhoneNumber;
@@ -261,13 +258,52 @@ namespace LOMSAPI.Repositories.Users
                     userInfo.ImageURL = await _cloudinaryService.UploadImageAsync(model.Avatar);
                 }
 
-                if (model.Email == null)
+                if (model.Email == null && model.Password == null)
                 {
                     await _userManager.UpdateAsync(user);
                 }
-                else
+                else if (model.Email != null && model.Password!=null)
                 {
                     userInfo.Email = model.Email;
+                    var passwordHasher = new PasswordHasher<User>();
+                    userInfo.PasswordHash = passwordHasher.HashPassword(userInfo, model.Password);
+                    var otpCode = new Random().Next(100000, 999999).ToString();
+                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("UPDATE_EMAIL", oldEmail, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("USER_INFO_UPDATE", JsonConvert.SerializeObject(userInfo), new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                }
+                else if (model.Email != null && model.Password == null)
+                {
+                    userInfo.Email = model.Email;
+                    var otpCode = new Random().Next(100000, 999999).ToString();
+                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("UPDATE_EMAIL", oldEmail, new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                    await _cache.SetStringAsync("USER_INFO_UPDATE", JsonConvert.SerializeObject(userInfo), new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    });
+                }
+                else if (model.Email == null && model.Password != null)
+                {
+                    var passwordHasher = new PasswordHasher<User>();
+                    userInfo.PasswordHash = passwordHasher.HashPassword(userInfo, model.Password);
                     var otpCode = new Random().Next(100000, 999999).ToString();
                     await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
                     await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
@@ -289,7 +325,7 @@ namespace LOMSAPI.Repositories.Users
                 Console.WriteLine(ex);
                 return false;
             }
-            
+
             return true;
 
         }
@@ -360,5 +396,25 @@ namespace LOMSAPI.Repositories.Users
             if (!result.Succeeded) return false;
             return true;
         }
+
+        public async Task<User> GetUserById(string userId)
+        {
+            return await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
+        public async Task<bool> UpdatePageId(string pageId, string userId)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return false;
+            }
+            user.PageId = pageId;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
+            return true;
+        }
+
+            
+        
     }
 }

@@ -6,7 +6,7 @@ using LOMSUI.Services.ThermalPrinterService;
 using LOMSUI.Services;
 namespace LOMSUI
 {
-    [Activity(Label = "@string/app_name", MainLauncher = true)]
+    [Activity(Label = "@string/app_name")]
     public class MainActivity : Activity
     {
         protected override void OnCreate(Bundle? savedInstanceState)

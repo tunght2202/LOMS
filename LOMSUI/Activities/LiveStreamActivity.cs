@@ -16,7 +16,7 @@ using LOMSUI.Activities;
 namespace LOMSUI
 {
     [Activity(Label = "Live Streams")]
-    public class LiveStreamActivity : Activity
+    public class LiveStreamActivity : BaseActivity
     {
         private SwipeRefreshLayout _swipeRefreshLayout;
         private RecyclerView _recyclerView;
@@ -30,7 +30,7 @@ namespace LOMSUI
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_live_stream);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            BottomNavHelper.SetupFooterNavigation(this, "sell");
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewLiveStreams);
             _txtNoLiveStreams = FindViewById<TextView>(Resource.Id.txtNoLiveStreams);
@@ -49,15 +49,6 @@ namespace LOMSUI
             await LoadLiveStreams();
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                Finish(); 
-                return true;
-            }
-            return base.OnOptionsItemSelected(item);
-        }
         private async Task LoadLiveStreams()
         {
             _liveStreams = await _apiService.GetAllLiveStreams();
@@ -77,18 +68,8 @@ namespace LOMSUI
                         },
                         onDeleteClick: async (livestream, position) =>
                         {
-                            bool success = await _apiService.DeleteLiveStreamAsync(livestream.LivestreamID);
+                            ShowDeleteLiveStreamConfirmationDialog(livestream, position);
 
-                            if (success)
-                            {
-                                Toast.MakeText(this, "Live stream deleted", ToastLength.Short).Show();
-                                _liveStreams.RemoveAt(position);
-                                _adapter.NotifyItemRemoved(position);
-                            }
-                            else
-                            {
-                                Toast.MakeText(this, "Delete failure!", ToastLength.Short).Show();
-                            }
                         });
 
                     _recyclerView.SetAdapter(_adapter);
@@ -100,5 +81,28 @@ namespace LOMSUI
                 }
             });
         }
+
+        private void ShowDeleteLiveStreamConfirmationDialog(LiveStreamModel livestream, int position)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.SetTitle("Confirm deletion");
+            builder.SetMessage("Are you sure you want to delete this livestream??");
+            builder.SetPositiveButton("Yes", async (sender, args) =>
+            {
+                bool success = await _apiService.DeleteLiveStreamAsync(livestream.LivestreamID);
+                Toast.MakeText(this, success ? "Delete successful!" : "Delete failed!", ToastLength.Short).Show();
+
+                if (success)
+                {
+                    _liveStreams.RemoveAt(position);
+                    _adapter.NotifyItemRemoved(position);
+                }
+            });
+            builder.SetNegativeButton("No", (sender, args) => { });
+
+            AlertDialog dialog = builder.Create();
+            dialog.Show();
+        }
+
     }
 }

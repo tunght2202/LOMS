@@ -43,7 +43,7 @@
             android:id="@+id/btnViewDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chi tiết"
+            android:text="Detail"
             android:textSize="14sp"
             android:backgroundTint="#2196F3"
             android:textColor="@android:color/white"/>
