@@ -6,7 +6,7 @@ using Xamarin.Essentials;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "HomePage", MainLauncher = true)]
+    [Activity(Label = "HomePage")]
     public class HomePageActivity : Activity
     {
 

@@ -45,7 +45,7 @@ builder.Services.Configure<IdentityOptions>(options => {
     options.Password.RequireLowercase = false; // Không bắt phải có chữ thường
     options.Password.RequireNonAlphanumeric = false; // Không bắt ký tự đặc biệt
     options.Password.RequireUppercase = false; // Không bắt buộc chữ in
-    options.Password.RequiredLength = 3; // Số ký tự tối thiểu của password
+    options.Password.RequiredLength = 6; // Số ký tự tối thiểu của password
     options.Password.RequiredUniqueChars = 1; // Số ký tự riêng biệt
 
     // Cấu hình Lockout - khóa user

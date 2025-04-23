@@ -130,12 +130,19 @@ namespace LOMSUI.Activities
             if (requestCode == 100 && resultCode == Result.Ok)
             {
                 if (!string.IsNullOrEmpty(_customerId))
+                {
                     _ = LoadOrdersByCustomerId(_customerId);
+                }
                 else if (!string.IsNullOrEmpty(_liveStreamId))
+                {
                     _ = LoadOrdersByLiveStreamId(_liveStreamId);
+                }
+                else
+                {
+                    _ = LoadOrdersByUserId(); 
+                }
             }
         }
-
 
     }
 }

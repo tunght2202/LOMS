@@ -13,18 +13,12 @@ using Android.Graphics;
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Register")]
-    public class RegisterActivity : Activity
+    public class RegisterActivity : BaseActivity
     {
-        private EditText _usernameEditText;
-        private EditText _phoneEditText;
-        private EditText _emailEditText;
-        private EditText _passwordEditText;
-        private EditText _confirmPasswordEditText;
-        private EditText _addressEditText;
+        private EditText _usernameEditText, _phoneEditText, _emailEditText, _passwordEditText,
+                         _confirmPasswordEditText, _addressEditText, _fullNameEditText;
         private Spinner _genderSpinner;
-        private EditText _fullNameEditText;
-        private Button _backButton;
-        private Button _registerButton;
+        private Button _backButton, _registerButton;
         private ImageView _avatarImageView;
         private readonly ApiService _apiService = new ApiService();
         private Android.Net.Uri _selectedImageUri;
@@ -49,20 +43,12 @@ namespace LOMSUI.Activities
             _registerButton = FindViewById<Button>(Resource.Id.registerButton);
             _avatarImageView = FindViewById<ImageView>(Resource.Id.avatarImageView);
 
-            if (_usernameEditText == null || _phoneEditText == null || _emailEditText == null ||
-                _passwordEditText == null || _confirmPasswordEditText == null || _genderSpinner == null ||
-                _backButton == null || _registerButton == null || _avatarImageView == null || _fullNameEditText == null)
-            {
-                Toast.MakeText(this, "Error loading UI components!", ToastLength.Long).Show();
-                return;
-            }
+            ArrayAdapter<string> genderAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleSpinnerDropDownItem, Resources.GetStringArray(Resource.Array.gender_options));
+            _genderSpinner.Adapter = genderAdapter;
 
             _registerButton.Click += RegisterButton_Click;
             _backButton.Click += BackButton_Click;
             _avatarImageView.Click += AvatarImageView_Click;
-
-            ArrayAdapter<string> genderAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleSpinnerDropDownItem, Resources.GetStringArray(Resource.Array.gender_options));
-            _genderSpinner.Adapter = genderAdapter;
         }
 
         private void AvatarImageView_Click(object sender, EventArgs e)
@@ -80,56 +66,42 @@ namespace LOMSUI.Activities
             if (requestCode == 101 && resultCode == Result.Ok && data != null)
             {
                 _selectedImageUri = data.Data;
+                _avatarImageData = ProcessAvatarImage(_selectedImageUri);
+                _avatarImageView.SetImageBitmap(BitmapFactory.DecodeByteArray(_avatarImageData, 0, _avatarImageData.Length));
+            }
+        }
+        private byte[] ProcessAvatarImage(Android.Net.Uri imageUri)
+        {
+            using (var input = ContentResolver.OpenInputStream(imageUri))
+            {
+                var options = new BitmapFactory.Options { InJustDecodeBounds = true };
+                BitmapFactory.DecodeStream(input, null, options);
 
-                using (var input = ContentResolver.OpenInputStream(_selectedImageUri))
+                int inSampleSize = Math.Max(options.OutHeight / 800, options.OutWidth / 800);
+                options.InSampleSize = inSampleSize > 0 ? inSampleSize : 1;
+                options.InJustDecodeBounds = false;
+
+                input.Close();
+
+                using (var resizedStream = ContentResolver.OpenInputStream(imageUri))
                 {
-                    var options = new BitmapFactory.Options
+                    Bitmap bitmap = BitmapFactory.DecodeStream(resizedStream, null, options);
+                    using (var stream = new MemoryStream())
                     {
-                        InJustDecodeBounds = true 
-                    };
-                    BitmapFactory.DecodeStream(input, null, options);
-
-                    int inSampleSize = Math.Max(options.OutHeight / 800, options.OutWidth / 800);
-                    options.InSampleSize = inSampleSize > 0 ? inSampleSize : 1;
-                    options.InJustDecodeBounds = false; 
-
-                    input.Close();
-
-                    using (var resizedStream = ContentResolver.OpenInputStream(_selectedImageUri))
-                    {
-                        Bitmap bitmap = BitmapFactory.DecodeStream(resizedStream, null, options);
-
-                        using (var stream = new MemoryStream())
-                        {
-                            bitmap.Compress(Bitmap.CompressFormat.Jpeg, 70, stream);
-                            stream.Seek(0, SeekOrigin.Begin);
-                            _avatarImageData = stream.ToArray(); 
-                        }
-
-                        _avatarImageView.SetImageBitmap(bitmap);
+                        bitmap.Compress(Bitmap.CompressFormat.Jpeg, 20, stream); 
+                        stream.Seek(0, SeekOrigin.Begin);
+                        return stream.ToArray();
                     }
                 }
             }
         }
 
-
         private async void RegisterButton_Click(object sender, EventArgs e)
         {
-            string username = _usernameEditText.Text?.Trim();
-            string phone = _phoneEditText.Text?.Trim();
-            string email = _emailEditText.Text?.Trim();
-            string password = _passwordEditText.Text.Trim();
-            string confirmPassword = _confirmPasswordEditText.Text.Trim();
-            string address = _addressEditText.Text?.Trim();
-            string gender = _genderSpinner.SelectedItem?.ToString();
-            string fullName = _fullNameEditText.Text?.Trim();
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(email) ||
-                string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(fullName))
-            {
-                Toast.MakeText(this, "Please fill in all information", ToastLength.Short).Show();
+            if (!ValidateFields(out string username, out string phone, out string email,
+                                 out string password, out string confirmPassword, out string address,
+                                 out string gender, out string fullName))
                 return;
-            }
 
             if (password != confirmPassword)
             {
@@ -139,7 +111,7 @@ namespace LOMSUI.Activities
 
             try
             {
-                RegisterModel registerModel = new RegisterModel
+                var registerModel = new RegisterModel
                 {
                     Username = username,
                     PhoneNumber = phone,
@@ -148,29 +120,17 @@ namespace LOMSUI.Activities
                     Gender = gender,
                     Address = address,
                     FullName = fullName,
-                    AvatarData = _avatarImageData 
+                    AvatarData = _avatarImageData
                 };
 
-                bool registrationSuccessful;
-
-                if (_avatarImageData != null && _selectedImageUri != null)
-                {
-                    using (Stream imageStream = ContentResolver.OpenInputStream(_selectedImageUri))
-                    {
-                        registrationSuccessful = await _apiService.RegisterWithAvatarAsync(registerModel, imageStream);
-                    }
-                }
-                else
-                {
-                    registrationSuccessful = await _apiService.RegisterAsync(registerModel);
-                }
+                bool registrationSuccessful = _avatarImageData != null && _selectedImageUri != null
+                    ? await RegisterWithAvatar(registerModel)
+                    : await _apiService.RegisterAsync(registerModel);
 
                 if (registrationSuccessful)
                 {
-                    Toast.MakeText(this, "Registration request successful. Please check your email for OTP code.", ToastLength.Long).Show();
-                    Intent intent = new Intent(this, typeof(VerifyOtpRegisterActivity));
-                    intent.PutExtra("email", email);
-                    StartActivity(intent);
+                    Toast.MakeText(this, "Registration successful. Please check your email for OTP code.", ToastLength.Long).Show();
+                    StartActivity(new Intent(this, typeof(VerifyOtpRegisterActivity)).PutExtra("email", email));
                 }
                 else
                 {
@@ -184,9 +144,48 @@ namespace LOMSUI.Activities
             }
         }
 
+        private bool ValidateFields(out string username, out string phone, out string email,
+                                     out string password, out string confirmPassword, out string address,
+                                     out string gender, out string fullName)
+        {
+            username = _usernameEditText.Text?.Trim();
+            phone = _phoneEditText.Text?.Trim();
+            email = _emailEditText.Text?.Trim();
+            password = _passwordEditText.Text?.Trim();
+            confirmPassword = _confirmPasswordEditText.Text?.Trim();
+            address = _addressEditText.Text?.Trim();
+            gender = _genderSpinner.SelectedItem?.ToString();
+            fullName = _fullNameEditText.Text?.Trim();
+
+            var missingFields = new List<string>();
+            if (string.IsNullOrEmpty(username)) missingFields.Add("Username");
+            if (string.IsNullOrEmpty(phone)) missingFields.Add("Phone number");
+            if (string.IsNullOrEmpty(email)) missingFields.Add("Email");
+            if (string.IsNullOrEmpty(password)) missingFields.Add("Password");
+            if (string.IsNullOrEmpty(confirmPassword)) missingFields.Add("Confirm Password");
+            if (string.IsNullOrEmpty(gender)) missingFields.Add("Gender");
+            if (string.IsNullOrEmpty(address)) missingFields.Add("Address");
+            if (string.IsNullOrEmpty(fullName)) missingFields.Add("Full Name");
+
+            if (missingFields.Any())
+            {
+                Toast.MakeText(this, $"{string.Join(", ", missingFields)} are required", ToastLength.Short).Show();
+                return false;
+            }
+
+            return true;
+        }
+        private async Task<bool> RegisterWithAvatar(RegisterModel registerModel)
+        {
+            using (Stream imageStream = ContentResolver.OpenInputStream(_selectedImageUri))
+            {
+                return await _apiService.RegisterWithAvatarAsync(registerModel, imageStream);
+            }
+        }
         private void BackButton_Click(object sender, EventArgs e)
         {
             Finish();
         }
     }
+
 }
