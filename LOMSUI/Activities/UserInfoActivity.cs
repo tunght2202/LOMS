@@ -100,21 +100,36 @@ namespace LOMSUI.Activities
                     Password = password
                 });
 
-                if (result.Contains("Please enter email verification code."))
+                if (result.Errors != null && result.Errors.Count > 0)
+                {
+                    if (result.Errors.ContainsKey("Email"))
+                        _emailEditText.Error = string.Join("\n", result.Errors["Email"]);
+
+                    if (result.Errors.ContainsKey("Password"))
+                        _passwordEditText.Error = string.Join("\n", result.Errors["Password"]);
+
+                    if (result.Errors.ContainsKey("PhoneNumber"))
+                        _phoneEditText.Error = string.Join("\n", result.Errors["PhoneNumber"]);
+
+                    return;
+                }
+
+                if (result.Message == "Please enter email verification code to change email.")
                 {
                     Toast.MakeText(this, "OTP code sent to email, please verify.", ToastLength.Long).Show();
                     var intent = new Intent(this, typeof(VerifyOtpUpdateUserActivity));
                     intent.PutExtra("email", email);
                     StartActivity(intent);
                 }
-                else if (result.Contains("Information edited successfully."))
+                else if (result.Message == "Information edited successfully.")
                 {
                     Toast.MakeText(this, "Information updated successfully!", ToastLength.Long).Show();
                 }
                 else
                 {
-                    Toast.MakeText(this, result, ToastLength.Long).Show();
+                    Toast.MakeText(this, result.Message ?? "Unknown response", ToastLength.Long).Show();
                 }
+
             }
             catch (Exception ex)
             {

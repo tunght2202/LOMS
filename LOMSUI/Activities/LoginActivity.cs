@@ -15,7 +15,7 @@ using System.Security.Claims;
 
 namespace LOMSUI
 {
-    [Activity(Label = "LOMS")]
+    [Activity(Label = "LOMS", MainLauncher = true)]
     public class LoginActivity : Activity
     {
         private AutoCompleteTextView _emailEditText;
