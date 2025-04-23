@@ -98,10 +98,14 @@ namespace LOMSUI.Activities
 
         private async void RegisterButton_Click(object sender, EventArgs e)
         {
-            if (!ValidateFields(out string username, out string phone, out string email,
-                                 out string password, out string confirmPassword, out string address,
-                                 out string gender, out string fullName))
-                return;
+            string username = _usernameEditText.Text?.Trim();
+            string phone = _phoneEditText.Text?.Trim();
+            string email = _emailEditText.Text?.Trim();
+            string password = _passwordEditText.Text?.Trim();
+            string confirmPassword = _confirmPasswordEditText.Text?.Trim();
+            string address = _addressEditText.Text?.Trim();
+            string gender = _genderSpinner.SelectedItem?.ToString();
+            string fullName = _fullNameEditText.Text?.Trim();
 
             if (password != confirmPassword)
             {
@@ -117,71 +121,27 @@ namespace LOMSUI.Activities
                     PhoneNumber = phone,
                     Email = email,
                     Password = password,
-                    Gender = gender,
                     Address = address,
+                    Gender = gender,
                     FullName = fullName,
                     AvatarData = _avatarImageData
                 };
 
-                bool registrationSuccessful = _avatarImageData != null && _selectedImageUri != null
-                    ? await RegisterWithAvatar(registerModel)
-                    : await _apiService.RegisterAsync(registerModel);
+                bool isSuccess = await _apiService.RegisterAsync(registerModel, _selectedImageUri);
 
-                if (registrationSuccessful)
+                if (isSuccess)
                 {
                     Toast.MakeText(this, "Registration successful. Please check your email for OTP code.", ToastLength.Long).Show();
                     StartActivity(new Intent(this, typeof(VerifyOtpRegisterActivity)).PutExtra("email", email));
                 }
-                else
-                {
-                    Toast.MakeText(this, "Registration failed. Please try again.", ToastLength.Short).Show();
-                }
             }
             catch (Exception ex)
             {
-                Log.Error("RegisterActivity", "Error during registration: " + ex.Message);
-                Toast.MakeText(this, "Error: " + ex.Message, ToastLength.Long).Show();
+                Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long).Show();
             }
         }
 
-        private bool ValidateFields(out string username, out string phone, out string email,
-                                     out string password, out string confirmPassword, out string address,
-                                     out string gender, out string fullName)
-        {
-            username = _usernameEditText.Text?.Trim();
-            phone = _phoneEditText.Text?.Trim();
-            email = _emailEditText.Text?.Trim();
-            password = _passwordEditText.Text?.Trim();
-            confirmPassword = _confirmPasswordEditText.Text?.Trim();
-            address = _addressEditText.Text?.Trim();
-            gender = _genderSpinner.SelectedItem?.ToString();
-            fullName = _fullNameEditText.Text?.Trim();
 
-            var missingFields = new List<string>();
-            if (string.IsNullOrEmpty(username)) missingFields.Add("Username");
-            if (string.IsNullOrEmpty(phone)) missingFields.Add("Phone number");
-            if (string.IsNullOrEmpty(email)) missingFields.Add("Email");
-            if (string.IsNullOrEmpty(password)) missingFields.Add("Password");
-            if (string.IsNullOrEmpty(confirmPassword)) missingFields.Add("Confirm Password");
-            if (string.IsNullOrEmpty(gender)) missingFields.Add("Gender");
-            if (string.IsNullOrEmpty(address)) missingFields.Add("Address");
-            if (string.IsNullOrEmpty(fullName)) missingFields.Add("Full Name");
-
-            if (missingFields.Any())
-            {
-                Toast.MakeText(this, $"{string.Join(", ", missingFields)} are required", ToastLength.Short).Show();
-                return false;
-            }
-
-            return true;
-        }
-        private async Task<bool> RegisterWithAvatar(RegisterModel registerModel)
-        {
-            using (Stream imageStream = ContentResolver.OpenInputStream(_selectedImageUri))
-            {
-                return await _apiService.RegisterWithAvatarAsync(registerModel, imageStream);
-            }
-        }
         private void BackButton_Click(object sender, EventArgs e)
         {
             Finish();
