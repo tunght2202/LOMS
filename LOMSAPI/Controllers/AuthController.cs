@@ -43,12 +43,14 @@ namespace LOMSAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RegisterRequest([FromForm] RegisterRequestModel model, IFormFile? Avatar)
         {
+
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var result = await _userRepository.RegisterRequestAsync(model, Avatar);
-            if (!result) return BadRequest("Error in the register process.");
+            var (success, message) = await _userRepository.RegisterRequestAsync(model, Avatar);
 
-            return Ok(new { message = "Please check email for otp code!" });
+            if (!success) return BadRequest(new { message });
+
+            return Ok(new { message });
         }
         
         
