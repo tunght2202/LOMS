@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.OS;
 using Android.Widget;
+using LOMSAPI.Models;
 using LOMSUI.Activities;
 using LOMSUI.Models;
 using LOMSUI.Services;
@@ -14,7 +15,7 @@ namespace LOMSUI
     {
         private TextView _txtTitle, _txtStatus, _txtStartTime;
         private Button _btnViewComments, _btnViewCustomers,
-                       _btnViewOrders, _btnSetupListProduct;
+                       _btnViewOrders, _btnSetupListProduct, _tvRevenusLive;
         private ToggleButton _toggleAutoCreateOrder;
         private bool _isAutoCreating = false;
         private CancellationTokenSource _cancellationTokenSource;
@@ -36,6 +37,7 @@ namespace LOMSUI
             _txtTitle = FindViewById<TextView>(Resource.Id.txtLiveTitle);
             _txtStatus = FindViewById<TextView>(Resource.Id.txtLiveStatus);
             _txtStartTime = FindViewById<TextView>(Resource.Id.txtLiveStartTime);
+            _tvRevenusLive = FindViewById<Button>(Resource.Id.tvRevenueLive);
             _btnSetupListProduct = FindViewById<Button>(Resource.Id.btnSetupListProduct);
             _toggleAutoCreateOrder = FindViewById<ToggleButton>(Resource.Id.toggleAutoOrder);
             _spinnerListProduct = FindViewById<Spinner>(Resource.Id.spinnerListProduct);
@@ -86,8 +88,14 @@ namespace LOMSUI
                 }
             };
 
-
-            _btnViewComments.Click += (s, e) =>
+            _tvRevenusLive.Click += (s, e) =>
+            {
+                var intent = new Intent(this, typeof(LiveStreamRevenueActivity));
+                intent.PutExtra("LiveStreamID", _liveStreamId);
+                StartActivity(intent);
+            };
+            
+            _btnViewComments.Click += (s, e) => 
             {
                 var intent = new Intent(this, typeof(CommentsActivity));
                 intent.PutExtra("LivestreamID", _liveStreamId);

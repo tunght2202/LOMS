@@ -1,16 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f0f0f0">
 
-    <LinearLayout
+	<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#00a880"
         android:gravity="center">
 
-        <ImageView
+		<ImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="center"
@@ -18,8 +19,8 @@
             android:layout_marginBottom="10dp"
             android:src="@drawable/logo_loms" />
 
-    </LinearLayout>
-    <TextView
+	</LinearLayout>
+	<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
@@ -28,14 +29,14 @@
         android:textSize="25dp"
         android:text="Livestream Revenue"/>
 
-    <LinearLayout
+	<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="30dp"
         android:padding="16dp">
 
-        <LinearLayout
+		<LinearLayout
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -44,7 +45,7 @@
             android:padding="8dp"
             android:layout_marginRight="10dp">
 
-            <TextView
+			<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Revenue"
@@ -52,16 +53,16 @@
                 android:textStyle="bold"
                 android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtTotalRevenue"
+			<TextView
+                android:id="@+id/textRevenue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="100.000 VND"
                 android:textSize="16sp"
                 android:textColor="#000000" />
-        </LinearLayout>
+		</LinearLayout>
 
-        <LinearLayout
+		<LinearLayout
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -69,7 +70,7 @@
             android:background="#009688"
             android:padding="8dp">
 
-            <TextView
+			<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Orders"
@@ -77,25 +78,25 @@
                 android:textStyle="bold"
                 android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtTotalOrders"
+			<TextView
+                android:id="@+id/textOrders"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="4"
                 android:textSize="16sp"
                 android:textColor="#000000" />
 
-        </LinearLayout>
+		</LinearLayout>
 
-    </LinearLayout>
+	</LinearLayout>
 
-    <LinearLayout
+	<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <LinearLayout
+		<LinearLayout
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -104,7 +105,7 @@
             android:background="#B71EE11E"
             android:padding="8dp">
 
-            <TextView
+			<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delivered"
@@ -112,16 +113,16 @@
                 android:textStyle="bold"
                 android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtOrderDelivered"
+			<TextView
+                android:id="@+id/textDelivered"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="4"
                 android:textSize="16sp"
                 android:textColor="#000000" />
 
-        </LinearLayout>
-        <LinearLayout
+		</LinearLayout>
+		<LinearLayout
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -130,7 +131,7 @@
             android:padding="8dp"
             android:layout_marginRight="10dp">
 
-            <TextView
+			<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Cancel"
@@ -138,17 +139,17 @@
                 android:textStyle="bold"
                 android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtOrderCancel"
+			<TextView
+                android:id="@+id/textCancelled"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="4"
                 android:textSize="16sp"
                 android:textColor="#000000" />
 
-        </LinearLayout>
+		</LinearLayout>
 
-        <LinearLayout
+		<LinearLayout
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -156,7 +157,7 @@
             android:background="#C6FF5722"
             android:padding="8dp">
 
-            <TextView
+			<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Return"
@@ -164,16 +165,16 @@
                 android:textStyle="bold"
                 android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtOrderReturn"
+			<TextView
+                android:id="@+id/textReturned"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="4"
                 android:textSize="16sp"
                 android:textColor="#000000" />
 
-        </LinearLayout>
+		</LinearLayout>
 
-    </LinearLayout>
+	</LinearLayout>
 
 </LinearLayout>
