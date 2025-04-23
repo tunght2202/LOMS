@@ -27,6 +27,7 @@ namespace LOMSUI.Models
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
         public Dictionary<string, List<string>> Errors { get; set; }
+
     }
 
 

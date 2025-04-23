@@ -51,6 +51,8 @@ namespace LOMSUI.Models
     {
         [JsonProperty("errors")]
         public Dictionary<string, string[]> Errors { get; set; }
+        [JsonProperty("message")]
+        public string Message { get; set; }
     }
 
 }
