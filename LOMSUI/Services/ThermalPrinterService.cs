@@ -6,10 +6,12 @@ namespace LOMSUI.Services
 {
     public class PrintInfo
     {
-        public string MaDonHang { get; set; }
-        public string TenKhachHang { get; set; }
-        public string MaVach { get; set; }
-        public DateTime NgayGio { get; set; }
+        public string MaSo { get; set; }
+        public string TenKhach { get; set; }
+        public DateTime? ThoiGian { get; set; }
+        public string NoiDungCommment { get; set; }
+        public string SanPham { get; set; }
+        public string TongGia { get; set; }
         public string DiaChi { get; set; }
         public string SoDienThoai { get; set; }
     }
@@ -43,13 +45,13 @@ namespace LOMSUI.Services
             Canvas canvas = new Canvas(bmp);
             canvas.DrawColor(Color.White);
 
-            Paint paint = new Paint { Color = Color.Black, TextSize = 28, AntiAlias = true };
-            Paint bold = new Paint(paint) { FakeBoldText = true };
+            Paint fontNormal = new Paint { Color = Color.Black, TextSize = 28, AntiAlias = true };
+            Paint fontBold = new Paint(fontNormal) { FakeBoldText = true };
 
             float y = 40;
             float centerX = width / 2f;
 
-            void DrawCenter(string text, Paint p, float sizeInc = 0)
+            void DrawLine(string text, Paint p, float sizeInc = 0)
             {
                 if (string.IsNullOrWhiteSpace(text)) return;
                 p.TextSize += sizeInc;
@@ -60,17 +62,49 @@ namespace LOMSUI.Services
             }
 
             // Nội dung
-            DrawCenter("Cửa hàng Tinh Hoa", bold);
-            DrawCenter(info.MaDonHang, bold);
-            DrawCenter(info.TenKhachHang, bold);
-            DrawCenter(info.MaVach, bold);
-            DrawCenter(info.NgayGio.ToString("dd/MM/yyyy HH:mm"), paint);
+            DrawLine(info.MaSo, fontBold);
+            DrawLine(info.TenKhach, fontBold);
+            DrawLine(info.ThoiGian?.ToString("dd/MM/yyyy HH:mm"), fontNormal);
+            var noiDungComment = info.NoiDungCommment;
+            if (noiDungComment.Length > 24)
+            {
+                DrawLine(noiDungComment.Substring(0, 20), fontNormal);
+                DrawLine(noiDungComment.Substring(20), fontNormal);
+            }
+            else
+            {
+                DrawLine(noiDungComment, fontNormal);
+            }
+            var product = info.SanPham;
+            if (!string.IsNullOrWhiteSpace(product))
+            {
+
+                if (product.Length > 24)
+                {
+                    DrawLine(product.Substring(0, 20), fontNormal);
+                    DrawLine(product.Substring(20), fontNormal);
+                }
+                else
+                {
+                    DrawLine(product, fontNormal);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(product))
+            {
+                DrawLine("Total: " + info.TongGia, fontBold);
+            }
             if (!string.IsNullOrWhiteSpace(info.DiaChi))
-                DrawCenter("ĐC: " + info.DiaChi, paint);
+            {
+                // Có thể chia thành 2 dòng nếu dài
+                var diaChiParts = info.DiaChi.Split(new[] { ',' }, 2);
+                DrawLine("ĐC: " + diaChiParts[0], fontNormal);
+                if (diaChiParts.Length > 1) DrawLine(diaChiParts[1], fontNormal);
+            }
+
             if (!string.IsNullOrWhiteSpace(info.SoDienThoai))
-                DrawCenter("SĐT: " + info.SoDienThoai, paint);
-            DrawCenter("TPOS.VN", paint);
-            DrawCenter("Cảm ơn quý khách!", bold, 10);
+            {
+                DrawLine("SĐT " + info.SoDienThoai, fontNormal);
+            }
 
             return bmp;
         }

@@ -22,17 +22,30 @@ public class MainActivity : Activity
 
             await printer.ConnectAsync(device);
 
-            var info = new PrintInfo
+            var thongTin = new PrintInfo
             {
-                MaDonHang = "100036478571801",
-                TenKhachHang = "Linh Phạm",
-                MaVach = "200300042",
-                NgayGio = DateTime.Now,
-                DiaChi = "48/15 Phạm Văn Xảo, Quận Tân Phú",
-                SoDienThoai = "0373389165"
+                MaSo = "DH123456789012345678901234567890123456",
+                TenKhach = "Nguyễn Văn A",
+                ThoiGian = DateTime.Now,
+                SanPham = "Áo dài tay, Size M",
+                TongGia = "350.000đ",
+                DiaChi = "123 Lê Lợi, Q1, TP.HCM",
+                SoDienThoai = "0987654321",
+                NoiDungCommment = "Giao hàng giờ hành chính"
             };
 
-            await printer.PrintCustomerLabelAsync(info);
+
+            await printer.PrintCustomerLabelAsync(thongTin);
+
+            var thongTin2 = new PrintInfo
+            {
+                TenKhach = "Nguyễn Văn A",
+                ThoiGian = DateTime.Now,
+                NoiDungCommment = "Giao hàng giờ hành chính"
+            };
+
+
+            await printer.PrintCustomerLabelAsync(thongTin2);
 
         }
 
@@ -70,7 +83,7 @@ public class MainActivity : Activity
 
         void GetPrinterDevice()
         {
-            device = adapter.BondedDevices?.FirstOrDefault(d => d.Name.Contains("PT"));
+            var device = adapter?.BondedDevices?.FirstOrDefault(d => d.Name.Contains("PT"));
 
             if (device != null)
             {
