@@ -37,8 +37,17 @@ namespace LOMSUI.Adapter
             var item = _liveStreams[position];
 
             viewHolder.Title.Text = item.StreamTitle;
-            viewHolder.Status.Text = $"{item.Status}";
+            viewHolder.Status.Text =$"Status: {item.Status}";
             viewHolder.StartTime.Text = $"Start: {item.GetFormattedTime()}";
+
+            if (item.Status.Equals("LIVE", StringComparison.OrdinalIgnoreCase))
+            {
+                viewHolder.Status.SetTextColor(Android.Graphics.Color.ParseColor("#4CAF50")); 
+            }
+            else
+            {
+                viewHolder.Status.SetTextColor(Android.Graphics.Color.ParseColor("#F44336")); 
+            }
 
             viewHolder.ItemView.Click += (sender, e) =>
             {

@@ -4,7 +4,7 @@ using LOMSUI.Services;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "VerifyOtpRegisterActivity")]
+    [Activity(Label = "Verify Otp")]
     public class VerifyOtpRegisterActivity : Activity
     {
         private EditText _otpEditText;

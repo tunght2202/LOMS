@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using LOMSAPI.Models;
 using System.Buffers.Text;
 using Android.Media.TV;
+using System.Net;
 
 namespace LOMSUI.Services
 {
@@ -82,58 +83,41 @@ namespace LOMSUI.Services
 
                     if (imageUri != null)
                     {
-                        using (var stream = Application.Context.ContentResolver.OpenInputStream(imageUri))
-                        {
-                            var imageContent = new StreamContent(stream);
-                            imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
-                            content.Add(imageContent, "Avatar", "avatar.jpg");
-                        }
+                        using var stream = Application.Context.ContentResolver.OpenInputStream(imageUri);
+                        var imageContent = new StreamContent(stream);
+                        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+                        content.Add(imageContent, "Avatar", "avatar.jpg");
                     }
 
-                    using (var response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content))
+                    using var response = await _httpClient.PostAsync($"{BASE_URLL}/Auth/register-account-request", content);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        var responseBody = await response.Content.ReadAsStringAsync();
-
-                        if (response.IsSuccessStatusCode)
+                        return JsonConvert.DeserializeObject<RegisterResult>(responseBody);
+                    }
+                    else if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        var errorResponse = JsonConvert.DeserializeObject<RegisterResult>(responseBody);
+                        return errorResponse;
+                    }
+                    else
+                    {
+                        return new RegisterResult
                         {
-                            result.IsSuccess = true;
-                            return result;
-                        }
-
-                        var errorJson = JsonConvert.DeserializeObject<JObject>(responseBody);
-                        var errors = errorJson["errors"] as JObject;
-
-                        if (errors != null)
-                        {
-                            foreach (var field in errors.Properties())
-                            {
-                                foreach (var msg in field.Value)
-                                {
-                                    result.Errors.Add($"{field.Name}: {msg}");
-                                }
-                            }
-                        }
-                        else if (errorJson["message"] != null)
-                        {
-                            result.Errors.Add(errorJson["message"].ToString());
-                        }
-                        else if (errorJson["title"] != null)
-                        {
-                            result.Errors.Add(errorJson["title"].ToString());
-                        }
-
+                            IsSuccess = false,
+                            Message = $"Unexpected status code: {response.StatusCode}"
+                        };
                     }
                 }
             }
             catch (Exception ex)
             {
-                result.Errors.Add($"Exception: {ex.Message}");
+                result.Message = $"Unexpected error: {ex.Message}";
             }
-
             return result;
         }
-
-
+            
 
         public async Task<bool> UpdateFacebookTokenAsync(string token)
         {
@@ -848,33 +832,37 @@ namespace LOMSUI.Services
         }
 
 
-
-        public async Task<string> UpdateUserProfileRequestAsync(UserModels model)
+        //Update User
+        public async Task<UserProfileUpdateResult> UpdateUserProfileRequestAsync(UserModels model)
         {
-            var content = new MultipartFormDataContent();
-
-            if (!string.IsNullOrEmpty(model.UserName))
-                content.Add(new StringContent(model.UserName), "UserName");
-
-            if (!string.IsNullOrEmpty(model.PhoneNumber))
-                content.Add(new StringContent(model.PhoneNumber), "PhoneNumber");
-
-            if (!string.IsNullOrEmpty(model.Email))
-                content.Add(new StringContent(model.Email), "Email");
-
-            if (!string.IsNullOrEmpty(model.Address))
-                content.Add(new StringContent(model.Address), "Address");
-
-            if (!string.IsNullOrEmpty(model.Gender))
-                content.Add(new StringContent(model.Gender), "Gender");
-
-            if (!string.IsNullOrEmpty(model.Password))
-                content.Add(new StringContent(model.Password), "Password");
+            var content = new MultipartFormDataContent
+                {
+                   { new StringContent(model.UserName ?? ""), "UserName" },
+                   { new StringContent(model.PhoneNumber ?? ""), "PhoneNumber" },
+                   { new StringContent(model.Email ?? ""), "Email" },
+                   { new StringContent(model.Address ?? ""), "Address" },
+                   { new StringContent(model.Gender ?? ""), "Gender" },
+                   { new StringContent(model.Password ?? ""), "Password" }
+                };
 
             var response = await _httpClient.PutAsync($"{BASE_URLL}/Auth/update-userProfile-request", content);
             var responseContent = await response.Content.ReadAsStringAsync();
 
-            return responseContent;
+            try
+            {
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    var errorResponse = JsonConvert.DeserializeObject<ValidationErrorResponse>(responseContent);
+                    return new UserProfileUpdateResult { Errors = errorResponse?.Errors };
+                }
+
+                var messageResponse = JsonConvert.DeserializeObject<SimpleMessageResponse>(responseContent);
+                return new UserProfileUpdateResult { Message = messageResponse?.Message };
+            }
+            catch
+            {
+                return new UserProfileUpdateResult { Message = responseContent };
+            }
         }
 
 

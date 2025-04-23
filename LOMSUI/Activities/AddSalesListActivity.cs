@@ -2,7 +2,7 @@ using LOMSUI.Services;
 
 namespace LOMSUI.Activities
 {
-    [Activity(Label = "AddSalesList")]
+    [Activity(Label = "Add Sales List")]
     public class AddSalesListActivity : BaseActivity
     {
         private EditText _etAddListName;
@@ -23,7 +23,7 @@ namespace LOMSUI.Activities
         }
 
         private async Task AddListProduct()
-        {
+        { 
             string listName = _etAddListName.Text.Trim();
 
             if (string.IsNullOrEmpty(listName))

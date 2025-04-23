@@ -102,16 +102,42 @@ namespace LOMSUI.Activities
             string phone = _phoneEditText.Text?.Trim();
             string email = _emailEditText.Text?.Trim();
             string password = _passwordEditText.Text?.Trim();
-            string confirmPassword = _confirmPasswordEditText.Text?.Trim();
+            string fullName = _fullNameEditText.Text?.Trim();
             string address = _addressEditText.Text?.Trim();
             string gender = _genderSpinner.SelectedItem?.ToString();
-            string fullName = _fullNameEditText.Text?.Trim();
 
-            if (password != confirmPassword)
+            _usernameEditText.Error = null;
+            _phoneEditText.Error = null;
+            _emailEditText.Error = null;
+            _passwordEditText.Error = null;
+
+            bool hasError = false;
+
+            if (string.IsNullOrWhiteSpace(username))
             {
-                Toast.MakeText(this, "Passwords do not match", ToastLength.Short).Show();
-                return;
+                _usernameEditText.Error = "Username is required";
+                hasError = true;
             }
+
+            if (string.IsNullOrWhiteSpace(phone))
+            {
+                _phoneEditText.Error = "Phone number is required";
+                hasError = true;
+            }
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                _emailEditText.Error = "Email is required";
+                hasError = true;
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                _passwordEditText.Error = "Password is required";
+                hasError = true;
+            }
+
+            if (hasError) return; 
 
             try
             {
@@ -129,24 +155,35 @@ namespace LOMSUI.Activities
 
                 var result = await _apiService.RegisterAsync(registerModel, _selectedImageUri);
 
-                if (result.IsSuccess)
+                if (result.Message.Contains("Please check email for otp code!", StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    Toast.MakeText(this, "Registration successful. Please check your email for OTP code.", ToastLength.Long).Show();
                     StartActivity(new Intent(this, typeof(VerifyOtpRegisterActivity)).PutExtra("email", email));
+                }
+                else if (result.Errors != null && result.Errors.Count > 0)
+                {
+                    if (result.Errors.ContainsKey("UserName"))
+                        _usernameEditText.Error = string.Join("\n", result.Errors["UserName"]);
+
+                    if (result.Errors.ContainsKey("PhoneNumber"))
+                        _phoneEditText.Error = string.Join("\n", result.Errors["PhoneNumber"]);
+
+                    if (result.Errors.ContainsKey("Email"))
+                        _emailEditText.Error = string.Join("\n", result.Errors["Email"]);
+
+                    if (result.Errors.ContainsKey("Password"))
+                        _passwordEditText.Error = string.Join("\n", result.Errors["Password"]);
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        Toast.MakeText(this, error, ToastLength.Long).Show();
-                    }
+                    Toast.MakeText(this, result.Message ?? "Unknown error occurred.", ToastLength.Long).Show();
                 }
             }
             catch (Exception ex)
             {
-                Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long).Show();
+                Toast.MakeText(this, $"Unexpected error: {ex.Message}", ToastLength.Long).Show();
             }
         }
+
 
         private void BackButton_Click(object sender, EventArgs e)
         {
