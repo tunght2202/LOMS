@@ -6,6 +6,16 @@ using System.Threading.Tasks;
 
 namespace LOMSUI.Models
 {
+
+    public enum OrderStatus
+    {
+        Pending = 0,
+        Confirmed = 1,
+        Shipped = 2,
+        Delivered = 3,
+        Canceled = 4,
+        Returned = 5
+    }
     public class OrderModel
     {
         public int OrderID { get; set; }

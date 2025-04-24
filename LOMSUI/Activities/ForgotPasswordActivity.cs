@@ -5,11 +5,12 @@ using Android.Content;
 using System.Threading.Tasks;
 using LOMSUI.Services;
 using LOMSUI.Models;
+using LOMSUI.Activities;
 
 namespace LOMSUI
 {
     [Activity(Label = "Forgot Password")]
-    public class ForgotPasswordActivity : Activity
+    public class ForgotPasswordActivity : BaseActivity
     {
         private EditText _emailEditText;
         private Button _sendOtpButton;

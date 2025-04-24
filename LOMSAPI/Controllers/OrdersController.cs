@@ -1,5 +1,4 @@
-﻿using CloudinaryDotNet.Actions;
-using LOMSAPI.Data.Entities;
+﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
 using LOMSAPI.Repositories.Orders;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
+using LOMSAPI.Repositories.Users;
 
 namespace LOMSAPI.Controllers
 {
@@ -17,12 +17,12 @@ namespace LOMSAPI.Controllers
     {
         private readonly IOrderRepository _orderRepo;
         private readonly IDistributedCache _cache;
-        private readonly LOMSDbContext _context;
-        public OrdersController(IOrderRepository context,IDistributedCache cache, LOMSDbContext lomscontext)
+        private readonly IUserRepository _userRepository;
+        public OrdersController(IOrderRepository context,IDistributedCache cache, IUserRepository userRepository)
         {
             _orderRepo = context;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _context = lomscontext;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
@@ -73,7 +73,10 @@ namespace LOMSAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(string commentId)
         {
-            var result = await _orderRepo.AddOrderAsync(commentId);
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            User user = await _userRepository.GetUserById(userId);
+            string accessToken = user.TokenFacbook;
+            var result = await _orderRepo.AddOrderAsync(commentId, accessToken);
             if (result)
             {
                 return Ok();
@@ -86,7 +89,7 @@ namespace LOMSAPI.Controllers
         public async Task<IActionResult> CreateOrderFromComments(string liveStreamId)
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            User user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            User user = await _userRepository.GetUserById(userId);
             string accessToken = user.TokenFacbook;
             if (liveStreamId == null) return BadRequest("liveStreamId is null");
             var result = await _orderRepo.CreateOrderFromComments(liveStreamId, accessToken);
@@ -105,7 +108,7 @@ namespace LOMSAPI.Controllers
         public async Task<IActionResult> UpdateStatus(int id, [FromForm] OrderStatus status)
         {
             var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
-            return result > 0 ? Ok() : NotFound("Can;t update status of this order");
+            return result > 0 ? Ok() : NotFound("Can't update status of this order");
         }
         [HttpPut("TestPrint")]
         public async Task<IActionResult> TestPrint()

@@ -13,9 +13,10 @@ namespace LOMSAPI.Repositories.ListProducts
             _context = context;
         }
 
-        public async Task<IEnumerable<ListProductModel>> GetAllListProduct()
+        public async Task<IEnumerable<ListProductModel>> GetAllListProduct(string userId)
         {
             var listProduct = await _context.ListProducts
+                .Where(x => x.UserID.Equals(userId))
                 .Select(x => new ListProductModel()
                 {
                     ListProductId = x.ListProductId,
@@ -76,7 +77,7 @@ namespace LOMSAPI.Repositories.ListProducts
             return result;
         }
 
-        public async Task<int> AddNewListProduct(string listProductName)
+        public async Task<int> AddNewListProduct(string listProductName, string userId)
         {
             if (listProductName == null)
             {
@@ -84,7 +85,8 @@ namespace LOMSAPI.Repositories.ListProducts
             }
             var listProduct = new ListProduct()
             {
-                ListProductName = listProductName
+                ListProductName = listProductName,
+                UserID = userId
             };
             await _context.ListProducts.AddAsync(listProduct);
             return await _context.SaveChangesAsync();
@@ -109,28 +111,43 @@ namespace LOMSAPI.Repositories.ListProducts
                 .ToListAsync();
             return productListProduct;
         }
+
         public async Task<int> AddProductIntoListProduct(int listProductId, List<int> listProduct)
         {
             var checkExitListProduct = await CheckExitListProductById(listProductId);
             if (!checkExitListProduct)
             {
-                throw new Exception("This listProduct not exit!");
+                throw new Exception("This listProduct not exists!");
             }
+
+            // Lấy danh sách ProductID đã tồn tại trong listProduct
+            var existingProductIds = await _context.ProductListProducts
+                .Where(plp => plp.ListProductID == listProductId)
+                .Select(plp => plp.ProductID)
+                .ToListAsync();
+
             var listproductlistproduct = new List<ProductListProduct>();
-            foreach (var item in listProduct)
+
+            foreach (var productId in listProduct)
             {
-                var productListProduct = new ProductListProduct()
+                // Chỉ thêm sản phẩm nếu chưa tồn tại
+                if (!existingProductIds.Contains(productId))
                 {
-                    ListProductID = listProductId,
-                    ProductID = item
-                };
-                listproductlistproduct.Add(productListProduct);
-
+                    listproductlistproduct.Add(new ProductListProduct
+                    {
+                        ListProductID = listProductId,
+                        ProductID = productId
+                    });
+                }
             }
-            await _context.AddRangeAsync(listproductlistproduct);
-            return await _context.SaveChangesAsync();
 
+            if (listproductlistproduct.Any())
+            {
+                await _context.AddRangeAsync(listproductlistproduct);
+                return await _context.SaveChangesAsync();
+            }
 
+            return 0; // Không có gì để thêm
         }
 
         public async Task<int> DeleteProductOutListProduct(int listProductId, List<int> listProductIds)

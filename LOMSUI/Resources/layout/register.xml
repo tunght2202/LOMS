@@ -2,18 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white">
-
+    android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
         android:orientation="vertical"
+=======
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
         android:background="#00a880"
         android:gravity="center"
         android:paddingTop="16dp"
         android:paddingBottom="16dp">
         <ImageView
+<<<<<<< HEAD
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/logo_loms"
@@ -27,6 +29,14 @@
             android:textColor="#000000"
             android:layout_marginTop="4dp"
             android:padding="2dp" />
+=======
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/logo_loms" />
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
     </LinearLayout>
 
     <ScrollView
@@ -43,15 +53,33 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Đăng Ký"
+=======
+                android:text="Register"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
                 android:layout_gravity="center_horizontal" />
+<<<<<<< HEAD
+=======
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Create Your Account"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                android:textColor="#000000"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp" />
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Tạo Tài Khoản Của Bạn"
                 android:textSize="14sp"
                 android:textStyle="italic"
@@ -63,6 +91,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Họ và Tên"
+=======
+                android:text="Full Name"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="8dp" />
@@ -70,7 +101,11 @@
                 android:id="@+id/fullNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:hint="Họ và tên"
+=======
+                android:hint="Full Name"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:inputType="textPersonName"
                 android:textColor="#000000"
                 android:textColorHint="#808080"
@@ -79,7 +114,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Nhập Tên Tài Khoản"
+=======
+                android:text="Account Name"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="8dp" />
@@ -87,7 +126,11 @@
                 android:id="@+id/usernameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:hint="Tên tài khoản"
+=======
+                android:hint="Account Name"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:inputType="text"
                 android:textColor="#000000"
                 android:textColorHint="#808080"
@@ -95,7 +138,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Số Điện Thoại"
+=======
+                android:text="Phone Number"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="4dp" />
@@ -103,7 +150,11 @@
                 android:id="@+id/phoneEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:hint="Số điện thoại"
+=======
+                android:hint="Phone number"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:inputType="phone"
                 android:textColor="#000000"
                 android:textColorHint="#808080"
@@ -127,7 +178,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Mật Khẩu"
+=======
+                android:text="Password"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="4dp" />
@@ -135,7 +190,11 @@
                 android:id="@+id/passwordEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:hint="Mật khẩu"
+=======
+                android:hint="Password"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:inputType="textPassword"
                 android:textColor="#000000"
                 android:textColorHint="#808080"
@@ -143,7 +202,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Nhập Lại Mật Khẩu"
+=======
+                android:text="Re-enter Password"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="4dp" />
@@ -151,7 +214,11 @@
                 android:id="@+id/confirmPasswordEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:hint="Nhập lại mật khẩu"
+=======
+                android:hint="Re-enter Password"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:inputType="textPassword"
                 android:textColor="#000000"
                 android:textColorHint="#808080"
@@ -159,7 +226,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Địa chỉ"
+=======
+                android:text="Address"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="4dp" />
@@ -167,7 +238,11 @@
                 android:id="@+id/addressEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:hint="Địa chỉ"
+=======
+                android:hint="Address"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:inputType="text"
                 android:textColor="#000000"
                 android:textColorHint="#808080"
@@ -175,13 +250,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Giới tính"
+=======
+                android:text="Gender"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="4dp" />
             <Spinner
                 android:id="@+id/genderSpinner"
+<<<<<<< HEAD
                 android:layout_width="match_parent"
+=======
+                android:layout_width="wrap_content"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:layout_height="wrap_content"
                 android:entries="@array/gender_options"
                 android:textColor="#000000"
@@ -192,7 +275,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:text="Ảnh Đại Diện (Tùy chọn)"
+=======
+                android:text="Profile Picture (Optional)"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:layout_marginTop="8dp" />
@@ -201,6 +288,10 @@
                 android:id="@+id/avatarImageView"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
+<<<<<<< HEAD
+=======
+                android:src="@drawable/logos"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 android:layout_marginTop="4dp"
                 android:scaleType="centerCrop"
                 android:clickable="true"
@@ -217,8 +308,13 @@
                     android:layout_width="1dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+<<<<<<< HEAD
                     android:text="Quay Lại"
                     android:backgroundTint="#F08080"
+=======
+                    android:text="Cancel"
+                    android:backgroundTint="#E91E63"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                     android:textColor="#FFFFFF"
                     android:layout_marginRight="4dp" />
                 <Button
@@ -226,8 +322,13 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+<<<<<<< HEAD
                     android:text="Đăng Ký"
                     android:backgroundTint="#87CEEB"
+=======
+                    android:text="Register"
+                    android:backgroundTint="#00BCD4"
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                     android:textColor="#FFFFFF" />
             </LinearLayout>
         </LinearLayout>

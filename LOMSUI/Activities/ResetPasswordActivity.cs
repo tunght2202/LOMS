@@ -35,6 +35,12 @@ namespace LOMSUI
             string newPassword = _newPasswordEditText.Text.Trim();
             if (!ValidateInput(newPassword, "Please enter a new password!")) return;
 
+            if (newPassword.Length < 6)
+            {
+                _newPasswordEditText.Error = "Password must be at least 6 characters long!";
+                return;
+            }
+
             var request = new ResetPasswordModel { Email = _email, NewPassword = newPassword };
             if (await _apiService.ResetPasswordAsync(request))
             {

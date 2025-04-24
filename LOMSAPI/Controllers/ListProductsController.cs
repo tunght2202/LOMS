@@ -1,9 +1,8 @@
-﻿using LOMSAPI.Data.Entities;
-using LOMSAPI.Models;
+﻿using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LOMSAPI.Controllers
 {
@@ -23,7 +22,8 @@ namespace LOMSAPI.Controllers
             [HttpGet("GetAllListProduct")]
             public async Task<IActionResult> GetAllListProduct()
             {
-                var listListProduct = await _context.GetAllListProduct();
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var listListProduct = await _context.GetAllListProduct(userId);
                 if (listListProduct == null)
                 {
                     return NotFound("not found any list product");
@@ -89,13 +89,14 @@ namespace LOMSAPI.Controllers
         [HttpPost("AddNewListProduct/{listProductName}")]
         public async Task<IActionResult> AddNewListProduct(string listProductName)
         {
-            var result = await _context.AddNewListProduct(listProductName);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _context.AddNewListProduct(listProductName, userId);
             if (result == 0)
             {
                 return BadRequest("Can't create list product");
             }
             return Ok("Add Sucessfull");
-        }
+        }   
 
         // Thanh Tùng 5
         // Add product into list product

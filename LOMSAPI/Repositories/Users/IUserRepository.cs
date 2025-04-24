@@ -7,7 +7,7 @@ namespace LOMSAPI.Repositories.Users
     public interface IUserRepository
     {
         Task<string> Authencate(LoginRequest loginRequest);
-        Task<bool> RegisterRequestAsync(RegisterRequestModel model, IFormFile image);
+        Task<(bool success, string message)> RegisterRequestAsync(RegisterRequestModel model, IFormFile? image);
         Task<bool> RegisterAccountAsync(VerifyOtpModel model);
         Task<bool> RequestPasswordResetAsync(ForgotPasswordModel model);
         Task<bool> ResetPasswordAsync(ResetPasswordModel model);
@@ -16,5 +16,7 @@ namespace LOMSAPI.Repositories.Users
         Task<bool> UpdateUserProfileRequest(User user, UpdateUserProfileModel model);
         Task<bool> UpdateUserProfile(VerifyOtpModel model, User user);
         Task<bool> UpdateTokenFacbook(string token,string userid);
+        Task<User> GetUserById(string userId);
+        Task<bool> UpdatePageId(string pageId, string userId);  
     }
 }

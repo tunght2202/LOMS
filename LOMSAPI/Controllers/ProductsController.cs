@@ -1,8 +1,6 @@
-﻿using LOMSAPI.Data.Entities;
-using LOMSAPI.Models;
+﻿using LOMSAPI.Models;
 using LOMSAPI.Repositories.Products;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -23,7 +21,7 @@ namespace LOMSAPI.Controllers
         // Thanh Tùng
         // Get all Product 
         [HttpGet("GetProducts")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductModel>>> GetProducts()
         {
             return Ok(await _productRepository.GetAllProducts());
         }
@@ -44,10 +42,12 @@ namespace LOMSAPI.Controllers
 
         // Thanh Tùng
         // Get List Product By User 
-        [HttpGet("GetAllProductsByUser/{userId}")]
-        public async Task<ActionResult<ProductModel>> GetAllProductsByUser()
+        [HttpGet("GetAllProductsByUser")]
+        public async Task<ActionResult<IEnumerable<ProductModel>>> GetAllProductsByUser()
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId)) return Unauthorized("Missing user info");
 
             var product = await _productRepository.GetAllProductsByUser(userId);
             if (product == null)
@@ -56,6 +56,7 @@ namespace LOMSAPI.Controllers
             }
             return Ok(product);
         }
+
 
         // Thanh Tùng
         // Add new product 

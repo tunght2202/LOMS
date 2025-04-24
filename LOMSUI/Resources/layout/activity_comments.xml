@@ -84,5 +84,5 @@
         android:layout_weight="1"
         android:layout_marginTop="16dp"/>
 
-	<include layout="@layout/layout_bottom_nav" />
+	<!--<include layout="@layout/layout_bottom_nav" />-->
 </LinearLayout>

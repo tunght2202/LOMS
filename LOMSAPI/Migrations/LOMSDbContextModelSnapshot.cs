@@ -103,7 +103,13 @@ namespace LOMSAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("ListProductId");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("ListProducts");
                 });
@@ -316,6 +322,9 @@ namespace LOMSAPI.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("PageId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -498,6 +507,17 @@ namespace LOMSAPI.Migrations
                     b.Navigation("LiveStreamCustomer");
                 });
 
+            modelBuilder.Entity("LOMSAPI.Data.Entities.ListProduct", b =>
+                {
+                    b.HasOne("LOMSAPI.Data.Entities.User", "User")
+                        .WithMany("ListProducts")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LOMSAPI.Data.Entities.LiveStream", b =>
                 {
                     b.HasOne("LOMSAPI.Data.Entities.ListProduct", "ListProduct")
@@ -671,6 +691,8 @@ namespace LOMSAPI.Migrations
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.User", b =>
                 {
+                    b.Navigation("ListProducts");
+
                     b.Navigation("LiveStreams");
 
                     b.Navigation("Products");

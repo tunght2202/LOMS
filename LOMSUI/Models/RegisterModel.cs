@@ -16,4 +16,18 @@
 
         public string AvatarContentType { get; set; }
     }
+<<<<<<< HEAD
 }
+=======
+    public class RegisterResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
+        public Dictionary<string, List<string>> Errors { get; set; }
+
+    }
+
+
+}
+
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2

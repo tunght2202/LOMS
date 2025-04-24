@@ -1,18 +1,11 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
-using System.Net.Mail;
-using System.Net;
-using Newtonsoft.Json;
 using LOMSAPI.Repositories.Users;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using Azure.Core;
 
 namespace LOMSAPI.Controllers
 {
@@ -48,14 +41,16 @@ namespace LOMSAPI.Controllers
 
         [HttpPost("register-account-request")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterRequest([FromForm] RegisterRequestModel model, IFormFile Avatar)
+        public async Task<IActionResult> RegisterRequest([FromForm] RegisterRequestModel model, IFormFile? Avatar)
         {
+
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var result = await _userRepository.RegisterRequestAsync(model, Avatar);
-            if (!result) return BadRequest("Error in the register process.");
+            var (success, message) = await _userRepository.RegisterRequestAsync(model, Avatar);
 
-            return Ok(new { message = "Please check email for otp code!" });
+            if (!success) return BadRequest(new { message });
+
+            return Ok(new { message });
         }
         
         
@@ -73,6 +68,7 @@ namespace LOMSAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetPasswordRequest([FromBody] ForgotPasswordModel model)
         {
+            
             var result = await _userRepository.RequestPasswordResetAsync(model);
             if (!result) return NotFound("Can't find the user.");
 
@@ -82,6 +78,7 @@ namespace LOMSAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpModel model)
         {
+            
             var result = await _userRepository.VerifyOtpAsync(model);
             if (!result) return BadRequest("OTP code is invalid or expired.");
 
@@ -91,8 +88,12 @@ namespace LOMSAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Password is invalid.");
+            }
             var result = await _userRepository.ResetPasswordAsync(model);
-            if (!result) return BadRequest("OTP code is invalid or expired.");
+            if (!result) return BadRequest("Cannot find user.");
 
             return Ok(new { message = "Password was reset successfully." });
         }
@@ -114,12 +115,21 @@ namespace LOMSAPI.Controllers
             if (user == null) return BadRequest("Can't find the user");
             var result = await _userRepository.UpdateUserProfileRequest(user, model);
             if (!result) return BadRequest("Error in information editing!");
-            if (model.Email != null)
+            if (model.Email != null && model.Password != null)
             {
-                return Ok(new { message = "Please enter email verification code." });
+                return Ok(new { message = "Please enter email verification code to change email and password." });
             }
+            else if (model.Email != null && model.Password == null)
+            {
+                return Ok(new { message = "Please enter email verification code to change email." });
+            }
+            else if (model.Email == null && model.Password != null)
+            {
+                return Ok(new { message = "Please enter email verification code to change password." });
+            }
+            
             return Ok(new { message = "Information edited successfully." });
-        }
+            }
         [HttpPut("update-userProfie")]
         public async Task<IActionResult> UpdateProfile(VerifyOtpModel OTP)
         {
@@ -146,6 +156,21 @@ namespace LOMSAPI.Controllers
             }
 
             return Ok(new { message = "Facebook token updated successfully!" });
+        }
+        [HttpPut("update-page-id")]
+        public async Task<IActionResult> UpdatePageId(string pageId)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "User not authenticated" });
+            }
+            var result = await _userRepository.UpdatePageId(pageId, userId);
+            if (!result)
+            {
+                return BadRequest(new { message = "Error updating Page ID" });
+            }
+            return Ok(new { message = "Page ID updated successfully!" });
         }
     }
 }

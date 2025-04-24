@@ -15,7 +15,7 @@ using System.Security.Claims;
 
 namespace LOMSUI
 {
-    [Activity(Label = "Login", MainLauncher = true)]
+    [Activity(Label = "LOMS", MainLauncher = true)]
     public class LoginActivity : Activity
     {
         private AutoCompleteTextView _emailEditText;
@@ -23,7 +23,6 @@ namespace LOMSUI
         private Button _loginButton;
         private Button _registerButton;
         private CheckBox cbRememberMe;
-        private readonly ApiService _apiService = new ApiService();
         private List<string> emailList;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -44,29 +43,28 @@ namespace LOMSUI
             var adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleDropDownItem1Line, emailList);
             _emailEditText.Adapter = adapter;
 
-            if (rememberMe)
+            string lastEmail = prefs.GetString("email", "");
+            string lastPassword = prefs.GetString($"password_{lastEmail}", "");
+
+            if (rememberMe && !string.IsNullOrEmpty(lastEmail))
             {
-                _emailEditText.Text = prefs.GetString("email", string.Empty);
-                _passwordEditText.Text = prefs.GetString("password", string.Empty);
+                _emailEditText.Text = lastEmail;
+                _passwordEditText.Text = lastPassword;
                 cbRememberMe.Checked = true;
             }
 
+
             _emailEditText.ItemClick += (s, e) =>
             {
-                string selectedEmail = emailList[e.Position];
-                string savedEmail = prefs.GetString("email", "");
+                string selectedEmail = _emailEditText.Text?.Trim();
 
-                if (selectedEmail == savedEmail && prefs.GetBoolean("rememberMe", false))
-                {
-                    _passwordEditText.Text = prefs.GetString("password", "");
-                    cbRememberMe.Checked = true;
-                }
-                else
-                {
-                    _passwordEditText.Text = "";
-                    cbRememberMe.Checked = false;
-                }
+                var freshPrefs = GetSharedPreferences("auth", FileCreationMode.Private);
+                string savedPassword = freshPrefs.GetString($"password_{selectedEmail}", "");
+
+                _passwordEditText.Text = savedPassword;
+                cbRememberMe.Checked = !string.IsNullOrEmpty(savedPassword);
             };
+
 
             TextView forgotPasswordTextView = FindViewById<TextView>(Resource.Id.tvForgotPassword);
             if (forgotPasswordTextView != null)
@@ -111,7 +109,6 @@ namespace LOMSUI
 
                 if (!string.IsNullOrEmpty(token))
                 {
-                    // Giải mã để lấy userID
                     var handler = new JwtSecurityTokenHandler();
                     var jwtToken = handler.ReadJwtToken(token);
                     string userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -122,6 +119,9 @@ namespace LOMSUI
                     var editor = prefs.Edit();
                     editor.PutString("token", token);
                     editor.PutString("userID", userId);
+
+                    // Lưu riêng password cho từng email
+                    editor.PutString($"password_{email}", password);
 
                     if (cbRememberMe.Checked)
                     {
@@ -140,6 +140,8 @@ namespace LOMSUI
                         editor.Remove("rememberMe");
                         editor.Remove("email");
                         editor.Remove("password");
+                        editor.Remove($"password_{email}");
+
                     }
 
                     editor.Apply();

@@ -1,23 +1,21 @@
-﻿using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Widget;
+﻿using Android.Content;
 using Bumptech.Glide;
-using LOMSUI.Models;
+using LOMSUI.Activities.IntroductActivity;
 using LOMSUI.Services;
-using System;
 
 namespace LOMSUI.Activities
 {
     [Activity(Label = "Menu")]
     public class MenuActivity : Activity
     {
+        private ApiService _apiService;
+        private string _token;
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.menu);
 
-            BottomNavHelper.SetupFooterNavigation(this);
+            BottomNavHelper.SetupFooterNavigation(this, "menu");
 
             TextView userNameTextView = FindViewById<TextView>(Resource.Id.userNameTextView);
             TextView emailTextView = FindViewById<TextView>(Resource.Id.emailTextView);
@@ -30,19 +28,21 @@ namespace LOMSUI.Activities
             LinearLayout helpLayout = FindViewById<LinearLayout>(Resource.Id.helpLinearLayout);
             LinearLayout aboutLayout = FindViewById<LinearLayout>(Resource.Id.aboutLinearLayout);
             LinearLayout fanpageLinkLayout = FindViewById<LinearLayout>(Resource.Id.fanpageLinkLayout);
-            LinearLayout printerConnectionLayout = FindViewById<LinearLayout>(Resource.Id.printerConnectionLayout);
             LinearLayout privacyPolicyLayout = FindViewById<LinearLayout>(Resource.Id.privacyPolicyLayout);
             LinearLayout termsOfUseLayout = FindViewById<LinearLayout>(Resource.Id.termsOfUseLayout);
 
-            var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
-            string token = prefs.GetString("token", null);
+            _apiService = ApiServiceProvider.Instance;
 
+<<<<<<< HEAD
             if (!string.IsNullOrEmpty(token))
             {
                 try
                 {
                     var apiService = new ApiService();
                     var user = await apiService.GetUserProfileAsync(token);
+=======
+                    var user = await _apiService.GetUserProfileAsync(); 
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
 
                     if (user != null)
                     {
@@ -56,12 +56,7 @@ namespace LOMSUI.Activities
                                  .Into(ImageView);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Toast.MakeText(this, "Error loading user information: " + ex.Message, ToastLength.Long).Show();
-                }
-            }
+        
 
             userInfoSection.Click += (s, e) =>
             {
@@ -72,7 +67,16 @@ namespace LOMSUI.Activities
             logoutButton.Click += (sender, e) =>
             {
                 var prefs = GetSharedPreferences("auth", FileCreationMode.Private);
+<<<<<<< HEAD
                 prefs.Edit().Remove("token").Apply();
+=======
+                var editor = prefs.Edit();
+                editor.Remove("token");
+                editor.Remove("email");
+                editor.Remove("password");
+                editor.Remove("rememberMe");
+                editor.Apply();
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
 
                 Intent intent = new Intent(this, typeof(LoginActivity));
                 intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.NewTask);
@@ -80,24 +84,35 @@ namespace LOMSUI.Activities
                 Finish();
             };
 
+
             productListLayout.Click += (sender, e) =>
             {
+<<<<<<< HEAD
                 Toast.MakeText(this, "Quản lý đơn hàng", ToastLength.Short).Show();
 
                 Intent intent = new Intent(this, typeof(ProductActivity));
 
                 // Bắt đầu OrderActivity
+=======
+                Intent intent = new Intent(this, typeof(ProductActivity));
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 StartActivity(intent);
             };
 
             orderManagementLayout.Click += (sender, e) =>
             {
+<<<<<<< HEAD
                 Toast.MakeText(this, "Quản lý đơn hàng", ToastLength.Short).Show();
 
                 // Tạo một Intent để khởi chạy OrderActivity
                 Intent intent = new Intent(this, typeof(OrderActivity));
 
                 // Bắt đầu OrderActivity
+=======
+
+                var intent = new Intent(this, typeof(OrderListActivity));
+                intent.PutExtra("Type", "ByUser");
+>>>>>>> 7dcccd97e68a72de4489f90f8e8b12ae1625b9d2
                 StartActivity(intent);
             };
 
@@ -109,12 +124,14 @@ namespace LOMSUI.Activities
 
             helpLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Trợ giúp", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(HelpActivity));
+                StartActivity(intent);
             };
 
             aboutLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Giới thiệu", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(AboutActivity));
+                StartActivity(intent);
             };
 
             fanpageLinkLayout.Click += (sender, e) =>
@@ -122,20 +139,16 @@ namespace LOMSUI.Activities
                 Intent intent = new Intent(this, typeof(FacebookTokenActivity));
                 StartActivity(intent);
             };
-
-            printerConnectionLayout.Click += (sender, e) =>
-            {
-                Toast.MakeText(this, "Kết nối máy in", ToastLength.Short).Show();
-            };
-
             privacyPolicyLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Chính sách bảo mật", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(PrivacyActivity));
+                StartActivity(intent);
             };
 
             termsOfUseLayout.Click += (sender, e) =>
             {
-                Toast.MakeText(this, "Điều khoản sử dụng", ToastLength.Short).Show();
+                Intent intent = new Intent(this, typeof(TermOfUserActivity));
+                StartActivity(intent);
             };
 
         }

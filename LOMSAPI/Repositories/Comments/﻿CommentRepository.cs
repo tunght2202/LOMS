@@ -131,7 +131,7 @@ namespace LOMSAPI.Repositories.Comments
                 }
             }
 
-            return comments;
+            return (List<CommentModel>)comments.OrderByDescending(c => c.CommentTime).ToList();
         }
 
 
