@@ -186,7 +186,7 @@ namespace LOMSUI
                         });
                     }
 
-                    await Task.Delay(4000, token); 
+                    await Task.Delay(5000, token); 
                 }
             }
             catch (TaskCanceledException)
@@ -202,6 +202,17 @@ namespace LOMSUI
             }
         }
 
+      /*  protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (_isAutoCreating && _cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Cancel();
+                _isAutoCreating = false;
+            }
+        }
+
+*/
 
     }
 }
