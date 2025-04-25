@@ -66,7 +66,7 @@
 
 			<Button
                 android:id="@+id/btnCreateOrder"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:text="Create order"
                 android:textSize="12sp"
@@ -76,7 +76,7 @@
 
 			<Button
                 android:id="@+id/btnViewInfo"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:text="Infomation"
                 android:textSize="12sp"

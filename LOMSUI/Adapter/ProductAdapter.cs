@@ -15,7 +15,7 @@ namespace LOMSUI.Adapter
     public class ProductAdapter : RecyclerView.Adapter
     {
         private readonly Context _context;
-        private readonly List<ProductModel> _products;
+        private List<ProductModel> _products;
         public event Action<ProductModel> OnViewDetailClick;
         public event Action<ProductModel> OnDeleteClick; 
 
@@ -82,7 +82,13 @@ namespace LOMSUI.Adapter
                 BtnDelete = itemView.FindViewById<Button>(Resource.Id.btDelete);
             }
         }
+        public void UpdateData(List<ProductModel> newData)
+        {
+            _products = newData;
+            NotifyDataSetChanged();
+        }
     }
+
 
 
 }

@@ -193,7 +193,7 @@ namespace LOMSUI
             }
             catch (TaskCanceledException)
             {
-                Console.WriteLine("Auto creation stopped.");
+                Console.WriteLine("Auto creation stopped."); 
             }
             catch (Exception ex)
             {
