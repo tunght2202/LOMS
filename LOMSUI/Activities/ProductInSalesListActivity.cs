@@ -16,7 +16,8 @@ namespace LOMSUI.Activities
         private ProductAdapter _adapter;
         private RecyclerView _productRecyclerView;
         private TextView _noProductsTextView, _tvListName;
-        private Button _addProductButton, _addListProductButton, _viewListProductButton;
+        private Button _addProductButton, _addListProductButton, _viewListProductButton, _btnSearchByProductName;
+        private EditText _etProductName;
         private SwipeRefreshLayout _swipeRefreshLayout;
         private int _listproductId;
         private string _listproductName;
@@ -32,6 +33,8 @@ namespace LOMSUI.Activities
             BottomNavHelper.SetupFooterNavigation(this, "products");
 
             _productRecyclerView = FindViewById<RecyclerView>(Resource.Id.productRecyclerView);
+            _btnSearchByProductName = FindViewById<Button>(Resource.Id.btnSearchByProductName);
+            _etProductName = FindViewById<EditText>(Resource.Id.etProductName);
             _noProductsTextView = FindViewById<TextView>(Resource.Id.noProductsTextView);
             _tvListName = FindViewById<TextView>(Resource.Id.tvListProductName);
             _addProductButton = FindViewById<Button>(Resource.Id.addProductButton);
@@ -51,7 +54,15 @@ namespace LOMSUI.Activities
             _listproductId = Intent.GetIntExtra("ListProductId", -1);
             _listproductName = Intent.GetStringExtra("ListProductName");
 
+            _btnSearchByProductName.Click += (s, e) =>
+            {
+                FilterProducts(_etProductName.Text);
+            };
 
+            _etProductName.TextChanged += (s, e) =>
+            {
+                FilterProducts(_etProductName.Text);
+            };
 
             _addProductButton.Click += (s, e) =>
             {
@@ -106,6 +117,22 @@ namespace LOMSUI.Activities
                 Console.WriteLine($"Error loading product data: {ex.Message}");
             }
         }
+
+        private void FilterProducts(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                _adapter.UpdateData(_products);
+                return;
+            }
+
+            var filtered = _products
+                .Where(p => p.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            _adapter.UpdateData(filtered);
+        }
+
         private void ShowDeleteConfirmationDialog(int listProductId, List<int> listProductIds)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
