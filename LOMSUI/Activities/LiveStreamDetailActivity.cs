@@ -178,6 +178,21 @@ namespace LOMSUI
             {
                 while (!token.IsCancellationRequested)
                 {
+
+                    bool isLive = await _apiService.IsLiveStreamStillLiveAsync(_liveStreamId);
+
+                    if (!isLive)
+                    {
+                        RunOnUiThread(() =>
+                        {
+                            _isAutoCreating = false;
+                            _cancellationTokenSource?.Cancel();
+                            _toggleAutoCreateOrder.Checked = false;
+                            _toggleAutoCreateOrder.Visibility = ViewStates.Gone;
+                        });
+                        break;
+                    }
+
                     var (isSuccess, message) = await _apiService.CreateOrdersFromCommentsAsync(_liveStreamId);
 
                     if (isSuccess)
