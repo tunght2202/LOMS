@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using LOMSAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace LOMSAPI.Repositories.LiveStreams
 {
@@ -212,21 +213,19 @@ namespace LOMSAPI.Repositories.LiveStreams
 
         public async Task<bool> IsLiveStreamStillLive(string liveStreamId)
         {
-            try
-            {
-                var liveStream = _context.LiveStreams
-                    .FirstOrDefaultAsync(ls => ls.LivestreamID == liveStreamId && !ls.StatusDelete);
-                if (liveStream == null)
+            var url = $"https://graph.facebook.com/v22.0/{liveStreamId}?fields=status&access_token={_accessToken}";
+            var response = await _httpClient.GetAsync(url);
 
-                    return await Task.FromResult(false);
+            if (!response.IsSuccessStatusCode)
+                return false; // Nếu không gọi được API, coi như livestream đã kết thúc
 
-                string status = liveStream.Result.Status.ToUpper();
-                return await Task.FromResult(status == "LIVE");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error checking livestream status: {ex.Message}", ex);
-            }
+            var content = await response.Content.ReadAsStringAsync();
+            var json = JObject.Parse(content);
+            var status = json["status"]?.ToString();
+
+            return status == "LIVE"; // Chỉ tiếp tục nếu livestream còn đang phát
+
+           
         }
     }
 }
