@@ -38,16 +38,23 @@ namespace LOMSUI.Adapter
 
             viewHolder.NameTextView.Text = product.Name;
             viewHolder.PriceTextView.Text = $"Giá: {product.Price:N0} VNĐ";
-            viewHolder.CheckBox.Checked = _selected[product.ProductID];
+
+            viewHolder.CheckBox.CheckedChange -= viewHolder.CheckedChangeListener;
+
+            viewHolder.CheckBox.Checked = _selected.ContainsKey(product.ProductID) && _selected[product.ProductID];
+
+            viewHolder.CheckedChangeListener = (s, e) =>
+            {
+                _selected[product.ProductID] = e.IsChecked;
+            };
+
+            viewHolder.CheckBox.CheckedChange += viewHolder.CheckedChangeListener;
 
             Glide.With(viewHolder.ImageView.Context)
                 .Load(product.ImageURL)
                 .Into(viewHolder.ImageView);
 
-            viewHolder.CheckBox.CheckedChange += (s, e) =>
-            {
-                _selected[product.ProductID] = e.IsChecked;
-            };
+          
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -64,6 +71,8 @@ namespace LOMSUI.Adapter
             public TextView NameTextView { get; }
             public TextView PriceTextView { get; }
             public CheckBox CheckBox { get; }
+            public EventHandler<CompoundButton.CheckedChangeEventArgs> CheckedChangeListener { get; set; }
+
 
             public ProductViewHolder(View itemView) : base(itemView)
             {
