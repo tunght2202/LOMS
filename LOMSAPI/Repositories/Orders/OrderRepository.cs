@@ -148,7 +148,7 @@ namespace LOMSAPI.Repositories.Orders
                     DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
                     SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
                 };
-                _print.PrintCustomerLabel("com5", inforprint);
+                _print.PrintCustomerLabel("COM4", inforprint);
                 return true;
             }
             catch (Exception ex)
@@ -278,6 +278,7 @@ namespace LOMSAPI.Repositories.Orders
                                 var sanpham = $"{product.Name} X{quantity}";
                                 var tonggiaDecimal = product.Price * quantity;
                                 var tonggia = (int)tonggiaDecimal;
+                                var stock = product.Stock;
                                 string formatted = tonggia.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND";
                                 var newOrder = new Order
                                 {
@@ -295,7 +296,8 @@ namespace LOMSAPI.Repositories.Orders
                                     newOrder.Status = OrderStatus.Confirmed;
 
                                     text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name} \n" +
+                                       $"Quantity : {quantity} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}";
 
@@ -304,6 +306,7 @@ namespace LOMSAPI.Repositories.Orders
                                 {
                                     text = "Your order has been successfully created\n" +
                                        $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Quantity : {quantity} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}\n" +
                                        "Please provide your address and phone number for shipping!";
@@ -330,11 +333,12 @@ namespace LOMSAPI.Repositories.Orders
                                     SanPham = sanpham,
                                     TongGia = formatted,
                                     DiaChi = customer.Address,
-                                    SoDienThoai = customer.PhoneNumber
+                                    SoDienThoai = customer.PhoneNumber,
+                                    Stock = stock
                                 };
                                 try
                                 {
-                                    _print.PrintCustomerLabel("COM5", printInfo);
+                                    _print.PrintCustomerLabel("COM4", printInfo);
 
                                 }
                                 catch (Exception ex)
