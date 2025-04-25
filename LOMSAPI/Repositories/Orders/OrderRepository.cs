@@ -275,9 +275,9 @@ namespace LOMSAPI.Repositories.Orders
                                     product.Stock -= quantity;
                                 }
 
-                                var sanpham = $"{product.Name} X{quantity}";
+                                var sanpham = $"{product.Name} X {quantity}";
                                 var tonggiaDecimal = product.Price * quantity;
-                                var tonggia = (int)tonggiaDecimal;
+                                var tonggia = (long)tonggiaDecimal;
                                 var stock = product.Stock;
                                 string formatted = tonggia.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND";
                                 var newOrder = new Order
@@ -298,6 +298,7 @@ namespace LOMSAPI.Repositories.Orders
                                     text = "Your order has been successfully created\n" +
                                        $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name} \n" +
                                        $"Quantity : {quantity} \n" +
+                                       $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}";
 
@@ -307,6 +308,7 @@ namespace LOMSAPI.Repositories.Orders
                                     text = "Your order has been successfully created\n" +
                                        $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
                                        $"Quantity : {quantity} \n" +
+                                       $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}\n" +
                                        "Please provide your address and phone number for shipping!";
