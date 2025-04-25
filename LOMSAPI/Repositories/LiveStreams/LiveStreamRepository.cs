@@ -217,7 +217,9 @@ namespace LOMSAPI.Repositories.LiveStreams
                 var liveStream = _context.LiveStreams
                     .FirstOrDefaultAsync(ls => ls.LivestreamID == liveStreamId && !ls.StatusDelete);
                 if (liveStream == null)
-                    return  await Task.FromResult(false);
+
+                    return await Task.FromResult(false);
+
                 string status = liveStream.Result.Status.ToUpper();
                 return await Task.FromResult(status == "LIVE");
             }

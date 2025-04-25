@@ -106,7 +106,8 @@ namespace LOMSAPI.Repositories.ListProducts
                     Description = plp.Product.Description,
                     ProductCode = plp.Product.ProductCode,
                     Status = plp.Product.Status,
-                    Stock = plp.Product.Stock
+                    Stock = plp.Product.Stock,
+                    ImageURL = plp.Product.ImageURL                  
                 })) // Lấy danh sách Product
                 .ToListAsync();
             return productListProduct;

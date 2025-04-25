@@ -538,6 +538,34 @@ namespace LOMSUI.Services
             return false;
         }
 
+        public async Task<bool> IsLiveStreamStillLiveAsync(string livestreamId)
+        {
+            try
+            {
+                string url = $"{BASE_URLL}/LiveStreams/IsLiveStreamStillLive/{livestreamId}";
+
+                using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+                {
+
+                    var response = await _httpClient.SendAsync(request);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string content = await response.Content.ReadAsStringAsync();
+                        bool isLive = JsonConvert.DeserializeObject<bool>(content);
+                        return isLive;
+                    }
+
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[IsLiveStreamStillLiveAsync] Error: {ex.Message}");
+                return false;
+            }
+        }
+
+
         //List Product
         public async Task<bool> SetupListProductAsync(string livestreamId, int listProductId)
         {
