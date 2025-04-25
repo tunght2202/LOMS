@@ -119,12 +119,21 @@ namespace LOMSAPI.Repositories.Products
             {
                 throw new Exception($"Can't find a product with id = {productId}");
             }
+            var productCodeExist = await _context.Products
+                .AnyAsync(p => p.ProductCode.ToLower()
+                .Equals(product.ProductCode.ToLower()));
+            if (productCodeExist)
+            {
+                throw new Exception($"Product code {product.ProductCode} exist");
+            }
+
+
             productById.Name = product.Name;
-            productById.ProductCode = product.ProductCode;
-            productById.Price = product.Price;
-            productById.Description = product.Description;
-            productById.Stock = product.Stock;
-            productById.ImageURL = product.ImageURL;
+                productById.ProductCode = product.ProductCode;
+                productById.Price = product.Price;
+                productById.Description = product.Description;
+                productById.Stock = product.Stock;
+                productById.ImageURL = product.ImageURL;
 
             return await _context.SaveChangesAsync();
         }
