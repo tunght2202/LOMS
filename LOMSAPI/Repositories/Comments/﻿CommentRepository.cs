@@ -34,7 +34,7 @@ namespace LOMSAPI.Repositories.Comments
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
             });
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={token}";
+            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?order=reverse_chronological&fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={token}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
