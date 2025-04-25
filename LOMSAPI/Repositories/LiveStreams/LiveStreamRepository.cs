@@ -209,5 +209,22 @@ namespace LOMSAPI.Repositories.LiveStreams
 
             return liveStream; // Trả về null nếu không tìm thấy
         }
+
+        public async Task<bool> IsLiveStreamStillLive(string liveStreamId)
+        {
+            try
+            {
+                var liveStream = _context.LiveStreams
+                    .FirstOrDefaultAsync(ls => ls.LivestreamID == liveStreamId && !ls.StatusDelete);
+                if (liveStream == null)
+                    return await Task.FromResult(false);
+                string status = liveStream.Result.Status.ToUpper();
+                return await Task.FromResult(status == "LIVE");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error checking livestream status: {ex.Message}", ex);
+            }
+        }
     }
 }

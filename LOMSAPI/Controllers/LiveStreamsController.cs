@@ -89,5 +89,22 @@ namespace LOMSAPI.Controllers
                 return StatusCode(500, $"Error deleting livestream: {ex.Message}");
             }
         }
+
+        [HttpGet("IsLiveStreamStillLive/{liveStreamId}")]
+        public async Task<IActionResult> IsLiveStreamStillLive(string liveStreamId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("UserID not found in token.");
+            try
+            {
+                var isLive = await _liveStreamRepositories.IsLiveStreamStillLive(liveStreamId);
+                return Ok(isLive);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
+        }
     }
 }
