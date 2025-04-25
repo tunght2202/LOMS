@@ -22,9 +22,5 @@ namespace LOMSAPI.Models
         [Required(ErrorMessage = "Stock is required.")]
         [Range(0, 100000, ErrorMessage = "Stock must be between 0 and 100,000.")]
         public int Stock { get; set; }
-
-        [StringLength(2048, ErrorMessage = "ImageURL cannot be longer than 2048 characters.")]
-        [Url(ErrorMessage = "ImageURL must be a valid URL.")]
-        public string? ImageURL { get; set; }
     }
 }

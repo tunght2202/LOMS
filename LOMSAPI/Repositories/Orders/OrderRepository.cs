@@ -148,7 +148,7 @@ namespace LOMSAPI.Repositories.Orders
                     DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
                     SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
                 };
-                _print.PrintCustomerLabel("COM3", inforprint);
+                _print.PrintCustomerLabel("COM4", inforprint);
                 return true;
             }
             catch (Exception ex)
