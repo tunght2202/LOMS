@@ -296,7 +296,8 @@ namespace LOMSAPI.Repositories.Orders
                                     newOrder.Status = OrderStatus.Confirmed;
 
                                     text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name} \n" +
+                                       $"Quantity : {quantity} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}";
 
@@ -305,6 +306,7 @@ namespace LOMSAPI.Repositories.Orders
                                 {
                                     text = "Your order has been successfully created\n" +
                                        $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Quantity : {quantity} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}\n" +
                                        "Please provide your address and phone number for shipping!";

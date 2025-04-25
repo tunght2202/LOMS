@@ -16,8 +16,8 @@ namespace LOMSUI.Activities
     [Activity(Label = "Comments")]
     public class CommentsActivity : BaseActivity
     {
-        private EditText txtLiveStreamId, txtProductCode;
-        private Button btnFetchComments, btnFilterByProduct;
+        private EditText _txtFaceName;
+        private Button _btnFilterByFaceName;
         private RecyclerView recyclerViewComments;
         private TextView txtNoComments;
         private CommentAdapter _commentAdapter;
@@ -31,48 +31,36 @@ namespace LOMSUI.Activities
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_comments);
 
-            //BottomNavHelper.SetupFooterNavigation(this);
-
             _apiService = ApiServiceProvider.Instance;
 
             _allComments = new List<CommentModel>();
 
-            txtLiveStreamId = FindViewById<EditText>(Resource.Id.txtLiveStreamId);
-            txtProductCode = FindViewById<EditText>(Resource.Id.txtProductCode);
-            btnFetchComments = FindViewById<Button>(Resource.Id.btnFetchComments);
-            btnFilterByProduct = FindViewById<Button>(Resource.Id.btnFilterByProductCode);
+            _txtFaceName = FindViewById<EditText>(Resource.Id.txtFaceName);
+            _btnFilterByFaceName = FindViewById<Button>(Resource.Id.btnFilterByFaceName);
             recyclerViewComments = FindViewById<RecyclerView>(Resource.Id.recyclerViewComments);
             txtNoComments = FindViewById<TextView>(Resource.Id.txtNoComments);
 
             recyclerViewComments.SetLayoutManager(new LinearLayoutManager(this));
 
             _currentLiveStreamId = Intent.GetStringExtra("LivestreamID");
-            if (!string.IsNullOrEmpty(_currentLiveStreamId))
+
+            _btnFilterByFaceName.Click += (s, e) => FilterCommentsByProduct(_txtFaceName.Text);
+            _txtFaceName.TextChanged += (s, e) =>
             {
-                txtLiveStreamId.Text = _currentLiveStreamId;
-
-                _ = StartPollingComments();
-            }
-
-
-            btnFetchComments.Click += async (s, e) =>
-            {
-                _isPolling = false;
-                await Task.Delay(100);
-                await StartPollingComments();
+                FilterCommentsByProduct(_txtFaceName.Text);
             };
 
-            btnFilterByProduct.Click += (s, e) => FilterCommentsByProduct();
+            await StartPollingComments();
+
         }
 
 
         private async Task StartPollingComments()
         {
-            _currentLiveStreamId = txtLiveStreamId.Text.Trim();
 
             if (string.IsNullOrEmpty(_currentLiveStreamId))
             {
-                Toast.MakeText(this, "Please enter Livestream ID", ToastLength.Short).Show();
+                Toast.MakeText(this, "Livestream ID not found!", ToastLength.Short).Show();
                 return;
             }
 
@@ -116,17 +104,16 @@ namespace LOMSUI.Activities
         }
 
 
-        private void FilterCommentsByProduct()
+        private void FilterCommentsByProduct(string faceName)
         {
-            string productCode = txtProductCode.Text.Trim();
-            if (string.IsNullOrEmpty(productCode))
+            if (string.IsNullOrEmpty(faceName))
             {
                 UpdateCommentList(_allComments);
             }
             else
             {
                 var filteredComments = _allComments
-                    .Where(c => c.Content.Contains(productCode, StringComparison.OrdinalIgnoreCase))
+                    .Where(c => c.CustomerName.Contains(faceName, StringComparison.OrdinalIgnoreCase))
                     .ToList();
                 UpdateCommentList(filteredComments);
             }
@@ -142,10 +129,7 @@ namespace LOMSUI.Activities
                     txtNoComments.Visibility = Android.Views.ViewStates.Visible;
                     txtNoComments.Text = "No comments!";
 
-                    txtProductCode.Visibility = Android.Views.ViewStates.Gone;
-                    btnFilterByProduct.Visibility = Android.Views.ViewStates.Gone;
-
-                    Toast.MakeText(this, "No comments!", ToastLength.Short).Show();
+                   // Toast.MakeText(this, "No comments!", ToastLength.Short).Show();
                 }
                 else
                 {
@@ -155,10 +139,7 @@ namespace LOMSUI.Activities
                     _commentAdapter = new CommentAdapter(comments);
                     recyclerViewComments.SetAdapter(_commentAdapter);
 
-                    txtProductCode.Visibility = Android.Views.ViewStates.Visible;
-                    btnFilterByProduct.Visibility = Android.Views.ViewStates.Visible;
-
-                    Toast.MakeText(this, $"Total comments: {comments.Count}", ToastLength.Short).Show();
+                    //Toast.MakeText(this, $"Total comments: {comments.Count}", ToastLength.Short).Show();
 
                     _commentAdapter.OnCreateOrder += async comment =>
                     {
