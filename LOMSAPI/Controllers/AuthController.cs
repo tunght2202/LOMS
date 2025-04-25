@@ -68,6 +68,7 @@ namespace LOMSAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetPasswordRequest([FromBody] ForgotPasswordModel model)
         {
+            
             var result = await _userRepository.RequestPasswordResetAsync(model);
             if (!result) return NotFound("Can't find the user.");
 
@@ -77,6 +78,7 @@ namespace LOMSAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpModel model)
         {
+            
             var result = await _userRepository.VerifyOtpAsync(model);
             if (!result) return BadRequest("OTP code is invalid or expired.");
 
@@ -86,8 +88,12 @@ namespace LOMSAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Password is invalid.");
+            }
             var result = await _userRepository.ResetPasswordAsync(model);
-            if (!result) return BadRequest("OTP code is invalid or expired.");
+            if (!result) return BadRequest("Cannot find user.");
 
             return Ok(new { message = "Password was reset successfully." });
         }

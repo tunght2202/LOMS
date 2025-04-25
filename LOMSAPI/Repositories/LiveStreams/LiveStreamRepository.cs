@@ -49,7 +49,7 @@ namespace LOMSAPI.Repositories.LiveStreams
             var liveStreamsFromFacebook = new List<LiveStream>();
             var liveStreamIdsFromFacebook = new HashSet<string>();
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{_pageId}/live_videos?fields=id,title,creation_time,status,embed_html,permalink_url&access_token={_accessToken}";
+            string apiUrl = $"https://graph.facebook.com/v22.0/{_pageId}/live_videos?fields=id,description,creation_time,status,embed_html,permalink_url&access_token={_accessToken}";
 
             try
             {
@@ -169,7 +169,7 @@ namespace LOMSAPI.Repositories.LiveStreams
                 liveStreams.Add(new LiveStream
                 {
                     LivestreamID = idElement.GetString() ?? Guid.NewGuid().ToString(),
-                    StreamTitle = item.TryGetProperty("title", out JsonElement title) ? title.GetString() : "Untitled",
+                    StreamTitle = item.TryGetProperty("description", out JsonElement description) ? description.GetString() : "Untitled",
                     StreamURL = permalink != null ? $"https://www.facebook.com{permalink}" : "Unknown",
                     StartTime = DateTime.Parse(creationTimeElement.GetString().Replace("+0000", "Z")),
                     UserID = userId,
@@ -208,6 +208,25 @@ namespace LOMSAPI.Repositories.LiveStreams
                 .FirstOrDefaultAsync(ls => ls.LivestreamID == liveStreamId && ls.UserID == userid && !ls.StatusDelete);
 
             return liveStream; // Trả về null nếu không tìm thấy
+        }
+
+        public async Task<bool> IsLiveStreamStillLive(string liveStreamId)
+        {
+            try
+            {
+                var liveStream = _context.LiveStreams
+                    .FirstOrDefaultAsync(ls => ls.LivestreamID == liveStreamId && !ls.StatusDelete);
+                if (liveStream == null)
+
+                    return await Task.FromResult(false);
+
+                string status = liveStream.Result.Status.ToUpper();
+                return await Task.FromResult(status == "LIVE");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error checking livestream status: {ex.Message}", ex);
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace LOMSUI.Adapter
 {
     public class AddProductSalesListAdapter : RecyclerView.Adapter
     {
-        private readonly List<ProductModel> _products;
+        private List<ProductModel> _products;
         private readonly Dictionary<int, bool> _selected = new();
 
         public AddProductSalesListAdapter(List<ProductModel> products)
@@ -73,6 +73,12 @@ namespace LOMSUI.Adapter
                 CheckBox = itemView.FindViewById<CheckBox>(Resource.Id.productCheckBox);
             }
         }
+        public void UpdateData(List<ProductModel> newData)
+        {
+            _products = newData;
+            NotifyDataSetChanged();
+        }
+
     }
 
 }

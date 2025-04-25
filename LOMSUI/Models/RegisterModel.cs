@@ -25,8 +25,11 @@ namespace LOMSUI.Models
     public class RegisterResult
     {
         public bool IsSuccess { get; set; }
-        public List<string> Errors { get; set; } = new List<string>();
+        public string Message { get; set; }
+        public Dictionary<string, List<string>> Errors { get; set; }
+
     }
+
 
 }
 
