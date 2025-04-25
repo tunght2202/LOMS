@@ -34,7 +34,7 @@ namespace LOMSAPI.Repositories.Comments
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
             });
 
-            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={token}";
+            string apiUrl = $"https://graph.facebook.com/v22.0/{LiveStreamId}/comments?order=reverse_chronological&fields=from%7Bname%2Cpicture%7D%2Cmessage%2Ccreated_time&access_token={token}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
             if (!response.IsSuccessStatusCode)
@@ -48,7 +48,8 @@ namespace LOMSAPI.Repositories.Comments
         {
             using JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement root = doc.RootElement;
-            List<CommentModel> comments = new List<CommentModel>();
+            //List<CommentModel> comments = new List<CommentModel>();
+            List<CommentModel> AllComments = new List<CommentModel>();
             if (root.TryGetProperty("data", out JsonElement dataElement))
             {
                 foreach (JsonElement item in dataElement.EnumerateArray())
@@ -106,22 +107,23 @@ namespace LOMSAPI.Repositories.Comments
                             _context.Comments.Add(new Comment
                             {
                                 CommentID = commentID,
-                                Content = content,  
+                                Content = content,
                                 CommentTime = commentTime,
                                 LiveStreamCustomerID = liveStreamCustomerId,
                             });
                             await _context.SaveChangesAsync();
                         }
-                        var comment = await _context.Comments.FirstOrDefaultAsync(s => s.CommentID == commentID);
-                        comments.Add(new CommentModel
-                        {
-                            CommentID = comment.CommentID,
-                            CustomerId = customerID,
-                            CustomerName = customerName,
-                            Content = comment.Content,
-                            CommentTime = commentTime,
-                            CustomerAvatar = avatar
-                        });
+                        //var comment = await _context.Comments.FirstOrDefaultAsync(s => s.CommentID == commentID);
+                        //comments.Add(new CommentModel
+                        //{
+                        //    CommentID = comment.CommentID,
+                        //    CustomerId = customerID,
+                        //    CustomerName = customerName,
+                        //    Content = comment.Content,
+                        //    CommentTime = commentTime,
+                        //    CustomerAvatar = avatar
+                        //});
+
                     }
                     catch (DbUpdateException ex)
                     {
@@ -129,11 +131,23 @@ namespace LOMSAPI.Repositories.Comments
                     }
 
                 }
+
             }
-
-            return (List<CommentModel>)comments.OrderByDescending(c => c.CommentTime).ToList();
+            AllComments = await _context.Comments
+          .Where(c => c.LiveStreamCustomer.LivestreamID == liveStreamId)
+          .OrderByDescending(c => c.CommentTime)
+          .Select(c => new CommentModel
+          {
+              CommentID = c.CommentID,
+              Content = c.Content,
+              CommentTime = c.CommentTime,
+              CustomerId = c.LiveStreamCustomer.Customer.CustomerID,
+              CustomerName = c.LiveStreamCustomer.Customer.FacebookName,
+              CustomerAvatar = c.LiveStreamCustomer.Customer.ImageURL
+          })
+          .ToListAsync();
+            return AllComments;
         }
-
-
     }
+
 }

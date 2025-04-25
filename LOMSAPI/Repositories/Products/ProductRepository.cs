@@ -122,8 +122,8 @@ namespace LOMSAPI.Repositories.Products
             }
             string imageUrl = await _cloudinaryService.UploadImageAsync(image);
             var productCodeExist = await _context.Products
-                .AnyAsync(p => p.ProductCode.ToLower()
-                .Equals(product.ProductCode.ToLower()));
+                .AnyAsync(p => p.ProductCode.ToLower() == product.ProductCode.ToLower()
+                   && p.ProductID != productId);
             if (productCodeExist)
             {
                 throw new Exception($"Product code {product.ProductCode} exist");

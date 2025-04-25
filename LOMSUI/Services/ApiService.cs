@@ -968,9 +968,12 @@ namespace LOMSUI.Services
                     form.Add(new StringContent(product.Price ?? ""), "price");
                     form.Add(new StringContent(product.Stock ?? ""), "stock");
 
-                    var imageContent = new StreamContent(imageStream);
-                    imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                    form.Add(imageContent, "image", fileName);
+                    if (imageStream != null && !string.IsNullOrEmpty(fileName))
+                    {
+                        var imageContent = new StreamContent(imageStream);
+                        imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                        form.Add(imageContent, "image", fileName);
+                    }
 
                     var response = await _httpClient.PutAsync($"{BASE_URLL}/Products/updateProduct/{productId}", form);
                     var responseContent = await response.Content.ReadAsStringAsync();

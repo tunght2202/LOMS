@@ -5,6 +5,7 @@ using Bumptech.Glide;
 using Java.Net;
 using LOMSUI.Models;
 using LOMSUI.Services;
+using System.Net;
 
 namespace LOMSUI.Activities
 {
@@ -114,6 +115,21 @@ namespace LOMSUI.Activities
 
             private async Task SaveProductInfo()
             {
+
+            if (_imageStream == null && !string.IsNullOrEmpty(_product.ImageURL))
+            {
+                try
+                {
+                    using var webClient = new WebClient();
+                    var imageBytes = await webClient.DownloadDataTaskAsync(_product.ImageURL);
+                    _imageStream = new MemoryStream(imageBytes);
+                }
+                catch (Exception ex)
+                {
+                    Toast.MakeText(this, "Failed to load old image: " + ex.Message, ToastLength.Short).Show();
+                    return;
+                }
+            }
 
             if (_imageStream == null)
             {
