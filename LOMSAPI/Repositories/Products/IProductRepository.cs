@@ -10,7 +10,7 @@ namespace LOMSAPI.Repositories.Products
         Task<IEnumerable<ProductModel>> GetAllProductsByUser (string userId);
         Task<ProductModel> GetProductById(int id);
         Task<int> AddProduct(PostProductModel product, IFormFile image, string userId);
-        Task<int> UpdateProduct(int productId, PutProductModel product);
+        Task<int> UpdateProduct(int productId, PutProductModel product, IFormFile image);
         Task<int> UpdatePriceProduct(int productId, int price);
         Task<int> UpdateStockProduct(int productId, int reduceProduct);
         Task<int> DeleteProduct(int id);
