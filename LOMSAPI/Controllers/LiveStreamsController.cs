@@ -89,7 +89,6 @@ namespace LOMSAPI.Controllers
                 return StatusCode(500, $"Error deleting livestream: {ex.Message}");
             }
         }
-
         [HttpGet("IsLiveStreamStillLive/{liveStreamId}")]
         public async Task<IActionResult> IsLiveStreamStillLive(string liveStreamId)
         {
