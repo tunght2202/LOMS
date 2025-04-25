@@ -48,7 +48,8 @@ namespace LOMSAPI.Repositories.Comments
         {
             using JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement root = doc.RootElement;
-            List<CommentModel> comments = new List<CommentModel>();
+            //List<CommentModel> comments = new List<CommentModel>();
+            List<CommentModel> AllComments = new List<CommentModel>();
             if (root.TryGetProperty("data", out JsonElement dataElement))
             {
                 foreach (JsonElement item in dataElement.EnumerateArray())
@@ -112,16 +113,17 @@ namespace LOMSAPI.Repositories.Comments
                             });
                             await _context.SaveChangesAsync();
                         }
-                        var comment = await _context.Comments.FirstOrDefaultAsync(s => s.CommentID == commentID);
-                        comments.Add(new CommentModel
-                        {
-                            CommentID = comment.CommentID,
-                            CustomerId = customerID,
-                            CustomerName = customerName,
-                            Content = comment.Content,
-                            CommentTime = commentTime,
-                            CustomerAvatar = avatar
-                        });
+                        //var comment = await _context.Comments.FirstOrDefaultAsync(s => s.CommentID == commentID);
+                        //comments.Add(new CommentModel
+                        //{
+                        //    CommentID = comment.CommentID,
+                        //    CustomerId = customerID,
+                        //    CustomerName = customerName,
+                        //    Content = comment.Content,
+                        //    CommentTime = commentTime,
+                        //    CustomerAvatar = avatar
+                        //});
+                       
                     }
                     catch (DbUpdateException ex)
                     {
@@ -129,11 +131,22 @@ namespace LOMSAPI.Repositories.Comments
                     }
 
                 }
+                
             }
-
-            return (List<CommentModel>)comments.OrderByDescending(c => c.CommentTime).ToList();
-        }
-
-
+            AllComments = await _context.Comments
+          .Where(c => c.LiveStreamCustomer.LivestreamID == liveStreamId)
+          .OrderByDescending(c => c.CommentTime)
+          .Select(c => new CommentModel
+          {
+              CommentID = c.CommentID,
+              Content = c.Content,
+              CommentTime = c.CommentTime,
+              CustomerId = c.LiveStreamCustomer.Customer.CustomerID,
+              CustomerName = c.LiveStreamCustomer.Customer.FacebookName,
+              CustomerAvatar = c.LiveStreamCustomer.Customer.ImageURL
+          })
+          .ToListAsync();
+            return AllComments;
+        }     
     }
 }
