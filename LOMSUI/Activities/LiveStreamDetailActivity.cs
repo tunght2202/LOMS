@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Views;
 using Android.Widget;
 using LOMSAPI.Models;
 using LOMSUI.Activities;
@@ -58,6 +59,7 @@ namespace LOMSUI
             _txtStatus.Text = $"Status: {_status}";
             _txtStartTime.Text = $"Start: {_startTime}";
 
+            await CheckLiveStreamStatusAndUpdateUIAsync();
             await LoadListProducts();
 
             _btnSetupListProduct.Click += async (s, e) => await SetupListProduct();
@@ -186,12 +188,12 @@ namespace LOMSUI
                         });
                     }
 
-                    await Task.Delay(4000, token); 
+                    await Task.Delay(5000, token); 
                 }
             }
             catch (TaskCanceledException)
             {
-                Console.WriteLine("Auto creation stopped.");
+                Console.WriteLine("Auto creation stopped."); 
             }
             catch (Exception ex)
             {
@@ -202,6 +204,29 @@ namespace LOMSUI
             }
         }
 
+        private async Task CheckLiveStreamStatusAndUpdateUIAsync()
+        {
+            bool isLive = await _apiService.IsLiveStreamStillLiveAsync(_liveStreamId);
+
+            RunOnUiThread(() =>
+            {
+                if (isLive)
+                {
+                    _toggleAutoCreateOrder.Visibility = ViewStates.Visible;
+                    _toggleAutoCreateOrder.Enabled = true;
+                }
+                else
+                {
+                    if (_isAutoCreating)
+                    {
+                        _isAutoCreating = false;
+                        _cancellationTokenSource?.Cancel();
+                        _toggleAutoCreateOrder.Checked = false;
+                    }
+                    _toggleAutoCreateOrder.Visibility = ViewStates.Gone;
+                }
+            });
+        }
 
     }
 }

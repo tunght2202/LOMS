@@ -224,6 +224,8 @@ namespace LOMSAPI.Repositories.LiveStreams
             var status = json["status"]?.ToString();
 
             return status == "LIVE"; // Chỉ tiếp tục nếu livestream còn đang phát
+
+           
         }
     }
 }

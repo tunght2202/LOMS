@@ -1,6 +1,7 @@
 using Android.Views;
 using AndroidX.RecyclerView.Widget;
 using LOMSUI.Adapter;
+using LOMSUI.Models;
 using LOMSUI.Services;
 
 namespace LOMSUI.Activities
@@ -9,10 +10,12 @@ namespace LOMSUI.Activities
     public class AddProductSalesListActivity : BaseActivity
     {
         private RecyclerView _recyclerView;
-        private Button _addButton;
+        private Button _addButton, _btnSearchByProductName;
+        private EditText _etProductName;
         private TextView _noProductsTextView;
         private AddProductSalesListAdapter _adapter;
         private ApiService _apiService;
+        private List<ProductModel> _originalProducts;
         private int _listProductId;
 
         protected override async void OnCreate(Bundle? savedInstanceState)
@@ -22,6 +25,8 @@ namespace LOMSUI.Activities
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.productRecyclerView);
             _addButton = FindViewById<Button>(Resource.Id.addToSalesListButton);
+            _btnSearchByProductName = FindViewById<Button>(Resource.Id.btnSearchByProductName);
+            _etProductName = FindViewById<EditText>(Resource.Id.etProductName);
             _noProductsTextView = FindViewById<TextView>(Resource.Id.noProductsTextView);
 
             _apiService = ApiServiceProvider.Instance;
@@ -29,6 +34,16 @@ namespace LOMSUI.Activities
             _listProductId = Intent.GetIntExtra("ListProductId", -1);
 
             await LoadProducts();
+
+            _btnSearchByProductName.Click += (s, e) =>
+            {
+                FilterProducts(_etProductName.Text);
+            };
+
+            _etProductName.TextChanged += (s, e) =>
+            {
+                FilterProducts(_etProductName.Text);
+            };
 
             _addButton.Click += async (s, e) =>
             {
@@ -62,6 +77,8 @@ namespace LOMSUI.Activities
                 .Where(p => !existingProducts.Any(ep => ep.ProductID == p.ProductID))
                 .ToList();
 
+            _originalProducts = filteredProducts;
+
             if (filteredProducts == null || !filteredProducts.Any())
             {
                 _noProductsTextView.Visibility = ViewStates.Visible;
@@ -73,9 +90,25 @@ namespace LOMSUI.Activities
             _addButton.Enabled=true;
 
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
-            _adapter = new AddProductSalesListAdapter(filteredProducts);
+            _adapter = new AddProductSalesListAdapter(_originalProducts);
             _recyclerView.SetAdapter(_adapter);
         }
+
+        private void FilterProducts(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                _adapter.UpdateData(_originalProducts); 
+                return;
+            }
+
+            var filtered = _originalProducts
+                .Where(p => p.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            _adapter.UpdateData(filtered);
+        }
+
 
     }
 }

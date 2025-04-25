@@ -8,5 +8,6 @@ namespace LOMSAPI.Repositories.LiveStreams
         Task<LiveStream> GetLiveStreamById(string liveStreamId, string userid);
         Task<int> DeleteLiveStream(string liveStreamId);
         Task<bool> IsLiveStreamStillLive(string liveStreamId);
+
     }
 }

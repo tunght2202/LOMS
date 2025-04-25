@@ -20,15 +20,17 @@ namespace LOMSAPI.Repositories.Users
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly CloudinaryService _cloudinaryService;
+        private readonly LOMSDbContext _lomsDbContext;
 
         public UserRepository(UserManager<User> userManager, SignInManager<User> signInManager
-            , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService)
+            , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService, LOMSDbContext lomsDbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = config;
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _cloudinaryService = cloudinaryService;
+            _lomsDbContext = lomsDbContext;
         }
         public async Task<string> Authencate(LoginRequest loginRequest)
         {
@@ -176,19 +178,16 @@ namespace LOMSAPI.Repositories.Users
             var isVerified = await _cache.GetStringAsync($"Verified_{userEmail}");
             if (string.IsNullOrEmpty(isVerified) || isVerified != "true") return false;
             var user = await _userManager.FindByEmailAsync($"{userEmail}");
-            if (user == null) return false;
-
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, resetToken, model.NewPassword);
-
-            if (!result.Succeeded) return false;
-
+            
+            var passwordHash = _userManager.PasswordHasher.HashPassword(user, model.NewPassword);
+            user.PasswordHash = passwordHash;
+            await _userManager.UpdateAsync(user);
             // Xóa trạng thái OTP sau khi đặt lại mật khẩu thành công
             await _cache.RemoveAsync("RESET_EMAIL");
             await _cache.RemoveAsync($"Verified_{userEmail}");
             await _cache.RemoveAsync($"OTP_RESET_{userEmail}");
-
             return true;
+
         }
 
         private async Task SendEmailAsync(string toEmail, string subject, string body)

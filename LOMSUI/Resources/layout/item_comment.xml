@@ -66,9 +66,9 @@
 
 			<Button
                 android:id="@+id/btnCreateOrder"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:text="Tạo đơn"
+                android:text="Create order"
                 android:textSize="12sp"
                 android:backgroundTint="#4CAF50"
                 android:textColor="@android:color/white"
@@ -76,9 +76,9 @@
 
 			<Button
                 android:id="@+id/btnViewInfo"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:text="Thông tin"
+                android:text="Infomation"
                 android:textSize="12sp"
                 android:backgroundTint="#2196F3"
                 android:textColor="@android:color/white" />
