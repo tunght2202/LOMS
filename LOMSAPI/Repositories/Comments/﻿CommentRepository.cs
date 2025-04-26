@@ -107,7 +107,7 @@ namespace LOMSAPI.Repositories.Comments
                             _context.Comments.Add(new Comment
                             {
                                 CommentID = commentID,
-                                Content = content,  
+                                Content = content,
                                 CommentTime = commentTime,
                                 LiveStreamCustomerID = liveStreamCustomerId,
                             });
@@ -123,7 +123,7 @@ namespace LOMSAPI.Repositories.Comments
                         //    CommentTime = commentTime,
                         //    CustomerAvatar = avatar
                         //});
-                       
+
                     }
                     catch (DbUpdateException ex)
                     {
@@ -131,7 +131,7 @@ namespace LOMSAPI.Repositories.Comments
                     }
 
                 }
-                
+
             }
             AllComments = await _context.Comments
           .Where(c => c.LiveStreamCustomer.LivestreamID == liveStreamId)
@@ -147,6 +147,8 @@ namespace LOMSAPI.Repositories.Comments
           })
           .ToListAsync();
             return AllComments;
-        }     
+        }
+
     }
+
 }
