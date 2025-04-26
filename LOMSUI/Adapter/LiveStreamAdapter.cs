@@ -54,16 +54,10 @@ namespace LOMSUI.Adapter
                 var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(item.StreamURL));
                 _context.StartActivity(intent);
             };
-
             viewHolder.BtnViewDetail.Click -= viewHolder.ViewDetailClickHandler;
             viewHolder.ViewDetailClickHandler = (sender, e) =>
             {
-                Intent intent = new Intent(_context, typeof(LiveStreamDetailActivity));
-                intent.PutExtra("LiveStreamID", item.LivestreamID);
-                intent.PutExtra("Title", item.StreamTitle);
-                intent.PutExtra("Status", item.Status);
-                intent.PutExtra("StartTime", item.GetFormattedTime());
-                _context.StartActivity(intent);
+                _onViewClick?.Invoke(item);
             };
             viewHolder.BtnViewDetail.Click += viewHolder.ViewDetailClickHandler;
 
