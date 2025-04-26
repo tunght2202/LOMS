@@ -244,7 +244,7 @@ namespace LOMSAPI.Repositories.Orders
                 .ToListAsync();
                 // produccode xnumber prr 3, prt, 
                 var result = 0;
-                var regex = new Regex(@"\b(?<code>[a-zA-Z]+\d*)\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
+                var regex = new Regex(@"\b(?<code>(\d+|[a-zA-Z]+\d*))\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
 
                 foreach (var comment in comments.OrderBy(c => c.CommentTime))
                 {
@@ -275,9 +275,9 @@ namespace LOMSAPI.Repositories.Orders
                                     product.Stock -= quantity;
                                 }
 
-                                var sanpham = $"{product.Name} X{quantity}";
+                                var sanpham = $"{product.Name} X {quantity}";
                                 var tonggiaDecimal = product.Price * quantity;
-                                var tonggia = (int)tonggiaDecimal;
+                                var tonggia = (long)tonggiaDecimal;
                                 var stock = product.Stock;
                                 string formatted = tonggia.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND";
                                 var newOrder = new Order
@@ -298,6 +298,7 @@ namespace LOMSAPI.Repositories.Orders
                                     text = "Your order has been successfully created\n" +
                                        $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name} \n" +
                                        $"Quantity : {quantity} \n" +
+                                       $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}";
 
@@ -307,6 +308,7 @@ namespace LOMSAPI.Repositories.Orders
                                     text = "Your order has been successfully created\n" +
                                        $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
                                        $"Quantity : {quantity} \n" +
+                                       $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}\n" +
                                        "Please provide your address and phone number for shipping!";
@@ -389,73 +391,6 @@ namespace LOMSAPI.Repositories.Orders
 
         }
 
-        private async Task SendMessageAsync(string customerId, string TokenFacbook, int OrderId)
-        {
-            Order order = await _context.Orders.FirstOrDefaultAsync(s => s.OrderID == OrderId);
-            var Customer = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == customerId);
-            bool IsNewCustomer = Customer.Address == null || Customer.PhoneNumber == null;
-            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={TokenFacbook}";
-
-            if (!IsNewCustomer)
-            {
-                var payload = new
-                {
-                    recipient = new { id = customerId },
-                    message = new
-                    {
-                        text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
-                                       $"Order creation time : {order.OrderDate}\n" +
-                                       $"Customer : {Customer.FacebookName}\n" +
-                                       $"Address : {Customer.Address}\n" +
-                                       $"Phone number : {Customer.PhoneNumber}"
-                    },
-                };
-                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(url, content);
-
-                var result = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error send message: {result}");
-                }
-                else
-                {
-                    Console.WriteLine("Sent message successfully");
-                }
-            }
-            else
-            {
-                var payload = new
-                {
-                    recipient = new { id = Customer.CustomerID },
-                    message = new
-                    {
-                        text = "Your order has been successfully created\n" +
-                                      $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
-                                      $"Order creation time : {order.OrderDate}\n" +
-                                      $"Customer : {Customer.FacebookName}\n" +
-                                      "Please provide your address and phone number for shipping!"
-                    },
-                };
-                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(url, content);
-
-                var result = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error send message: {result}");
-                }
-                else
-                {
-                    Console.WriteLine("Sent message successfully");
-                }
-            }
-        }
 
         public Task<bool> PrinTest()
         {
