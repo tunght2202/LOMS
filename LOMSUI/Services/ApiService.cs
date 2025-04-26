@@ -978,9 +978,16 @@ namespace LOMSUI.Services
                     var response = await _httpClient.PutAsync($"{BASE_URLL}/Products/updateProduct/{productId}", form);
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.BadRequest)
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
                         return JsonConvert.DeserializeObject<ValidationErrorResponse>(responseContent);
+                    }
+                    else if (!response.IsSuccessStatusCode) 
+                    {
+                        return new ValidationErrorResponse
+                        {
+                            Message = responseContent
+                        };
                     }
 
                     return null;

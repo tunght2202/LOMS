@@ -123,6 +123,7 @@ namespace LOMSUI.Activities
                     using var webClient = new WebClient();
                     var imageBytes = await webClient.DownloadDataTaskAsync(_product.ImageURL);
                     _imageStream = new MemoryStream(imageBytes);
+
                 }
                 catch (Exception ex)
                 {
@@ -143,14 +144,20 @@ namespace LOMSUI.Activities
                 _product.Price = _etPrice.Text; 
                 _product.Stock = _etStock.Text;
 
+            _imageStream.Seek(0, SeekOrigin.Begin);
+            var clonedStream = new MemoryStream();
+            await _imageStream.CopyToAsync(clonedStream);
+            clonedStream.Seek(0, SeekOrigin.Begin);
 
-            var errorResponse = await _apiService.UpdateProductAsync(_productId, _product, _imageStream, "product.jpg");
+            var errorResponse = await _apiService.UpdateProductAsync(_productId, _product, clonedStream, "product.jpg");
                 if (errorResponse == null)
                 {
                     Toast.MakeText(this, "Update Product successful!", ToastLength.Short).Show();
                     Finish();
                 }
                 else
+                {
+                if (errorResponse.Errors != null && errorResponse.Errors.Count > 0)
                 {
                     _etName.Error = null;
                     _etPrice.Error = null;
@@ -169,6 +176,12 @@ namespace LOMSUI.Activities
                     if (errorResponse.Errors.TryGetValue("Description", out var descErrs))
                         _etDescription.Error = string.Join("\n", descErrs);
                 }
+                else
+                {
+                    Toast.MakeText(this, errorResponse.Message ?? "Unknown error occurred", ToastLength.Long).Show();
+
+                }
+            }
             }
 
         }
