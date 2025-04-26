@@ -211,8 +211,21 @@ namespace LOMSAPI.Repositories.LiveStreams
             return liveStream; // Trả về null nếu không tìm thấy
         }
 
-        public async Task<bool> IsLiveStreamStillLive(string liveStreamId)
+        public async Task<bool> IsLiveStreamStillLive(string liveStreamId , string userId)
         {
+            if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
+                throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
+
+            var user = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new { u.TokenFacbook, u.PageId })
+                .FirstOrDefaultAsync();
+
+            if (user == null || string.IsNullOrEmpty(user.TokenFacbook))
+                throw new UnauthorizedAccessException("No Facebook token.");
+
+            _accessToken = user.TokenFacbook;
+
             var url = $"https://graph.facebook.com/v22.0/{liveStreamId}?fields=status&access_token={_accessToken}";
             var response = await _httpClient.GetAsync(url);
 
