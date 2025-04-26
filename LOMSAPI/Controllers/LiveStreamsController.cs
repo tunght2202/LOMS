@@ -97,7 +97,7 @@ namespace LOMSAPI.Controllers
                 return Unauthorized("UserID not found in token.");
             try
             {
-                var isLive = await _liveStreamRepositories.IsLiveStreamStillLive(liveStreamId);
+                var isLive = await _liveStreamRepositories.IsLiveStreamStillLive(liveStreamId, userId);
                 return Ok(isLive);
             }
             catch (Exception ex)
