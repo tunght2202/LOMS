@@ -244,7 +244,7 @@ namespace LOMSAPI.Repositories.Orders
                 .ToListAsync();
                 // produccode xnumber prr 3, prt, 
                 var result = 0;
-                var regex = new Regex(@"\b(?<code>[a-zA-Z]+\d*)\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
+                var regex = new Regex(@"\b(?<code>[a-zA-Z]+\d*)\b(?:\s*[xX]?\s*(?<qty>-?\d+))?", RegexOptions.IgnoreCase);
 
                 foreach (var comment in comments.OrderBy(c => c.CommentTime))
                 {
