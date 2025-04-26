@@ -260,7 +260,7 @@ namespace LOMSAPI.Repositories.Orders
                             if (match.Groups["qty"].Success)
                             {
                                 quantity = int.Parse(match.Groups["qty"].Value);
-                                if (quantity < 0)
+                                if (quantity <= 0)
                                 { 
                                     continue; 
                                 }
