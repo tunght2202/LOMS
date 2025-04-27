@@ -243,19 +243,7 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-			<LinearLayout
-			   android:id="@+id/revenueChartLayout"
-			   android:layout_width="wrap_content"
-			   android:layout_height="wrap_content"
-			   android:layout_marginTop="16dp"
-			   android:background="#E0F8E0">
-				<ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="190dp"
-                    android:src="@drawable/bieu_do"/>
-			</LinearLayout>
-
+			
 			<TableLayout
                 android:id="@+id/productListLayout"
                 android:layout_width="match_parent"

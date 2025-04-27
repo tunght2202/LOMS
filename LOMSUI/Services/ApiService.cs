@@ -7,6 +7,7 @@ using LOMSAPI.Models;
 using System.Buffers.Text;
 using Android.Media.TV;
 using System.Net;
+using Java.Util.Streams;
 
 namespace LOMSUI.Services
 {
@@ -955,7 +956,7 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<ValidationErrorResponse> UpdateProductAsync(int productId, ProductModelRequest product)
+        public async Task<ValidationErrorResponse> UpdateProductAsync(int productId, ProductModelRequest product, Stream imageStream, string fileName)
         {
             try
             {
@@ -966,14 +967,27 @@ namespace LOMSUI.Services
                     form.Add(new StringContent(product.Description ?? ""), "description");
                     form.Add(new StringContent(product.Price ?? ""), "price");
                     form.Add(new StringContent(product.Stock ?? ""), "stock");
-                    form.Add(new StringContent(product.ImageURL ?? ""), "imageURL");
+
+                    if (imageStream != null && !string.IsNullOrEmpty(fileName))
+                    {
+                        var imageContent = new StreamContent(imageStream);
+                        imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                        form.Add(imageContent, "image", fileName);
+                    }
 
                     var response = await _httpClient.PutAsync($"{BASE_URLL}/Products/updateProduct/{productId}", form);
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.BadRequest)
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
                         return JsonConvert.DeserializeObject<ValidationErrorResponse>(responseContent);
+                    }
+                    else if (!response.IsSuccessStatusCode) 
+                    {
+                        return new ValidationErrorResponse
+                        {
+                            Message = responseContent
+                        };
                     }
 
                     return null;

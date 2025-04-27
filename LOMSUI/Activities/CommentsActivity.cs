@@ -99,7 +99,7 @@ namespace LOMSUI.Activities
                     RunOnUiThread(() => Toast.MakeText(this, $"Error loading comments: {ex.Message}", ToastLength.Short).Show());
                 }
 
-                await Task.Delay(4000);
+                await Task.Delay(1000);
             }
         }
 
