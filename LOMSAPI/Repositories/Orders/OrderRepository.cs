@@ -244,7 +244,7 @@ namespace LOMSAPI.Repositories.Orders
                 .ToListAsync();
                 // produccode xnumber prr 3, prt, 
                 var result = 0;
-                var regex = new Regex(@"\b(?<code>(\d+|[a-zA-Z]+\d*))\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
+                var regex = new Regex(@"\b(?<code>[a-zA-Z\d]+)\s+(?<qty>\d+)\b", RegexOptions.IgnoreCase);
 
                 foreach (var comment in comments.OrderBy(c => c.CommentTime))
                 {
@@ -260,6 +260,10 @@ namespace LOMSAPI.Repositories.Orders
                             if (match.Groups["qty"].Success)
                             {
                                 quantity = int.Parse(match.Groups["qty"].Value);
+                                if (quantity <= 0)
+                                { 
+                                    continue; 
+                                }
                             }
 
                             if (productCodeToId.TryGetValue(code, out int productId))

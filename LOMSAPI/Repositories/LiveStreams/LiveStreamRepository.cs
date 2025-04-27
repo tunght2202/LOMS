@@ -211,7 +211,7 @@ namespace LOMSAPI.Repositories.LiveStreams
             return liveStream; // Trả về null nếu không tìm thấy
         }
 
-        public async Task<bool> IsLiveStreamStillLive(string liveStreamId, string userId)
+        public async Task<bool> IsLiveStreamStillLive(string liveStreamId , string userId)
         {
             if (string.IsNullOrEmpty(userId) || !await _context.Users.AnyAsync(u => u.Id == userId))
                 throw new ArgumentException("Invalid or non-existent UserID", nameof(userId));
