@@ -155,8 +155,9 @@ namespace LOMSUI.Activities
 
                 var result = await _apiService.RegisterAsync(registerModel, _selectedImageUri);
 
-                if (result.Message.Contains("Please check email for otp code!", StringComparison.OrdinalIgnoreCase) == true)
+                if (!string.IsNullOrEmpty(result.Message) && result.Message.Contains("Please check email for otp code!", StringComparison.OrdinalIgnoreCase))
                 {
+                    Toast.MakeText(this, "Please check email for otp code!", ToastLength.Long).Show();
                     StartActivity(new Intent(this, typeof(VerifyOtpRegisterActivity)).PutExtra("email", email));
                 }
                 else if (result.Errors != null && result.Errors.Count > 0)
@@ -177,6 +178,7 @@ namespace LOMSUI.Activities
                 {
                     Toast.MakeText(this, result.Message ?? "Unknown error occurred.", ToastLength.Long).Show();
                 }
+
             }
             catch (Exception ex)
             {
