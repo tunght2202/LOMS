@@ -21,7 +21,7 @@ namespace LOMSAPI.Data.Entities
         public OrderStatus Status { get; set; } // Pending, Confirmed, Shipped, Delivered, Canceled, Returned
         public int Quantity { get; set; }
         public decimal? CurrentPrice { get; set; }
-        public bool StatusCheck { get; set; }
+        public bool StatusCheck { get; set; } = false;
         public string? TrackingNumber { get; set; }
         public string? Note { get; set; }
         public int ProductID { get; set; }
