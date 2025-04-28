@@ -231,33 +231,19 @@ namespace LOMSUI.Services
             public string Message { get; set; }
         }
 
-        public async Task<RevenueData> GetRevenueDataAsync()
+
+        public async Task<int> GetTotalOrdersAsync(DateTime startDate, DateTime endDate)
         {
             try
             {
-                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-revenue"))
-                {
-                    if (!response.IsSuccessStatusCode) return null;
+                string formattedStart = startDate.ToString("yyyy-MM-dd");
+                string formattedEnd = endDate.AddDays(1).ToString("yyyy-MM-dd");
+                string url = $"{BASE_URLL}/Revenues/total-orders-by-date?startDate={formattedStart}&endDate={formattedEnd}";
 
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<RevenueData>(responseBody);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching revenue data: {ex.Message}");
-                return null;
-            }
-        }
-
-        public async Task<int> GetTotalOrdersAsync()
-        {
-            try
-            {
-                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders")) 
+                using (HttpResponseMessage response = await _httpClient.GetAsync(url))
                 {
                     if (!response.IsSuccessStatusCode) return -1;
-                        
+
                     string responseBody = await response.Content.ReadAsStringAsync();
                     var orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseBody);
                     return orderResponse?.TotalOrders ?? -1;
@@ -270,31 +256,39 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<int> GetTotalOrdersDeliveredAsync()
+        public async Task<int> GetTotalOrdersDeliveredAsync(DateTime startDate, DateTime endDate)
         {
             try
             {
-                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-delivered"))
+                string formattedStart = startDate.ToString("yyyy-MM-dd");
+                string formattedEnd = endDate.AddDays(1).ToString("yyyy-MM-dd");
+                string url = $"{BASE_URLL}/Revenues/total-orders-delivered-by-date?startDate={formattedStart}&endDate={formattedEnd}";
+
+                using (HttpResponseMessage response = await _httpClient.GetAsync(url))
                 {
                     if (!response.IsSuccessStatusCode) return -1;
 
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    var returnedResponse = JsonConvert.DeserializeObject<DeliveredOrderResponse>(responseBody);
-                    return returnedResponse?.TotalOrdersDelivered ?? -1;
+                    var deliveredResponse = JsonConvert.DeserializeObject<DeliveredOrderResponse>(responseBody);
+                    return deliveredResponse?.TotalOrdersDelivered ?? -1;
                 }
             }
-            catch (Exception ex)    
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching returned orders: {ex.Message}");
+                Console.WriteLine($"Error fetching delivered orders: {ex.Message}");
                 return -1;
             }
         }
 
-        public async Task<int> GetTotalOrdersCancelledAsync()
+        public async Task<int> GetTotalOrdersCancelledAsync(DateTime startDate, DateTime endDate)
         {
             try
             {
-                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-cancelled"))
+                string formattedStart = startDate.ToString("yyyy-MM-dd");
+                string formattedEnd = endDate.AddDays(1).ToString("yyyy-MM-dd");
+                string url = $"{BASE_URLL}/Revenues/total-orders-cancelled-by-date?startDate={formattedStart}&endDate={formattedEnd}";
+
+                using (HttpResponseMessage response = await _httpClient.GetAsync(url))
                 {
                     if (!response.IsSuccessStatusCode) return -1;
 
@@ -310,11 +304,15 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<int> GetTotalOrdersReturnedAsync()
+        public async Task<int> GetTotalOrdersReturnedAsync(DateTime startDate, DateTime endDate)
         {
             try
             {
-                using (HttpResponseMessage response = await _httpClient.GetAsync($"{BASE_URLL}/Revenues/total-orders-returned"))
+                string formattedStart = startDate.ToString("yyyy-MM-dd");
+                string formattedEnd = endDate.AddDays(1).ToString("yyyy-MM-dd"); 
+                string url = $"{BASE_URLL}/Revenues/total-orders-returned-by-date?startDate={formattedStart}&endDate={formattedEnd}";
+
+                using (HttpResponseMessage response = await _httpClient.GetAsync(url))
                 {
                     if (!response.IsSuccessStatusCode) return -1;
 
@@ -330,12 +328,13 @@ namespace LOMSUI.Services
             }
         }
 
+
         public async Task<RevenueData> GetRevenueByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             try
             {
                 string formattedStart = startDate.ToString("yyyy-MM-dd");
-                string formattedEnd = endDate.ToString("yyyy-MM-dd");
+                string formattedEnd = endDate.AddDays(1).ToString("yyyy-MM-dd"); 
                 string url = $"{BASE_URLL}/Revenues/revenue-by-date?startDate={formattedStart}&endDate={formattedEnd}";
 
                 using (HttpResponseMessage response = await _httpClient.GetAsync(url))
@@ -352,6 +351,7 @@ namespace LOMSUI.Services
                 return null;
             }
         }
+
         //RevenueByLivestream
         public async Task<RevenueLivestream> GetRevenueByLivestream(string livestreamId)
         {
