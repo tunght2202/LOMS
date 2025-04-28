@@ -1,5 +1,4 @@
-﻿
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Net;
 
 namespace LOMSAPI.Services

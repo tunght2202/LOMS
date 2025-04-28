@@ -2,9 +2,6 @@
 using LOMSAPI.Models;
 using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Drawing;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LOMSAPI.Repositories.Products
 {
@@ -23,21 +20,6 @@ namespace LOMSAPI.Repositories.Products
         private ProductModel MapToModel(Product product)
         {
             return new ProductModel
-            {
-                ProductID = product.ProductID,
-                ProductCode = product.ProductCode,
-                Description = product.Description,
-                Name = product.Name,
-                Price = product.Price,
-                Stock = product.Stock,
-                Status = product.Status,
-                ImageURL = product.ImageURL
-            };
-        }
-
-        private Product MapToEntity(ProductModel product)
-        {
-            return new Product
             {
                 ProductID = product.ProductID,
                 ProductCode = product.ProductCode,
