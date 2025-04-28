@@ -1,4 +1,4 @@
-﻿using LOMSAPI.Data.Entities;
+﻿﻿using LOMSAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace LOMSAPI.Repositories.Revenues

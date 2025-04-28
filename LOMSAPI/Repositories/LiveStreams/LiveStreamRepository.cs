@@ -238,7 +238,7 @@ namespace LOMSAPI.Repositories.LiveStreams
 
             return status == "LIVE"; // Chỉ tiếp tục nếu livestream còn đang phát
 
-           
+
         }
     }
 }

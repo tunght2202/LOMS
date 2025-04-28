@@ -49,18 +49,15 @@ namespace LOMSUI.Activities
         }
         private async Task LoadRevenueData()
         {
-            var revenueData = await _apiService.GetRevenueDataAsync();
-            var totalOrders = await _apiService.GetTotalOrdersAsync();
-            var totalOrderCancel = await _apiService.GetTotalOrdersCancelledAsync();
-            var totalOrderReturn = await _apiService.GetTotalOrdersReturnedAsync();
-            var totalOrderDelive = await _apiService.GetTotalOrdersDeliveredAsync();
-
-
+            var revenueData = await _apiService.GetRevenueByDateRangeAsync(_startDate, _endDate);
+            var totalOrders = await _apiService.GetTotalOrdersAsync(_startDate, _endDate);
+            var totalOrderCancel = await _apiService.GetTotalOrdersCancelledAsync(_startDate, _endDate);
+            var totalOrderReturn = await _apiService.GetTotalOrdersReturnedAsync(_startDate, _endDate);
+            var totalOrderDelive = await _apiService.GetTotalOrdersDeliveredAsync(_startDate, _endDate);
 
             if (revenueData != null)
             {
                 _txtTotalRevenue.Text = string.Format(CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", revenueData.TotalRevenue);
-
             }
 
             if (totalOrders >= 0)
@@ -103,7 +100,7 @@ namespace LOMSUI.Activities
 
                 if (_startDate <= _endDate)
                 {
-                    LoadRevenueByDateRange();
+                    LoadRevenueData(); 
                 }
                 else
                 {
@@ -114,16 +111,6 @@ namespace LOMSUI.Activities
 
             dialog.Show();
         }
-
-        private async void LoadRevenueByDateRange()
-        {
-            var revenue = await _apiService.GetRevenueByDateRangeAsync(_startDate, _endDate);
-            if (revenue != null)
-            {
-                _txtTotalRevenue.Text = string.Format(CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", revenue.TotalRevenue);
-            }
-        }
-
 
 
         private async Task LoadProductData()
