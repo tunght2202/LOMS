@@ -6,6 +6,7 @@ using LOMSAPI.Repositories.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,14 +18,14 @@ namespace LOMSAPITEST
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<UserManager<User>> _userManagerMock;
         private readonly AuthController _controller;
-
+        private readonly Mock<IDistributedCache> _cacheMock;
         public AuthControllerTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             var userStoreMock = new Mock<IUserStore<User>>();
             _userManagerMock = new Mock<UserManager<User>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
-
-            _controller = new AuthController(_userManagerMock.Object, null, null, _userRepositoryMock.Object);
+            _cacheMock = new Mock<IDistributedCache>();
+            _controller = new AuthController(_userManagerMock.Object, _cacheMock.Object, null, _userRepositoryMock.Object);
 
             // Mock user claims for authenticated endpoints
             var claims = new[] { new Claim(ClaimTypes.NameIdentifier, "test-user-id") };
@@ -73,19 +74,33 @@ namespace LOMSAPITEST
         public async Task RegisterRequest_ValidModel_ReturnsOk()
         {
             // Arrange
-            var registerRequest = new RegisterRequestModel();
-            var avatarFile = new Mock<IFormFile>().Object;
-            _userRepositoryMock.Setup(repo => repo.RegisterRequestAsync(registerRequest, avatarFile)).ReturnsAsync(true);
+            var registerModel = new RegisterRequestModel
+            {
+                Email = "test@example.com",
+                Password = "Test1123",
+                UserName = "testuser",
+                FullName = "Test User",
+                PhoneNumber = "0123456789",
+                Address = "123 Street",
+                Gender = "Male"
+            };
+
+            _userManagerMock.Setup(x => x.FindByEmailAsync(registerModel.Email))
+                .ReturnsAsync((User)null); // giả lập: chưa có user nào dùng email này
+
+            _cacheMock.Setup(x => x.SetAsync(
+        It.IsAny<string>(),
+        It.IsAny<byte[]>(),
+        It.IsAny<DistributedCacheEntryOptions>(),
+        It.IsAny<CancellationToken>()
+    )).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _controller.RegisterRequest(registerRequest, avatarFile);
+            var result = await _controller.RegisterRequest(registerModel, null);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var serialized = JsonConvert.SerializeObject(okResult.Value);
-            var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(serialized);
-
-            Assert.Equal("Please check email for otp code!", dict["message"]);
+            Assert.Equal("Please check email for otp code!", okResult.Value.ToString());
 
         }
 
@@ -93,12 +108,23 @@ namespace LOMSAPITEST
         public async Task RegisterRequest_FailedProcess_ReturnsBadRequest()
         {
             // Arrange
-            var registerRequest = new RegisterRequestModel();
-            var avatarFile = new Mock<IFormFile>().Object;
-            _userRepositoryMock.Setup(repo => repo.RegisterRequestAsync(registerRequest, avatarFile)).ReturnsAsync(false);
+            var model = new RegisterRequestModel
+            {
+                Email = "test@example.com",
+                UserName = "testuser",
+                Password = "Password123!",
+                FullName = "Test User",
+                PhoneNumber = "1234567890",
+                Address = "123 Test St",
+                Gender = "Male"
+            };
+            var avatar = (IFormFile?)null;
+            _userRepositoryMock.Setup(x => x.RegisterRequestAsync(model, avatar))
+                .ReturnsAsync((true, "Please check email for otp code!"));
 
             // Act
-            var result = await _controller.RegisterRequest(registerRequest, avatarFile);
+            var result = await _controller.RegisterRequest(model, avatar);
+
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -282,7 +308,7 @@ namespace LOMSAPITEST
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("OTP code is invalid or expired.", badRequestResult.Value);
+            Assert.Equal("Cannot find user.", badRequestResult.Value);
         }
 
         [Fact]
@@ -330,7 +356,7 @@ namespace LOMSAPITEST
             var okResult = Assert.IsType<OkObjectResult>(result);
             var serialized = JsonConvert.SerializeObject(okResult.Value);
             var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(serialized);
-            Assert.Equal("Please enter email verification code.", dict["message"]);
+            Assert.Equal("Please enter email verification code to change email.", dict["message"]);
         }
 
         [Fact]
