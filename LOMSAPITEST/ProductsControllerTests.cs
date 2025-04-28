@@ -154,15 +154,17 @@ namespace LOMSAPITEST
         {
             // Arrange
             var productId = 1;
-            var productModel = new PutProductModel();
-            _productRepositoryMock.Setup(repo => repo.UpdateProduct(productId, productModel))
+            var productModel = new PutProductModel { Name = "Updated Product", Price = 99.99m };
+            var image = (IFormFile?)null;
+            _productRepositoryMock.Setup(repo => repo.UpdateProduct(productId, productModel, image))
                 .ReturnsAsync(1);
 
             // Act
-            var result = await _controller.UpdateProduct(productId, productModel);
+            var result = await _controller.UpdateProduct(productId, productModel, image);
 
             // Assert
-            Assert.IsType<OkResult>(result);
+            var okResult = Assert.IsType<OkResult>(result);
+            _productRepositoryMock.Verify(repo => repo.UpdateProduct(productId, productModel, image), Times.Once());
         }
 
         [Fact]

@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
 using System.Text;
-using System;
 using System.IO.Ports;
-using static System.Net.Mime.MediaTypeNames;
 namespace LOMSAPI.Services
 {
     public class PrintInfo
