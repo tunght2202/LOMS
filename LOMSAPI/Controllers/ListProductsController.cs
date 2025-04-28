@@ -113,7 +113,7 @@ namespace LOMSAPI.Controllers
 
         // Thanh Tùng
         // Add list product into live stream
-        [HttpPut("AddListProductInToLiveStream/listProductID/{listProductId}/liveStreamID/{liveStreamID}/PriceMax")]
+        [HttpPut("AddListProductInToLiveStream/listProductID/{listProductId}/liveStreamID/{liveStreamID}/PriceMax/{priceMax}")]
         public async Task<IActionResult> AddListProductInToLiveStream(int listProductId, string liveStreamID, decimal priceMax)
         {
             var result = await _context.AddListProductInToLiveStream(liveStreamID, listProductId, priceMax);
