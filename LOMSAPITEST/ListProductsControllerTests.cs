@@ -36,9 +36,10 @@ namespace LOMSAPITEST
                 new ListProductModel { ListProductId = 1, ListProductName = "List 1" },
                 new ListProductModel { ListProductId = 2, ListProductName = "List 2" }
             };
-
+            // Replace the problematic line with the following:
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.GetAllListProduct())
+                .Setup(repo => repo.GetAllListProduct(userId))
                 .ReturnsAsync(listProducts);
 
             // Act
@@ -60,8 +61,9 @@ namespace LOMSAPITEST
         public async Task GetAllListProduct_NoListProducts_ReturnsNotFoundResult()
         {
             // Arrange
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.GetAllListProduct())
+                .Setup(repo => repo.GetAllListProduct(userId))
                 .ReturnsAsync((List<ListProductModel>)null);
 
             // Act
@@ -232,9 +234,9 @@ namespace LOMSAPITEST
         {
             // Arrange
             var listProductName = "New List";
-
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.AddNewListProduct(listProductName))
+                .Setup(repo => repo.AddNewListProduct(listProductName,userId))
                 .ReturnsAsync(1);
 
             // Act
@@ -250,9 +252,9 @@ namespace LOMSAPITEST
         {
             // Arrange
             var listProductName = "New List";
-
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.AddNewListProduct(listProductName))
+                .Setup(repo => repo.AddNewListProduct(listProductName,userId))
                 .ReturnsAsync(0);
 
             // Act
