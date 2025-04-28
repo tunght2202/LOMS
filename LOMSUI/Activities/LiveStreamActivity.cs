@@ -65,7 +65,7 @@ namespace LOMSUI
                             onViewClick: livestream =>
                             {
                                 Intent intent = new Intent(this, typeof(LiveStreamDetailActivity));
-                                intent.PutExtra("LivestreamID", livestream.LivestreamID);
+                                intent.PutExtra("LiveStreamID", livestream.LivestreamID);
                                 intent.PutExtra("Title", livestream.StreamTitle);
                                 intent.PutExtra("Status", livestream.Status);
                                 intent.PutExtra("StartTime", livestream.GetFormattedTime());
