@@ -184,7 +184,7 @@ namespace LOMSAPI.Repositories.ListProducts
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> AddListProductInToLiveStream(int listProductId, string liveStreamId)
+        public async Task<int> AddListProductInToLiveStream(string liveStreamId, int listProductId, decimal maxPrice)
         {
             var liveStream = await _context.LiveStreams
                 .FirstOrDefaultAsync(x => x.LivestreamID.Equals(liveStreamId));
@@ -204,6 +204,7 @@ namespace LOMSAPI.Repositories.ListProducts
             else
             {
                 liveStream.ListProductID = listProductId;
+                liveStream.PriceMax = maxPrice;
             }
 
             var result = await _context.SaveChangesAsync();

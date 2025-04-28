@@ -16,6 +16,7 @@ namespace LOMSAPI.Data.Entities
         public string StreamURL { get; set; }
         public string StreamTitle { get; set; }
         public DateTime StartTime { get; set; }
+        public decimal? PriceMax { get; set; }
         public string Status { get; set; } //LIVE: Dang phat song la LIVE VOD: Da ket thuc la VOD
         public bool StatusDelete { get; set; } = false;  // Neu la true thi da xoa, con neu la false thi chua xoa
         public virtual User User { get; set; } 
