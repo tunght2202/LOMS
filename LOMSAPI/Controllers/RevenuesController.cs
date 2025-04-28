@@ -17,31 +17,6 @@ namespace LOMSAPI.Controllers
         {
             _revenueRepository = revenueRepository;
         }
-
-        /// <summary>
-        /// API tính tổng doanh thu từ tất cả đơn hàng đã giao.
-        /// </summary>
-        [HttpGet("total-revenue")]
-        public async Task<IActionResult> GetTotalRevenue()
-        {
-            // Lấy UserID từ token
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var revenue = await _revenueRepository.GetTotalRevenue(userId);
-            return Ok(new { TotalRevenue = revenue });
-        }
-
-        /// <summary>
-        /// API tính tổng số lượng đơn hàng.
-        /// </summary>
-        [HttpGet("total-orders")]
-        public async Task<IActionResult> GetTotalOrders()
-        {
-            // Lấy UserID từ token
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var orders = await _revenueRepository.GetTotalOrders(userId);
-            return Ok(new { TotalOrders = orders });
-        }
-
         /// <summary>
         /// API tính doanh thu của một phiên livestream theo Livestream ID.
         /// </summary>
@@ -71,30 +46,6 @@ namespace LOMSAPI.Controllers
 
             var revenue = await _revenueRepository.GetRevenueByDateRange(userId, startDate, endDate);
             return Ok(new { StartDate = startDate, EndDate = endDate, TotalRevenue = revenue });
-        }
-        [HttpGet("total-orders-cancelled")]
-        public async Task<IActionResult> GetTotalOrdersCancelled()
-        {
-            // Lấy UserID từ token
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var totalCancelled = await _revenueRepository.GetTotalOrederCancelled(userId);
-            return Ok(new { TotalOrdersCancelled = totalCancelled });
-        }
-        [HttpGet("total-orders-returned")]
-        public async Task<IActionResult> GetTotalOrdersReturned()
-        {
-            // Lấy UserID từ token
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var totalReturned = await _revenueRepository.GetTotalOrederReturned(userId);
-            return Ok(new { TotalOrdersReturned = totalReturned });
-        }
-        [HttpGet("total-orders-delivered")]
-        public async Task<IActionResult> GetTotalOrdersDelivered()
-        {
-            // Lấy UserID từ token
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var totalDelivered = await _revenueRepository.GetTotalOrederDelivered(userId);
-            return Ok(new { TotalOrdersDelivered = totalDelivered });
         }
         [HttpGet("total-orders-by-livestream/{livestreamId}")]
         public async Task<IActionResult> GetTotalOrdersByLivestreamId(string livestreamId)
@@ -128,5 +79,54 @@ namespace LOMSAPI.Controllers
             var totalDelivered = await _revenueRepository.GetTotalOrederDeliveredByLivestreamId(userId, livestreamId);
             return Ok(new { TotalOrdersDelivered = totalDelivered });
         }
+        [HttpGet("total-orders-by-date")]
+        public async Task<IActionResult> GetTotalOrdersByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (startDate > endDate)
+            {
+                return BadRequest("Start date must be before end date.");
+            }
+            var totalOrders = await _revenueRepository.GetTotalOrdersByDateRange(userId, startDate, endDate);
+            return Ok(new { StartDate = startDate, EndDate = endDate, TotalOrders = totalOrders });
+        }
+        [HttpGet("total-orders-cancelled-by-date")]
+        public async Task<IActionResult> GetTotalOrdersCancelledByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (startDate > endDate)
+            {
+                return BadRequest("Start date must be before end date.");
+            }
+            var totalCancelled = await _revenueRepository.GetTotalOrederCancelledByDateRange(userId, startDate, endDate);
+            return Ok(new { StartDate = startDate, EndDate = endDate, TotalOrdersCancelled = totalCancelled });
+        }
+        [HttpGet("total-orders-returned-by-date")]
+        public async Task<IActionResult> GetTotalOrdersReturnedByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (startDate > endDate)
+            {
+                return BadRequest("Start date must be before end date.");
+            }
+            var totalReturned = await _revenueRepository.GetTotalOrederReturnedByDateRange(userId, startDate, endDate);
+            return Ok(new { StartDate = startDate, EndDate = endDate, TotalOrdersReturned = totalReturned });
+        }
+        [HttpGet("total-orders-delivered-by-date")]
+        public async Task<IActionResult> GetTotalOrdersDeliveredByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            // Lấy UserID từ token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (startDate > endDate)
+            {
+                return BadRequest("Start date must be before end date.");
+            }
+            var totalDelivered = await _revenueRepository.GetTotalOrederDelivered(userId, startDate, endDate);
+            return Ok(new { StartDate = startDate, EndDate = endDate, TotalOrdersDelivered = totalDelivered });
+        }
     }
+
 }
