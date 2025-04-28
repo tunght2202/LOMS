@@ -265,7 +265,6 @@ namespace LOMSAPI.Repositories.Orders
                                     continue; 
                                 }
                             }
-
                             if (productCodeToId.TryGetValue(code, out int productId))
                             {
                                 var product = await _context.Products.FindAsync(productId);
