@@ -193,6 +193,10 @@ namespace LOMSAPI.Repositories.ListProducts
             {
                 throw new Exception("This live stream does not exist.");
             }
+            if(maxPrice < 0)
+            {
+                throw new Exception("Max price must be greater than 0");
+            }
 
             var listProduct = await _context.ListProducts
                 .FirstOrDefaultAsync(lp => lp.ListProductId == listProductId);
