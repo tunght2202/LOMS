@@ -389,5 +389,80 @@ namespace LOMSAPITEST
             Assert.Equal(500, statusCodeResult.StatusCode);
             Assert.Equal("Error deleting livestream: Database error", statusCodeResult.Value);
         }
+        [Fact]
+        public async Task IsLiveStreamStillLive_UserIdMissing_ReturnsUnauthorized()
+        {
+            // Arrange
+            var httpContext = new DefaultHttpContext();
+            _controller.ControllerContext.HttpContext = httpContext;
+
+            // Act
+            var result = await _controller.IsLiveStreamStillLive("anyLiveStreamId");
+
+            // Assert
+            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal("UserID not found in token.", unauthorizedResult.Value);
+        }
+
+        [Fact]
+        public async Task IsLiveStreamStillLive_LiveStreamIsLive_ReturnsOkTrue()
+        {
+            // Arrange
+            string userId = "test-user-id";
+            string liveStreamId = "stream123";
+
+
+            _mockLiveStreamRepository
+                .Setup(x => x.IsLiveStreamStillLive(liveStreamId, userId))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await _controller.IsLiveStreamStillLive(liveStreamId);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.True((bool)okResult.Value);
+        }
+
+        [Fact]
+        public async Task IsLiveStreamStillLive_LiveStreamIsNotLive_ReturnsOkFalse()
+        {
+            // Arrange
+            string userId = "user123";
+            string liveStreamId = "stream123";
+     
+
+            _mockLiveStreamRepository
+                .Setup(x => x.IsLiveStreamStillLive(liveStreamId, userId))
+                .ReturnsAsync(false);
+
+            // Act
+            var result = await _controller.IsLiveStreamStillLive(liveStreamId);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.False((bool)okResult.Value);
+        }
+
+        [Fact]
+        public async Task IsLiveStreamStillLive_ExceptionThrown_ReturnsInternalServerError()
+        {
+            // Arrange
+            string userId = "test-user-id";
+            string liveStreamId = "stream123";
+
+
+            _mockLiveStreamRepository
+                .Setup(x => x.IsLiveStreamStillLive(liveStreamId, userId))
+                .ThrowsAsync(new System.Exception("Something went wrong"));
+
+            // Act
+            var result = await _controller.IsLiveStreamStillLive(liveStreamId);
+
+            // Assert
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, statusCodeResult.StatusCode);
+            Assert.Contains("Something went wrong", statusCodeResult.Value.ToString());
+        }
     }
 }

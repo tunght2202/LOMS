@@ -309,13 +309,13 @@ namespace LOMSAPITEST
             // Arrange
             var listProductId = 1;
             var liveStreamID = "stream123";
-
+            var maxPrice = 99.99m; // thêm maxPrice
             _mockListProductRepository
-                .Setup(repo => repo.AddListProductInToLiveStream(listProductId, liveStreamID))
+                .Setup(repo => repo.AddListProductInToLiveStream(liveStreamID, listProductId, maxPrice))
                 .ReturnsAsync(1);
 
             // Act
-            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID);
+            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID,maxPrice);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -328,13 +328,13 @@ namespace LOMSAPITEST
             // Arrange
             var listProductId = 1;
             var liveStreamID = "stream123";
-
+            var maxPrice = 99.99m; // thêm maxPrice
             _mockListProductRepository
-                .Setup(repo => repo.AddListProductInToLiveStream(listProductId, liveStreamID))
+                .Setup(repo => repo.AddListProductInToLiveStream(liveStreamID, listProductId, maxPrice))
                 .ReturnsAsync(0);
 
             // Act
-            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID);
+            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID, maxPrice);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);

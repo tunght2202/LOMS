@@ -16,9 +16,7 @@ namespace LOMSAPI.Controllers
         {
             _revenueRepository = revenueRepository;
         }
-        /// <summary>
-        /// API tính doanh thu của một phiên livestream theo Livestream ID.
-        /// </summary>
+  
         [HttpGet("livestream-revenue/{livestreamId}")]
         public async Task<IActionResult> GetRevenueByLivestreamId(string livestreamId)
         {
@@ -28,12 +26,6 @@ namespace LOMSAPI.Controllers
             return Ok(new { LiveStreamRevenue = revenue });
         }
 
-        /// <summary>
-        /// API tính doanh thu theo khoảng thời gian.
-        /// </summary>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
-        /// <returns></returns>
         [HttpGet("revenue-by-date")]
         public async Task<IActionResult> GetRevenueByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
