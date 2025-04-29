@@ -24,6 +24,11 @@ namespace LOMSUI.Models
         public int Quantity { get; set; }
         public int ProductID { get; set; }
         public string CommentID { get; set; }
+        public string? Note { get; set; }
+        public string FacebookName { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
+        public string? Address { get; set; }
         public ProductModel Product { get; set; }
 
     }

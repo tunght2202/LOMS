@@ -9,7 +9,11 @@ namespace LOMSUI.Activities
     {
         private TextView _txtOrderCode, _txtOrderDate, 
                          _txtTotalPrice, _txtOrderStatus,
-                         _txtProductName, _txtProductPrice, _txtOrderQuantity;
+                         _txtProductName, _txtProductPrice,
+                         _txtOrderQuantity, _txtCustomerName,
+                          _txtAddress, _txPhoneNumber;
+        private CheckBox _cbCheck;
+        private EditText _edtTrackingNumber;
         private Button _btnStatusCancel, _btnStatusConfirmed, _btnStatusCancell,
                    _btnStatusShipped, _btnStatusReturn, _btnStatusDelivered;
         private LinearLayout _layoutPending, _layoutConfirm, _layoutShipped;
@@ -38,6 +42,10 @@ namespace LOMSUI.Activities
 
         private void InitViews()
         {
+            _txtCustomerName = FindViewById<TextView>(Resource.Id.txtCustomerName);
+            _txtAddress = FindViewById<TextView>(Resource.Id.txtAddress);
+            _txPhoneNumber = FindViewById<TextView>(Resource.Id.txPhoneNumber);
+
             _txtOrderCode = FindViewById<TextView>(Resource.Id.txtOrderCode);
             _txtOrderDate = FindViewById<TextView>(Resource.Id.txtOrderDate);
             _txtOrderQuantity = FindViewById<TextView>(Resource.Id.txtOrderQuantity);
@@ -79,7 +87,11 @@ namespace LOMSUI.Activities
                 return;
             }
 
-            _currentOrder = order; 
+            _currentOrder = order;
+
+            _txtCustomerName.Text = "Customer : " + order.FacebookName;
+            _txtAddress.Text = "Address : " + order.Address;
+            _txPhoneNumber.Text = "Phone : " + order.PhoneNumber;
 
             _txtOrderCode.Text = "Order code: " + order.OrderID;
             _txtOrderDate.Text = "Order date: " + order.OrderDate;

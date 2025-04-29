@@ -183,6 +183,7 @@ namespace LOMSAPI.Repositories.Orders
         public async Task<OrderCustomerModel?> GetOrderByIdAsync(int orderId)
         {
             var order = await _context.Orders
+                        .Include(o => o.Product)
                         .Include(o => o.Comment)
                         .Include(o => o.Comment.LiveStreamCustomer)
                         .Include(o => o.Comment.LiveStreamCustomer.Customer)

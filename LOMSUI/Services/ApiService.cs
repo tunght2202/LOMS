@@ -568,11 +568,11 @@ namespace LOMSUI.Services
 
 
         //List Product
-        public async Task<bool> SetupListProductAsync(string livestreamId, int listProductId)
+        public async Task<bool> SetupListProductAsync(string livestreamId, int listProductId,decimal maxPrice)
         {
+            var bodyContent = new StringContent("", Encoding.UTF8, "application/json"); 
             var response = await _httpClient.PutAsync(
-                $"{BASE_URLL}/ListProducts/AddListProductInToLiveStream/listProductID/{listProductId}/liveStreamID/{livestreamId}",
-                null); 
+                $"{BASE_URLL}/ListProducts/AddListProductInToLiveStream/listProductID/{listProductId}/liveStreamID/{livestreamId}/PriceMax/{maxPrice}", bodyContent); 
                 
             return response.IsSuccessStatusCode;
         }
