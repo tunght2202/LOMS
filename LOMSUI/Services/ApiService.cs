@@ -844,9 +844,80 @@ namespace LOMSUI.Services
                   };
 
                 var response = await _httpClient.PutAsync(url, content);
-                return response.IsSuccessStatusCode;
 
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                try
+                {
+                    var errorObj = JsonConvert.DeserializeObject<ApiErrorResponse>(responseContent);
+                    if (errorObj != null && !string.IsNullOrEmpty(errorObj.Message))
+                    {
+                        throw new Exception(errorObj.Message);
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown error (no message in JSON): " + responseContent);
+                    }
+                }
+                catch (JsonException)
+                {
+                    throw new Exception("Unknown error (not valid JSON): " + responseContent);
+                }
+            }
+
+
+            return true;
         }
+
+        public async Task<bool> UpdateStatusCheckOrderAsync(int orderId, bool newStatusCheck)
+        {
+            try
+            {
+                var content = new MultipartFormDataContent
+                 {
+                     { new StringContent(newStatusCheck.ToString()), "newStatusCheck" }
+                 };
+
+                var url = $"{BASE_URLL}/Orders/status-check/{orderId}";
+                var response = await _httpClient.PutAsync(url, content);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error updating status check: " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateOrderTrackingAndNoteAsync(int orderId, OrderModelRequest model)
+        {
+            var url = $"{BASE_URLL}/Orders/update-tracking-note/{orderId}";
+            var json = JsonConvert.SerializeObject(model);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PutAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    var errorObj = JsonConvert.DeserializeObject<ApiErrorResponse>(responseContent);
+                    if (errorObj != null && !string.IsNullOrEmpty(errorObj.Message))
+                        throw new Exception(errorObj.Message);
+                }
+                catch
+                {
+                    throw new Exception("Unknown error while updating order info.");
+                }
+            }
+
+            return true;
+        }
+
+
 
         public async Task<bool> CheckListProductExistsAsync(string liveStreamId)
         {

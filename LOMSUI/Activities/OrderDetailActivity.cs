@@ -13,10 +13,12 @@ namespace LOMSUI.Activities
                          _txtOrderQuantity, _txtCustomerName,
                           _txtAddress, _txPhoneNumber;
         private CheckBox _cbCheck;
-        private EditText _edtTrackingNumber;
+        private EditText _edtTrackingNumber, _edtNote;
         private Button _btnStatusCancel, _btnStatusConfirmed, _btnStatusCancell,
-                   _btnStatusShipped, _btnStatusReturn, _btnStatusDelivered;
-        private LinearLayout _layoutPending, _layoutConfirm, _layoutShipped;
+                   _btnStatusShipped, _btnStatusReturn, _btnStatusDelivered,
+                   _btnSetStatusCheck, _btnUpdateOrder;
+        private LinearLayout _layoutPending, _layoutConfirm, _layoutShipped,
+                              _layoutTracking, _layoutNote;
         private OrderModel _currentOrder;
         private ApiService _apiService;
         private int _orderId;
@@ -34,10 +36,29 @@ namespace LOMSUI.Activities
                 Finish();
                 return;
             }
-
             InitViews();
             InitButtonEvents();
             await LoadOrderDetails();
+
+            _btnSetStatusCheck.Click += async (s, e) =>
+            {
+                bool newStatusCheck = _cbCheck.Checked;
+
+                var success = await _apiService.UpdateStatusCheckOrderAsync(_currentOrder.OrderID, newStatusCheck);
+                if (success)
+                {
+                    Toast.MakeText(this, "Updated check status successfully", ToastLength.Short).Show();
+                }
+                else
+                {
+                    Toast.MakeText(this, "Failed to update check status", ToastLength.Short).Show();
+                }
+            };
+            _btnUpdateOrder.Click += async (sender, e) =>
+            {
+                await UpdateOrderTrackingAndNote();
+            };
+
         }
 
         private void InitViews()
@@ -53,6 +74,14 @@ namespace LOMSUI.Activities
             _txtOrderStatus = FindViewById<TextView>(Resource.Id.txtOrderStatus);
             _txtProductName = FindViewById<TextView>(Resource.Id.txtProductName);
             _txtProductPrice = FindViewById<TextView>(Resource.Id.txtProductPrice);
+
+            _edtTrackingNumber = FindViewById<EditText>(Resource.Id.edtTrackingNumber);
+            _edtNote = FindViewById<EditText>(Resource.Id.edtNote);
+            _cbCheck =  FindViewById<CheckBox>(Resource.Id.cbCheck);
+            _btnSetStatusCheck = FindViewById<Button>(Resource.Id.btnSetStatusCheck);
+            _btnUpdateOrder =  FindViewById<Button>(Resource.Id.btnUpdateOrder);
+            _layoutTracking = FindViewById<LinearLayout>(Resource.Id.layoutTracking);
+            _layoutNote = FindViewById<LinearLayout>(Resource.Id.layoutNote);
 
             _layoutPending = FindViewById<LinearLayout>(Resource.Id.layoutPending);
             _layoutConfirm = FindViewById<LinearLayout>(Resource.Id.layoutConfirm);
@@ -92,14 +121,16 @@ namespace LOMSUI.Activities
             _txtCustomerName.Text = "Customer : " + order.FacebookName;
             _txtAddress.Text = "Address : " + order.Address;
             _txPhoneNumber.Text = "Phone : " + order.PhoneNumber;
-
+            _cbCheck.Checked = order.StatusCheck;
+            _edtTrackingNumber.Text = order.TrackingNumber;
+            _edtNote.Text = order.Note;
             _txtOrderCode.Text = "Order code: " + order.OrderID;
             _txtOrderDate.Text = "Order date: " + order.OrderDate;
             _txtOrderQuantity.Text =  "Quantity: " + order.Quantity;
-            _txtTotalPrice.Text =$"Price: {order.Quantity * order.Product.Price:n0}đ";
+            _txtTotalPrice.Text =$"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ";
             _txtOrderStatus.Text = "Status: " + order.Status;
             _txtProductName.Text = "Product Name: " + order.Product.Name;
-            _txtProductPrice.Text =$"Price: {order.Quantity * order.Product.Price:n0}đ";
+            _txtProductPrice.Text =$"Price: {order.Quantity * order.CurrentPrice:n0}đ";
 
             UpdateStatusLayout(order.Status); 
 
@@ -115,9 +146,18 @@ namespace LOMSUI.Activities
             {
                 case "Pending":
                     _layoutPending.Visibility = ViewStates.Visible;
+                    _layoutTracking.Visibility = ViewStates.Gone;
+                    _layoutNote.Visibility = ViewStates.Gone;
+                    _btnSetStatusCheck.Visibility = ViewStates.Visible;
+                    _btnSetStatusCheck.Enabled = true;
+                    _cbCheck.Enabled = true;
                     break;
                 case "Confirmed":
                     _layoutConfirm.Visibility = ViewStates.Visible;
+                    _btnUpdateOrder.Visibility = ViewStates.Visible;
+                    _btnUpdateOrder.Enabled = true;
+                    _edtNote.Enabled = true;
+                    _edtTrackingNumber.Enabled = true;
                     break;
                 case "Shipped":
                     _layoutShipped.Visibility = ViewStates.Visible;
@@ -127,17 +167,47 @@ namespace LOMSUI.Activities
 
         private async Task UpdateOrderStatus(OrderStatus newStatus)
         {
-            var success = await _apiService.UpdateOrderStatusAsync(_orderId, newStatus);
-            if (success)
+            try
             {
-                Toast.MakeText(this, "Order status updated", ToastLength.Short).Show();
-                SetResult(Result.Ok); 
-                Finish(); 
+                var success = await _apiService.UpdateOrderStatusAsync(_orderId, newStatus);
+                if (success)
+                {
+                    Toast.MakeText(this, "Order status updated", ToastLength.Short).Show();
+                    SetResult(Result.Ok);
+                    Finish();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Toast.MakeText(this, "Failed to update status", ToastLength.Long).Show();
+                Toast.MakeText(this, ex.Message, ToastLength.Long).Show();
             }
         }
+
+        private async Task UpdateOrderTrackingAndNote()
+        {
+            var tracking = _edtTrackingNumber.Text?.Trim();
+            var note = _edtNote.Text?.Trim();
+
+            var model = new OrderModelRequest
+            {
+                OrderID = _orderId,
+                TrackingNumber = tracking,
+                Note = note
+            };
+
+            try
+            {
+                var success = await _apiService.UpdateOrderTrackingAndNoteAsync(_orderId,model);
+                if (success)
+                {
+                    Toast.MakeText(this, "Order infomation updated", ToastLength.Short).Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                Toast.MakeText(this, ex.Message, ToastLength.Long).Show();
+            }
+        }
+
     }
 }

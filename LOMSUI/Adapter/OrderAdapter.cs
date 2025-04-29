@@ -37,7 +37,7 @@ namespace LOMSUI.Adapter
             viewHolder.txtCustomerName.Text = $"Customer :{order.FacebookName}";
             viewHolder.txtProductName.Text = $"{order.Product.Name}";
             viewHolder.txtOrderQuantity.Text = $"Quantity: {order.Quantity}";
-            viewHolder.TxtTotalPrice.Text = $"Price: {order.Quantity * order.Product.Price:n0}đ"; 
+            viewHolder.TxtTotalPrice.Text = $"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ"; 
             viewHolder.TxtOrderStatus.Text = $"Status: {order.Status}";
 
             viewHolder.BtnViewDetail.Tag = new OrderModelWrapper(order);
