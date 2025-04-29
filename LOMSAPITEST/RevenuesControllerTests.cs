@@ -40,30 +40,7 @@ public class RevenueControllerTests
             HttpContext = new DefaultHttpContext { User = user }
         };
     }
-   // [Fact]
-   /* public async Task GetRevenueByDateRange_ValidDateRange_ReturnsOk()
-    {
-        // Arrange
-        var userId = "user123";
-        var startDate = new DateTime(2025, 1, 1);
-        var endDate = new DateTime(2025, 1, 31);
-        var revenue = 5000.75m;
-        SetupAuthenticatedUser(userId);
-        _revenueRepositoryMock.Setup(repo => repo.GetRevenueByDateRange(userId, startDate, endDate))
-            .ReturnsAsync(revenue);
-
-        // Act
-        var result = await _controller.GetRevenueByDateRange(startDate, endDate);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = Assert.IsType<dynamic>(okResult.Value);
-        Assert.Equal(startDate, response.StartDate);
-        Assert.Equal(endDate, response.EndDate);
-        Assert.Equal(revenue, response.TotalRevenue);
-        _revenueRepositoryMock.Verify(repo => repo.GetRevenueByDateRange(userId, startDate, endDate), Times.Once());
-    }*/
-
+   
     [Fact]
     public async Task GetRevenueByLivestreamId_ReturnsOkResult_WithRevenue()
     {
