@@ -183,6 +183,7 @@ namespace LOMSAPI.Repositories.Orders
         public async Task<OrderCustomerModel?> GetOrderByIdAsync(int orderId)
         {
             var order = await _context.Orders
+                        .Include(o => o.Product)
                         .Include(o => o.Comment)
                         .Include(o => o.Comment.LiveStreamCustomer)
                         .Include(o => o.Comment.LiveStreamCustomer.Customer)
@@ -290,6 +291,17 @@ namespace LOMSAPI.Repositories.Orders
             existing.CurrentPrice = orderModel.CurrentPrice;
             existing.ProductID = orderModel.ProductID;
             existing.CommentID = orderModel.CommentID;
+
+            return await _context.SaveChangesAsync();
+        }
+
+
+        public async Task<int> UpdateOrderAsync2(OrderModelRequest orderModel)
+        {
+            var existing = await _context.Orders.FindAsync(orderModel.OrderID);
+            if (existing == null) return 0;
+            existing.TrackingNumber = orderModel.TrackingNumber;
+            existing.Note = orderModel.Note;
 
             return await _context.SaveChangesAsync();
         }
