@@ -51,28 +51,20 @@ namespace LOMSAPITEST
         public async Task GetAll_OrdersExist_ReturnsOkResult()
         {
             // Arrange
-            var orders = new List<OrderModel>
+            var orders = new List<OrderCustomerModel>
             {
-                new OrderModel
+                new OrderCustomerModel
                 {
-                    OrderID = 1,
+                   OrderID = 1,
                     OrderDate = new DateTime(2025, 4, 20, 10, 0, 0),
                     Status = "Pending",
                     Quantity = 2,
-                    ProductID = 101,
-                    CommentID = "comment1",
-                    Product = new ProductModel { ProductID = 101, Name = "Product 1", Price = 10.99m }
+                    CurrentPrice = 10.99m,
+                    FacebookName = "Test User",
+                    PhoneNumber = "1234567890",
+                    Email = "test@example.com",
+                    Address = "123 Test St"
                 },
-                new OrderModel
-                {
-                    OrderID = 2,
-                    OrderDate = new DateTime(2025, 4, 20, 12, 0, 0),
-                    Status = "Confirmed",
-                    Quantity = 1,
-                    ProductID = 102,
-                    CommentID = "comment2",
-                    Product = new ProductModel { ProductID = 102, Name = "Product 2", Price = 20.99m }
-                }
             };
 
             _mockOrderRepository
@@ -85,27 +77,18 @@ namespace LOMSAPITEST
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var serialized = JsonConvert.SerializeObject(okResult.Value);
-            var returnValue = JsonConvert.DeserializeObject<List<OrderModel>>(serialized);
+            var returnValue = JsonConvert.DeserializeObject<List<OrderCustomerModel>>(serialized);
 
-            Assert.Equal(2, returnValue.Count);
+            Assert.Single(returnValue);
             Assert.Equal(1, returnValue[0].OrderID);
             Assert.Equal(new DateTime(2025, 4, 20, 10, 0, 0), returnValue[0].OrderDate);
             Assert.Equal("Pending", returnValue[0].Status);
             Assert.Equal(2, returnValue[0].Quantity);
-            Assert.Equal(101, returnValue[0].ProductID);
-            Assert.Equal("comment1", returnValue[0].CommentID);
-            Assert.Equal(101, returnValue[0].Product.ProductID);
-            Assert.Equal("Product 1", returnValue[0].Product.Name);
-            Assert.Equal(10.99m, returnValue[0].Product.Price);
-            Assert.Equal(2, returnValue[1].OrderID);
-            Assert.Equal(new DateTime(2025, 4, 20, 12, 0, 0), returnValue[1].OrderDate);
-            Assert.Equal("Confirmed", returnValue[1].Status);
-            Assert.Equal(1, returnValue[1].Quantity);
-            Assert.Equal(102, returnValue[1].ProductID);
-            Assert.Equal("comment2", returnValue[1].CommentID);
-            Assert.Equal(102, returnValue[1].Product.ProductID);
-            Assert.Equal("Product 2", returnValue[1].Product.Name);
-            Assert.Equal(20.99m, returnValue[1].Product.Price);
+            Assert.Equal(10.99m, returnValue[0].CurrentPrice);
+            Assert.Equal("Test User", returnValue[0].FacebookName);
+            Assert.Equal("1234567890", returnValue[0].PhoneNumber);
+            Assert.Equal("test@example.com", returnValue[0].Email);
+            Assert.Equal("123 Test St", returnValue[0].Address);
         }
 
         [Fact]
@@ -114,7 +97,7 @@ namespace LOMSAPITEST
             // Arrange
             _mockOrderRepository
                 .Setup(repo => repo.GetAllOrdersAsync())
-                .ReturnsAsync(new List<OrderModel>());
+                .ReturnsAsync(new List<OrderCustomerModel>());
 
             // Act
             var result = await _controller.GetAll();
@@ -128,17 +111,19 @@ namespace LOMSAPITEST
         public async Task GetAllByUserId_OrdersExist_ReturnsOkResult()
         {
             // Arrange
-            var orders = new List<OrderModel>
+            var orders = new List<OrderCustomerModel>
             {
-                new OrderModel
+                new OrderCustomerModel
                 {
-                    OrderID = 1,
+                      OrderID = 1,
                     OrderDate = new DateTime(2025, 4, 20, 10, 0, 0),
                     Status = "Pending",
                     Quantity = 2,
-                    ProductID = 101,
-                    CommentID = "comment1",
-                    Product = new ProductModel { ProductID = 101, Name = "Product 1", Price = 10.99m }
+                    CurrentPrice = 10.99m,
+                    FacebookName = "Test User",
+                    PhoneNumber = "1234567890",
+                    Email = "test@example.com",
+                    Address = "123 Test St"
                 }
             };
 
@@ -165,7 +150,7 @@ namespace LOMSAPITEST
             // Arrange
             _mockOrderRepository
                 .Setup(repo => repo.GetAllOrdersByUserIdAsync(_userId))
-                .ReturnsAsync(new List<OrderModel>());
+                .ReturnsAsync(new List<OrderCustomerModel>());
 
             // Act
             var result = await _controller.GetAllByUserId();
@@ -202,17 +187,19 @@ namespace LOMSAPITEST
         {
             // Arrange
             var liveStreamId = "stream1";
-            var orders = new List<OrderModel>
+            var orders = new List<OrderCustomerModel>
             {
-                new OrderModel
+                new OrderCustomerModel
                 {
-                    OrderID = 1,
+                      OrderID = 1,
                     OrderDate = new DateTime(2025, 4, 20, 10, 0, 0),
                     Status = "Pending",
                     Quantity = 2,
-                    ProductID = 101,
-                    CommentID = "comment1",
-                    Product = new ProductModel { ProductID = 101, Name = "Product 1", Price = 10.99m }
+                    CurrentPrice = 10.99m,
+                    FacebookName = "Test User",
+                    PhoneNumber = "1234567890",
+                    Email = "test@example.com",
+                    Address = "123 Test St"
                 }
             };
 
@@ -240,7 +227,7 @@ namespace LOMSAPITEST
 
             _mockOrderRepository
                 .Setup(repo => repo.GetAllOrdersByLiveStreamIdAsync(liveStreamId))
-                .ReturnsAsync(new List<OrderModel>());
+                .ReturnsAsync(new List<OrderCustomerModel>());
 
             // Act
             var result = await _controller.GetAllByLiveStreamId(liveStreamId);
@@ -255,17 +242,19 @@ namespace LOMSAPITEST
         {
             // Arrange
             var customerId = "cust1";
-            var orders = new List<OrderModel>
+            var orders = new List<OrderCustomerModel>
             {
-                new OrderModel
+                new OrderCustomerModel
                 {
-                    OrderID = 1,
+                      OrderID = 1,
                     OrderDate = new DateTime(2025, 4, 20, 10, 0, 0),
                     Status = "Pending",
                     Quantity = 2,
-                    ProductID = 101,
-                    CommentID = "comment1",
-                    Product = new ProductModel { ProductID = 101, Name = "Product 1", Price = 10.99m }
+                    CurrentPrice = 10.99m,
+                    FacebookName = "Test User",
+                    PhoneNumber = "1234567890",
+                    Email = "test@example.com",
+                    Address = "123 Test St"
                 }
             };
 
@@ -293,7 +282,7 @@ namespace LOMSAPITEST
 
             _mockOrderRepository
                 .Setup(repo => repo.GetOrdersByCustomerIdAsync(customerId))
-                .ReturnsAsync(new List<OrderModel>());
+                .ReturnsAsync(new List<OrderCustomerModel>());
 
             // Act
             var result = await _controller.GetByCustomerId(customerId);
@@ -308,15 +297,17 @@ namespace LOMSAPITEST
         {
             // Arrange
             var orderId = 1;
-            var order = new OrderModel
+            var order = new OrderCustomerModel
             {
-                OrderID = orderId,
+                OrderID = 1,
                 OrderDate = new DateTime(2025, 4, 20, 10, 0, 0),
                 Status = "Pending",
                 Quantity = 2,
-                ProductID = 101,
-                CommentID = "comment1",
-                Product = new ProductModel { ProductID = 101, Name = "Product 1", Price = 10.99m }
+                CurrentPrice = 10.99m,
+                FacebookName = "Test User",
+                PhoneNumber = "1234567890",
+                Email = "test@example.com",
+                Address = "123 Test St"
             };
 
             _mockOrderRepository
@@ -328,16 +319,17 @@ namespace LOMSAPITEST
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<OrderModel>(okResult.Value);
-            Assert.Equal(orderId, returnValue.OrderID);
+            var returnValue = Assert.IsType<OrderCustomerModel>(okResult.Value);
+
+            Assert.Equal(1, returnValue.OrderID);
             Assert.Equal(new DateTime(2025, 4, 20, 10, 0, 0), returnValue.OrderDate);
             Assert.Equal("Pending", returnValue.Status);
             Assert.Equal(2, returnValue.Quantity);
-            Assert.Equal(101, returnValue.ProductID);
-            Assert.Equal("comment1", returnValue.CommentID);
-            Assert.Equal(101, returnValue.Product.ProductID);
-            Assert.Equal("Product 1", returnValue.Product.Name);
-            Assert.Equal(10.99m, returnValue.Product.Price);
+            Assert.Equal(10.99m, returnValue.CurrentPrice);
+            Assert.Equal("Test User", returnValue.FacebookName);
+            Assert.Equal("1234567890", returnValue.PhoneNumber);
+            Assert.Equal("test@example.com", returnValue.Email);
+            Assert.Equal("123 Test St", returnValue.Address);
         }
 
         [Fact]
@@ -348,7 +340,7 @@ namespace LOMSAPITEST
 
             _mockOrderRepository
                 .Setup(repo => repo.GetOrderByIdAsync(orderId))
-                .ReturnsAsync((OrderModel)null);
+                .ReturnsAsync((OrderCustomerModel)null);
 
             // Act
             var result = await _controller.GetById(orderId);
