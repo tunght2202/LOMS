@@ -23,10 +23,33 @@
         public int TotalOrdersDelivered { get; set; }
     }
 
-    public class LivestreamRevenueResponse
+
+    public class RevenueLivestream
     {
         public decimal LiveStreamRevenue { get; set; }
     }
+
+    public class OrderLive
+    {
+        public int totalOrders { get; set; }
+    }
+
+    public class CancelledOrderLive
+    {
+        public int totalOrdersCancelled { get; set; }
+    }
+
+    public class ReturnedOrderLive
+    {
+        public int totalOrdersReturned { get; set; }
+    }
+
+    public class DeliveredOrderLive
+    {
+        public int totalOrdersDelivered { get; set; }
+    }
+
+
 
 
 

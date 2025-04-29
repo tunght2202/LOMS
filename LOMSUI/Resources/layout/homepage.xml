@@ -36,25 +36,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Spinner
-                    android:id="@+id/spinner1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <Spinner
-                    android:id="@+id/spinner2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="16dp">
 
@@ -262,19 +243,7 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-			<LinearLayout
-			   android:id="@+id/revenueChartLayout"
-			   android:layout_width="wrap_content"
-			   android:layout_height="wrap_content"
-			   android:layout_marginTop="16dp"
-			   android:background="#E0F8E0">
-				<ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="190dp"
-                    android:src="@drawable/bieu_do"/>
-			</LinearLayout>
-
+			
 			<TableLayout
                 android:id="@+id/productListLayout"
                 android:layout_width="match_parent"

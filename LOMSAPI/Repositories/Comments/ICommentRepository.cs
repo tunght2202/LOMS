@@ -1,5 +1,4 @@
-﻿using LOMSAPI.Data.Entities;
-using LOMSAPI.Models;
+﻿using LOMSAPI.Models;
 namespace LOMSAPI.Repositories.Comments
 {
     public interface ICommentRepository

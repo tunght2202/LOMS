@@ -17,7 +17,7 @@ namespace LOMSUI.Activities
     public class AddNewProductActivity : BaseActivity
     {
         private ImageView _imgProduct;
-        private EditText _edtName, _edtDescription, _edtPrice, _edtStock;
+        private EditText _edtName, _edtDescription, _edtPrice, _edtStock, _edtCode;
         private Button _btnSave, _btnCancel;
         private Uri _imageUri;
         private Stream _imageStream;
@@ -31,6 +31,7 @@ namespace LOMSUI.Activities
             _imgProduct = FindViewById<ImageView>(Resource.Id.imgProductadd);
             _edtName = FindViewById<EditText>(Resource.Id.edtProductName);
             _edtDescription = FindViewById<EditText>(Resource.Id.edtDescripton);
+            _edtCode = FindViewById<EditText>(Resource.Id.edtCode);
             _edtPrice = FindViewById<EditText>(Resource.Id.productPriceEditText);
             _edtStock = FindViewById<EditText>(Resource.Id.edtStock);
             _btnSave = FindViewById<Button>(Resource.Id.saveButton);
@@ -87,19 +88,44 @@ namespace LOMSUI.Activities
                 return;
             }
 
-            var product = new ProductModel
+            var product = new ProductModelRequest
             {
                 Name = _edtName.Text,
+                ProductCode = _edtCode.Text,
                 Description = _edtDescription.Text,
-                Price = decimal.Parse(_edtPrice.Text),
-                Stock = int.Parse(_edtStock.Text),
+                Price = _edtPrice.Text,
+                Stock = _edtStock.Text,
             };
 
-            var success = await _apiService.AddProductAsync(product, _imageStream, "product.jpg");
+            var error = await _apiService.AddProductAsync(product, _imageStream, "product.jpg");
 
-            Toast.MakeText(this, success ? "Add successful" : "Add failed", ToastLength.Short).Show();
-            if (success) Finish(); 
+            if (error == null)
+            {
+                Toast.MakeText(this, "Add successful", ToastLength.Short).Show();
+                Finish();
+            }
+            else
+            {
+                _edtName.Error = null;
+                _edtPrice.Error = null;
+                _edtStock.Error = null;
+                _edtDescription.Error = null;
+
+                if (error.Errors.TryGetValue("Name", out var nameErrs))
+                    _edtName.Error = string.Join("\n", nameErrs);
+
+                if (error.Errors.TryGetValue("Price", out var priceErrs))
+                    _edtPrice.Error = string.Join("\n", priceErrs);
+
+                if (error.Errors.TryGetValue("Stock", out var stockErrs))
+                    _edtStock.Error = string.Join("\n", stockErrs);
+
+                if (error.Errors.TryGetValue("Description", out var descErrs))
+                    _edtDescription.Error = string.Join("\n", descErrs);
+
+            }
         }
+
     }
 
 }

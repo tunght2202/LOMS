@@ -1,10 +1,7 @@
 ﻿using LOMSAPI.Data.Entities;
-using System.Text.RegularExpressions;
-using System;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
 using LOMSAPI.Models;
 
 namespace LOMSAPI.Repositories.Comments
@@ -107,23 +104,12 @@ namespace LOMSAPI.Repositories.Comments
                             _context.Comments.Add(new Comment
                             {
                                 CommentID = commentID,
-                                Content = content,  
+                                Content = content,
                                 CommentTime = commentTime,
                                 LiveStreamCustomerID = liveStreamCustomerId,
                             });
                             await _context.SaveChangesAsync();
                         }
-                        //var comment = await _context.Comments.FirstOrDefaultAsync(s => s.CommentID == commentID);
-                        //comments.Add(new CommentModel
-                        //{
-                        //    CommentID = comment.CommentID,
-                        //    CustomerId = customerID,
-                        //    CustomerName = customerName,
-                        //    Content = comment.Content,
-                        //    CommentTime = commentTime,
-                        //    CustomerAvatar = avatar
-                        //});
-                       
                     }
                     catch (DbUpdateException ex)
                     {
@@ -131,7 +117,7 @@ namespace LOMSAPI.Repositories.Comments
                     }
 
                 }
-                
+
             }
             AllComments = await _context.Comments
           .Where(c => c.LiveStreamCustomer.LivestreamID == liveStreamId)
@@ -147,6 +133,8 @@ namespace LOMSAPI.Repositories.Comments
           })
           .ToListAsync();
             return AllComments;
-        }     
+        }
+
     }
+
 }

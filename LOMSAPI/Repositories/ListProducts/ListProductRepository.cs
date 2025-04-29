@@ -106,33 +106,49 @@ namespace LOMSAPI.Repositories.ListProducts
                     Description = plp.Product.Description,
                     ProductCode = plp.Product.ProductCode,
                     Status = plp.Product.Status,
-                    Stock = plp.Product.Stock
+                    Stock = plp.Product.Stock,
+                    ImageURL = plp.Product.ImageURL                  
                 })) // Lấy danh sách Product
                 .ToListAsync();
             return productListProduct;
         }
+
         public async Task<int> AddProductIntoListProduct(int listProductId, List<int> listProduct)
         {
             var checkExitListProduct = await CheckExitListProductById(listProductId);
             if (!checkExitListProduct)
             {
-                throw new Exception("This listProduct not exit!");
+                throw new Exception("This listProduct not exists!");
             }
+
+            // Lấy danh sách ProductID đã tồn tại trong listProduct
+            var existingProductIds = await _context.ProductListProducts
+                .Where(plp => plp.ListProductID == listProductId)
+                .Select(plp => plp.ProductID)
+                .ToListAsync();
+
             var listproductlistproduct = new List<ProductListProduct>();
-            foreach (var item in listProduct)
+
+            foreach (var productId in listProduct)
             {
-                var productListProduct = new ProductListProduct()
+                // Chỉ thêm sản phẩm nếu chưa tồn tại
+                if (!existingProductIds.Contains(productId))
                 {
-                    ListProductID = listProductId,
-                    ProductID = item
-                };
-                listproductlistproduct.Add(productListProduct);
-
+                    listproductlistproduct.Add(new ProductListProduct
+                    {
+                        ListProductID = listProductId,
+                        ProductID = productId
+                    });
+                }
             }
-            await _context.AddRangeAsync(listproductlistproduct);
-            return await _context.SaveChangesAsync();
 
+            if (listproductlistproduct.Any())
+            {
+                await _context.AddRangeAsync(listproductlistproduct);
+                return await _context.SaveChangesAsync();
+            }
 
+            return 0; // Không có gì để thêm
         }
 
         public async Task<int> DeleteProductOutListProduct(int listProductId, List<int> listProductIds)
@@ -168,7 +184,7 @@ namespace LOMSAPI.Repositories.ListProducts
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> AddListProductInToLiveStream(int listProductId, string liveStreamId)
+        public async Task<int> AddListProductInToLiveStream(string liveStreamId, int listProductId, decimal maxPrice)
         {
             var liveStream = await _context.LiveStreams
                 .FirstOrDefaultAsync(x => x.LivestreamID.Equals(liveStreamId));
@@ -176,6 +192,10 @@ namespace LOMSAPI.Repositories.ListProducts
             if (liveStream == null)
             {
                 throw new Exception("This live stream does not exist.");
+            }
+            if(maxPrice < 0)
+            {
+                throw new Exception("Max price must be greater than 0");
             }
 
             var listProduct = await _context.ListProducts
@@ -188,6 +208,7 @@ namespace LOMSAPI.Repositories.ListProducts
             else
             {
                 liveStream.ListProductID = listProductId;
+                liveStream.PriceMax = maxPrice;
             }
 
             var result = await _context.SaveChangesAsync();

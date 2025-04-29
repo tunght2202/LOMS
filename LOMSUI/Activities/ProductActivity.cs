@@ -16,7 +16,8 @@ namespace LOMSUI.Activities
         private ProductAdapter _adapter;
         private RecyclerView _productRecyclerView;
         private TextView _noProductsTextView;
-        private Button _addProductButton, _addListProductButton, _viewListProductButton;
+        private Button _addProductButton, _addListProductButton, _viewListProductButton, _btnSearchByProductName;
+        private EditText _etProductName;
         private SwipeRefreshLayout _swipeRefreshLayout;
         private string _userId;
         private List<ProductModel> _products = new List<ProductModel>();
@@ -32,6 +33,8 @@ namespace LOMSUI.Activities
             _productRecyclerView = FindViewById<RecyclerView>(Resource.Id.productRecyclerView);
             _noProductsTextView = FindViewById<TextView>(Resource.Id.noProductsTextView);
             _addProductButton = FindViewById<Button>(Resource.Id.addProductButton);
+            _btnSearchByProductName = FindViewById<Button>(Resource.Id.btnSearchByProductName);
+            _etProductName = FindViewById<EditText>(Resource.Id.etProductName);
             _addListProductButton = FindViewById<Button>(Resource.Id.addListProductButton);
             _viewListProductButton = FindViewById<Button>(Resource.Id.viewListProductButton);
             _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipeRefreshLayout);
@@ -41,7 +44,18 @@ namespace LOMSUI.Activities
               _userId = Preferences.Get("userID", "");
 
             _apiService = ApiServiceProvider.Instance;
-       
+
+
+            _btnSearchByProductName.Click += (s, e) =>
+            {
+                FilterProducts(_etProductName.Text);
+            };
+
+            _etProductName.TextChanged += (s, e) =>
+            {
+                FilterProducts(_etProductName.Text);
+            };
+
             _addProductButton.Click += (s, e) =>
             {
                 var intent = new Intent(this, typeof(AddNewProductActivity));
@@ -63,6 +77,7 @@ namespace LOMSUI.Activities
                  LoadProductDataAsync();
                 _swipeRefreshLayout.Refreshing = false;
             };
+
             await LoadProductDataAsync();
         }
 
@@ -99,6 +114,23 @@ namespace LOMSUI.Activities
                 Console.WriteLine($"Error loading product data: {ex.Message}");
             }
         }
+
+
+            private void FilterProducts(string keyword)
+            {
+                if (string.IsNullOrWhiteSpace(keyword))
+                {
+                    _adapter.UpdateData(_products);
+                    return;
+                }
+
+                var filtered = _products
+                    .Where(p => p.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                _adapter.UpdateData(filtered);
+            }
+
         private void ShowDeleteConfirmationDialog(ProductModel product)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);

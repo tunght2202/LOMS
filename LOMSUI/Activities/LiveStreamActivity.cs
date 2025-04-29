@@ -57,23 +57,32 @@ namespace LOMSUI
             {
                 if (_liveStreams.Any())
                 {
-                    _adapter = new LiveStreamAdapter(
-                        _liveStreams,
-                        this,
-                        onViewClick: livestream =>
-                        {
-                            Intent intent = new Intent(this, typeof(LOMSUI.Activities.CommentsActivity));
-                            intent.PutExtra("LivestreamID", livestream.LivestreamID);
-                            StartActivity(intent);
-                        },
-                        onDeleteClick: async (livestream, position) =>
-                        {
-                            ShowDeleteLiveStreamConfirmationDialog(livestream, position);
-
-                        });
-
-                    _recyclerView.SetAdapter(_adapter);
                     _txtNoLiveStreams.Visibility = ViewStates.Gone;
+
+                    if (_adapter == null)
+                    {
+                        _adapter = new LiveStreamAdapter(_liveStreams, this,
+                            onViewClick: livestream =>
+                            {
+                                Intent intent = new Intent(this, typeof(LiveStreamDetailActivity));
+                                intent.PutExtra("LiveStreamID", livestream.LivestreamID);
+                                intent.PutExtra("Title", livestream.StreamTitle);
+                                intent.PutExtra("Status", livestream.Status);
+                                intent.PutExtra("StartTime", livestream.GetFormattedTime());
+                                StartActivity(intent);
+                            },
+                            onDeleteClick: async (livestream, position) =>
+                            {
+                                ShowDeleteLiveStreamConfirmationDialog(livestream, position);
+                            });
+
+                        _recyclerView.SetAdapter(_adapter);
+                    }
+                    else
+                    {
+                        _adapter.UpdateData(_liveStreams);
+                        _adapter.NotifyDataSetChanged();
+                    }
                 }
                 else
                 {
@@ -81,12 +90,11 @@ namespace LOMSUI
                 }
             });
         }
-
         private void ShowDeleteLiveStreamConfirmationDialog(LiveStreamModel livestream, int position)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.SetTitle("Confirm deletion");
-            builder.SetMessage("Are you sure you want to delete this livestream??");
+            builder.SetMessage("Are you sure you want to delete this livestream?");
             builder.SetPositiveButton("Yes", async (sender, args) =>
             {
                 bool success = await _apiService.DeleteLiveStreamAsync(livestream.LivestreamID);

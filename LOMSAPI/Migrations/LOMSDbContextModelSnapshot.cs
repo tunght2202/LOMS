@@ -122,6 +122,9 @@ namespace LOMSAPI.Migrations
                     b.Property<int?>("ListProductID")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("PriceMax")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -189,6 +192,12 @@ namespace LOMSAPI.Migrations
                     b.Property<string>("CommentID")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<decimal?>("CurrentPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -200,6 +209,12 @@ namespace LOMSAPI.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<bool>("StatusCheck")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TrackingNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrderID");
 

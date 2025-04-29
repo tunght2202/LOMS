@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using Android.Views;
 using AndroidX.RecyclerView.Widget;
+using Bumptech.Glide;
 using LOMSUI.Models;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace LOMSUI.Adapter
     public class ProductAdapter : RecyclerView.Adapter
     {
         private readonly Context _context;
-        private readonly List<ProductModel> _products;
+        private List<ProductModel> _products;
         public event Action<ProductModel> OnViewDetailClick;
         public event Action<ProductModel> OnDeleteClick; 
 
@@ -34,6 +35,11 @@ namespace LOMSUI.Adapter
             viewHolder.TvName.Text = product.Name;
             viewHolder.TvDescription.Text = product.Description;
             viewHolder.TvPrice.Text = $"Price : {product.Price:N0}đ";
+            Glide.With(viewHolder.ItemView.Context)
+                     .Load(product.ImageURL)
+                     .Placeholder(Resource.Drawable.logos)
+                     .Into(viewHolder.ImgProduct);
+
 
             viewHolder.BtnDetail.Click -= viewHolder.DetailClickHandler;
             viewHolder.DetailClickHandler = (s, e) => OnViewDetailClick?.Invoke(product);
@@ -55,6 +61,8 @@ namespace LOMSUI.Adapter
 
         public class ProductViewHolder : RecyclerView.ViewHolder
         {
+            public ImageView ImgProduct { get; }
+
             public TextView TvName { get; }
             public TextView TvDescription { get; }
             public TextView TvPrice { get; }
@@ -66,6 +74,7 @@ namespace LOMSUI.Adapter
 
             public ProductViewHolder(View itemView) : base(itemView)
             {
+                ImgProduct = itemView.FindViewById<ImageView>(Resource.Id.imgProduct);
                 TvName = itemView.FindViewById<TextView>(Resource.Id.tvNameProduct);
                 TvDescription = itemView.FindViewById<TextView>(Resource.Id.tvDescription);
                 TvPrice = itemView.FindViewById<TextView>(Resource.Id.tvPrice);
@@ -73,7 +82,13 @@ namespace LOMSUI.Adapter
                 BtnDelete = itemView.FindViewById<Button>(Resource.Id.btDelete);
             }
         }
+        public void UpdateData(List<ProductModel> newData)
+        {
+            _products = newData;
+            NotifyDataSetChanged();
+        }
     }
+
 
 
 }

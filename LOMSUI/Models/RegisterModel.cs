@@ -22,4 +22,14 @@ namespace LOMSUI.Models
 
         public string AvatarContentType { get; set; }
     }
+    public class RegisterResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
+        public Dictionary<string, string[]> Errors { get; set; }
+
+    }
+
+
 }
+

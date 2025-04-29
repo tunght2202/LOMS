@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
 using System.Text;
-using System;
 using System.IO.Ports;
-using static System.Net.Mime.MediaTypeNames;
 namespace LOMSAPI.Services
 {
     public class PrintInfo
@@ -15,6 +13,7 @@ namespace LOMSAPI.Services
         public string TongGia { get; set; }
         public string DiaChi { get; set; }
         public string SoDienThoai { get; set; }
+        public int Stock { get; set; }
     }
     public class PrintService : IPrintService
     {
@@ -138,6 +137,10 @@ namespace LOMSAPI.Services
                 if (!string.IsNullOrWhiteSpace(product))
                 {
                     DrawLine("Total: " + info.TongGia, fontBold);
+                }
+                if (info.Stock != null)
+                {
+                    DrawLine("Stock: " + info.Stock, fontNormal);
                 }
                 if (!string.IsNullOrWhiteSpace(info.DiaChi))
                 {

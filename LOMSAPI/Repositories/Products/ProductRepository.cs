@@ -2,8 +2,6 @@
 using LOMSAPI.Models;
 using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LOMSAPI.Repositories.Products
 {
@@ -22,21 +20,6 @@ namespace LOMSAPI.Repositories.Products
         private ProductModel MapToModel(Product product)
         {
             return new ProductModel
-            {
-                ProductID = product.ProductID,
-                ProductCode = product.ProductCode,
-                Description = product.Description,
-                Name = product.Name,
-                Price = product.Price,
-                Stock = product.Stock,
-                Status = product.Status,
-                ImageURL = product.ImageURL
-            };
-        }
-
-        private Product MapToEntity(ProductModel product)
-        {
-            return new Product
             {
                 ProductID = product.ProductID,
                 ProductCode = product.ProductCode,
@@ -112,19 +95,30 @@ namespace LOMSAPI.Repositories.Products
             return await _context.SaveChangesAsync();
 
         }
-        public async Task<int> UpdateProduct(int productId, PutProductModel product)
+        public async Task<int> UpdateProduct(int productId, PutProductModel product, IFormFile image)
         {
             var productById = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == productId);
             if (productById == null)
             {
                 throw new Exception($"Can't find a product with id = {productId}");
             }
+            string imageUrl = await _cloudinaryService.UploadImageAsync(image);
+            var productCodeExist = await _context.Products
+
+            .AnyAsync(p => p.ProductCode.ToLower() == product.ProductCode.ToLower()
+                   && p.ProductID != productId);
+            if (productCodeExist)
+            {
+                throw new Exception($"Product code {product.ProductCode} exist");
+            }
+
+
             productById.Name = product.Name;
-            productById.ProductCode = product.ProductCode;
-            productById.Price = product.Price;
-            productById.Description = product.Description;
-            productById.Stock = product.Stock;
-            productById.ImageURL = product.ImageURL;
+                productById.ProductCode = product.ProductCode;
+                productById.Price = product.Price;
+                productById.Description = product.Description;
+                productById.Stock = product.Stock;
+                productById.ImageURL = imageUrl;
 
             return await _context.SaveChangesAsync();
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -33,6 +34,27 @@ namespace LOMSUI.Models
 
         public string? ImageUrl { get; set; }
     }
+
+    public class UserProfileUpdateResult
+    {
+        public Dictionary<string, string[]> Errors { get; set; } = null;
+        public string Message { get; set; }
+    }
+
+    public class SimpleMessageResponse
+    {
+        [JsonProperty("message")]
+        public string Message { get; set; }
+    }
+
+    public class ValidationErrorResponse
+    {
+        [JsonProperty("errors")]
+        public Dictionary<string, string[]> Errors { get; set; }
+        [JsonProperty("message")]
+        public string Message { get; set; }
+    }
+
 }
 
 

@@ -1,6 +1,5 @@
 ﻿using LOMSAPI.Data.Entities;
 using LOMSAPI.Models;
-using Microsoft.AspNetCore.Http;
 
 namespace LOMSAPI.Repositories.Users
 {

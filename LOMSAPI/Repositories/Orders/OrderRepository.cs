@@ -3,6 +3,7 @@ using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
 using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -26,80 +27,196 @@ namespace LOMSAPI.Repositories.Orders
             _print = print;
         }
 
-        private OrderModel MapToModel(Order order)
+        public async Task<IEnumerable<OrderCustomerModel>> GetAllOrdersAsync()
         {
-            return new OrderModel
+            var orders = await _context.Orders
+                        .Include(o => o.Product)
+                        .Include(o => o.Comment)
+                        .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.Customer).ToListAsync();
+            if (orders == null) return null;
+            var orderModels = orders.Select(o => new OrderCustomerModel
+            {
+                OrderID = o.OrderID,
+                OrderDate = o.OrderDate,
+                Status = o.Status.ToString(),
+                Quantity = o.Quantity,
+                CurrentPrice = o.CurrentPrice,
+                Note = o.Note,
+                StatusCheck = o.StatusCheck,
+                TrackingNumber = o.TrackingNumber,
+                Address = o.Comment.LiveStreamCustomer.Customer.Address,
+                Email = o.Comment.LiveStreamCustomer.Customer.Email,
+                FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
+            }).ToList();
+            return orderModels;
+        }
+
+        public async Task<IEnumerable<OrderCustomerModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId)
+        {
+            var orders = await _context.Orders
+                        .Include(o => o.Product)
+                        .Include(o => o.Comment)
+                        .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.Customer)
+                .Where(o => o.Comment.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
+                .ToListAsync();
+            if(orders == null) return null;
+            var orderModels = orders.Select(o => new OrderCustomerModel
+            {
+                OrderID = o.OrderID,
+                OrderDate = o.OrderDate,
+                Status = o.Status.ToString(),
+                Quantity = o.Quantity,
+                CurrentPrice = o.CurrentPrice,
+                Note = o.Note,
+                StatusCheck = o.StatusCheck,
+                TrackingNumber = o.TrackingNumber,
+                Address = o.Comment.LiveStreamCustomer.Customer.Address,
+                Email = o.Comment.LiveStreamCustomer.Customer.Email,
+                FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
+            }).ToList();
+            return orderModels;
+        }
+
+        public async Task<IEnumerable<OrderCustomerModel>> GetOrdersByCustomerIdAsync(string customerId)
+        {
+            var orders = await _context.Orders
+                        .Include(o => o.Product)
+                        .Include(o => o.Comment)
+                        .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.Customer)
+                .Where(o => o.Comment.LiveStreamCustomer.CustomerID.Equals(customerId))
+                .ToListAsync();
+            if(orders == null) return null;
+            var orderModels = orders.Select(o => new OrderCustomerModel
+            {
+                OrderID = o.OrderID,
+                OrderDate = o.OrderDate,
+                Status = o.Status.ToString(),
+                Quantity = o.Quantity,
+                CurrentPrice = o.CurrentPrice,
+                Note = o.Note,
+                StatusCheck = o.StatusCheck,
+                TrackingNumber = o.TrackingNumber,
+                Address = o.Comment.LiveStreamCustomer.Customer.Address,
+                Email = o.Comment.LiveStreamCustomer.Customer.Email,
+                FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
+            }).ToList();
+            return orderModels;
+        }
+
+        public async Task<IEnumerable<OrderCustomerModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID)
+        {
+            var orders = await _context.Orders
+                        .Include(o => o.Product)
+                        .Include(o => o.Comment)
+                        .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.Customer)
+                .Where(o => o.Comment.LiveStreamCustomerID == liveStreamCustomerID)
+                .ToListAsync();
+            if(orders == null) return null;
+            var orderModels = orders.Select(o => new OrderCustomerModel
+            {
+                OrderID = o.OrderID,
+                OrderDate = o.OrderDate,
+                Status = o.Status.ToString(),
+                Quantity = o.Quantity,
+                CurrentPrice = o.CurrentPrice,
+                Note = o.Note,
+                StatusCheck = o.StatusCheck,
+                TrackingNumber = o.TrackingNumber,
+                Address = o.Comment.LiveStreamCustomer.Customer.Address,
+                Email = o.Comment.LiveStreamCustomer.Customer.Email,
+                FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
+            }).ToList();
+            return orderModels;
+        }
+        public async Task<OrderCustomerModel?> GetOrderByIdAsync(int orderId)
+        {
+            var order = await _context.Orders
+                        .Include(o => o.Comment)
+                        .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.Customer)
+                .FirstOrDefaultAsync(o => o.OrderID == orderId);
+            if (order == null) return null;
+            var orderCustomer = new OrderCustomerModel
             {
                 OrderID = order.OrderID,
                 OrderDate = order.OrderDate,
                 Status = order.Status.ToString(),
                 Quantity = order.Quantity,
-                ProductID = order.ProductID,
+                CurrentPrice = order.CurrentPrice,
+                Note = order.Note,
+                StatusCheck = order.StatusCheck,
+                TrackingNumber = order.TrackingNumber,
+                Address = order.Comment.LiveStreamCustomer.Customer.Address,
+                Email = order.Comment.LiveStreamCustomer.Customer.Email,
+                FacebookName = order.Comment.LiveStreamCustomer.Customer.FacebookName,
+                PhoneNumber = order.Comment.LiveStreamCustomer.Customer.PhoneNumber,
                 CommentID = order.CommentID,
-                Product = new ProductModel()
+                ProductID = order.ProductID,
+                Product = new ProductModel
                 {
-                    ProductID = order.ProductID,
-                    ProductCode = order.Product.ProductCode,
-                    Description = order.Product.Description,
+                    ProductID = order.Product.ProductID,
                     Name = order.Product.Name,
-                    ImageURL = order.Product.ImageURL,
                     Price = order.Product.Price,
                     Stock = order.Product.Stock,
-                    Status = order.Product.Status
-
+                    Description = order.Product.Description,
+                    ImageURL = order.Product.ImageURL
                 }
             };
-        }
 
-        private Order MapToEntity(OrderModel model)
-        {
-            return new Order
-            {
-                OrderID = model.OrderID,
-                OrderDate = model.OrderDate,
-                Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), model.Status),
-                Quantity = model.Quantity,
-                ProductID = model.ProductID,
-                CommentID = model.CommentID
-            };
-        }
+            return orderCustomer;
 
-        public async Task<IEnumerable<OrderModel>> GetAllOrdersAsync()
-        {
-            var orders = await _context.Orders.Include(o => o.Product).ToListAsync();
-            return orders.Select(o => MapToModel(o));
-        }
-
-        public async Task<IEnumerable<OrderModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId)
-        {
-            var orders = await _context.Orders.Include(o => o.Product)
-                .Where(o => o.Comment.LiveStreamCustomer.LivestreamID.Equals(liveStreamId))
-                .ToListAsync();
-            return orders.Select(o => MapToModel(o));
-        }
-
-        public async Task<IEnumerable<OrderModel>> GetOrdersByCustomerIdAsync(string customerId)
-        {
-            var orders = await _context.Orders
-                .Include(o => o.Product)
-                .Where(o => o.Comment.LiveStreamCustomer.CustomerID.Equals(customerId))
-                .ToListAsync();
-            return orders.Select(o => MapToModel(o));
-        }
-
-        public async Task<IEnumerable<OrderModel>> GetOrdersByLiveStreamCustomerIdAsync(int liveStreamCustomerID)
-        {
-            var orders = await _context.Orders.Include(o => o.Product)
-                .Where(o => o.Comment.LiveStreamCustomerID == liveStreamCustomerID)
-                .ToListAsync();
-            return orders.Select(o => MapToModel(o));
-        }
-        public async Task<OrderModel?> GetOrderByIdAsync(int orderId)
-        {
-            var order = await _context.Orders
-                .Include(o => o.Product)
-                .FirstOrDefaultAsync(o => o.OrderID == orderId);
-            return order != null ? MapToModel(order) : null;
         }
 
         public async Task<bool> OrderExistsAsync(int orderId)
@@ -148,7 +265,7 @@ namespace LOMSAPI.Repositories.Orders
                     DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
                     SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
                 };
-                _print.PrintCustomerLabel("com5", inforprint);
+//                _print.PrintCustomerLabel("COM5", inforprint);
                 return true;
             }
             catch (Exception ex)
@@ -167,6 +284,10 @@ namespace LOMSAPI.Repositories.Orders
             existing.OrderDate = orderModel.OrderDate;
             existing.Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), orderModel.Status);
             existing.Quantity = orderModel.Quantity;
+            existing.StatusCheck = orderModel.StatusCheck;
+            existing.TrackingNumber = orderModel.TrackingNumber;
+            existing.Note = orderModel.Note;
+            existing.CurrentPrice = orderModel.CurrentPrice;
             existing.ProductID = orderModel.ProductID;
             existing.CommentID = orderModel.CommentID;
 
@@ -175,7 +296,13 @@ namespace LOMSAPI.Repositories.Orders
 
         public async Task<int> UpdateStatusOrderAsync(int orderId, OrderStatus newStatus)
         {
-            var order = await _context.Orders.FindAsync(orderId);
+            var order = await _context.Orders
+                        .Include(o => o.Product)
+                        .Include(o => o.Comment)
+                        .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.LiveStream)
+                .FirstOrDefaultAsync( o => o.OrderID == orderId);
+
             if (order == null) return 0;
             if (newStatus < order.Status)
             {
@@ -185,6 +312,15 @@ namespace LOMSAPI.Repositories.Orders
             if (order.Status == OrderStatus.Canceled)
             {
                 throw new Exception("Can't change status");
+                return 0;
+            }
+            if( ((order.StatusCheck == false) && (order.Comment.LiveStreamCustomer.LiveStream.PriceMax <= (order.CurrentPrice * order.Quantity))) ) {
+                throw new Exception("Can't change status, you must call for customer !");
+                return 0;
+            }
+            if((newStatus.Equals(OrderStatus.Shipped)) && (string.IsNullOrEmpty(order.TrackingNumber)))
+            {
+                throw new Exception("Can't change status, you must input tracking number !");
                 return 0;
             }
             var getProduct = await _context.Products
@@ -202,16 +338,52 @@ namespace LOMSAPI.Repositories.Orders
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<OrderModel>> GetAllOrdersByUserIdAsync(string userID)
+        public async Task<int> UpdateStatusCheckOrderAsync(int orderId, bool newStatusCheck)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null) return 0;
+            order.StatusCheck = newStatusCheck;
+            return await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<OrderCustomerModel>> GetAllOrdersByUserIdAsync(string userID)
         {
             var orders = await _context.Orders
                         .Include(o => o.Product)
                         .Include(o => o.Comment)
                         .Include(o => o.Comment.LiveStreamCustomer)
+                        .Include(o => o.Comment.LiveStreamCustomer.Customer)
                         .Include(o => o.Comment.LiveStreamCustomer.LiveStream)
                         .Where(o => o.Comment.LiveStreamCustomer.LiveStream.UserID.Equals(userID))
                         .ToListAsync();
-            return orders.Select(o => MapToModel(o));
+            var orderModels = orders.Select(o => new OrderCustomerModel
+            {
+                OrderID = o.OrderID,
+                OrderDate = o.OrderDate,
+                Status = o.Status.ToString(),
+                Quantity = o.Quantity,
+                CurrentPrice = o.CurrentPrice,
+                Note = o.Note,
+                StatusCheck = o.StatusCheck,
+                TrackingNumber = o.TrackingNumber,
+                Address = o.Comment.LiveStreamCustomer.Customer.Address,
+                Email = o.Comment.LiveStreamCustomer.Customer.Email,
+                FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
+
+            }).ToList();
+            return orderModels;
         }
         public async Task<int> CreateOrderFromComments(string liveStreamId, string TokenFacbook)
         {
@@ -244,7 +416,7 @@ namespace LOMSAPI.Repositories.Orders
                 .ToListAsync();
                 // produccode xnumber prr 3, prt, 
                 var result = 0;
-                var regex = new Regex(@"\b(?<code>[a-zA-Z]+\d*)\b(?:\s*[xX]?\s*(?<qty>\d+))?", RegexOptions.IgnoreCase);
+                var regex = new Regex(@"^(?<code>[a-zA-Z\d]+)(?:\s+(?<qty>\d+))?$", RegexOptions.IgnoreCase);
 
                 foreach (var comment in comments.OrderBy(c => c.CommentTime))
                 {
@@ -260,8 +432,11 @@ namespace LOMSAPI.Repositories.Orders
                             if (match.Groups["qty"].Success)
                             {
                                 quantity = int.Parse(match.Groups["qty"].Value);
+                                if (quantity <= 0)
+                                { 
+                                    continue; 
+                                }
                             }
-
                             if (productCodeToId.TryGetValue(code, out int productId))
                             {
                                 var product = await _context.Products.FindAsync(productId);
@@ -275,27 +450,54 @@ namespace LOMSAPI.Repositories.Orders
                                     product.Stock -= quantity;
                                 }
 
-                                var sanpham = $"{product.Name} X{quantity}";
+                                var sanpham = $"{product.Name} X {quantity}";
                                 var tonggiaDecimal = product.Price * quantity;
-                                var tonggia = (int)tonggiaDecimal;
+                                var tonggia = (long)tonggiaDecimal;
+                                var stock = product.Stock;
                                 string formatted = tonggia.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND";
+                                var priceMax = liveStream.PriceMax;
                                 var newOrder = new Order
                                 {
                                     ProductID = productId,
                                     Quantity = quantity,
                                     CommentID = comment.CommentID,
-                                    OrderDate = comment.CommentTime
+                                    OrderDate = comment.CommentTime,
+                                    CurrentPrice = product.Price
+                                    
                                 };
                                 var customer = await _context.Customers
                                     .FirstOrDefaultAsync(c => c.CustomerID.Equals(comment.LiveStreamCustomer.CustomerID));
 
+                                var oldOrder = _context.Orders
+                                        .Include(o => o.Product)
+                                        .Where(o => o.Comment.LiveStreamCustomerID == comment.LiveStreamCustomerID
+                                        && o.ProductID == productId).ToList();
+                                decimal total = 0;
+                                if(oldOrder != null)
+                                {
+                                    total = oldOrder.Sum(order => order.Product.Price * order.Quantity);
+
+                                }
+                                if (total == null)
+                                {
+                                    total = 0;
+                                }
                                 var text = string.Empty;
                                 if (customer.Address != null || customer.PhoneNumber != null)
                                 {
-                                    newOrder.Status = OrderStatus.Confirmed;
+                                    if((tonggia + total) >= priceMax)
+                                    {
+                                        newOrder.Status = OrderStatus.Pending;
+                                    }
+                                    else
+                                    {
+                                        newOrder.Status = OrderStatus.Confirmed;
+                                    }
 
                                     text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name} \n" +
+                                       $"Quantity : {quantity} \n" +
+                                       $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}";
 
@@ -304,6 +506,8 @@ namespace LOMSAPI.Repositories.Orders
                                 {
                                     text = "Your order has been successfully created\n" +
                                        $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == productId).Name}\n" +
+                                       $"Quantity : {quantity} \n" +
+                                       $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}\n" +
                                        "Please provide your address and phone number for shipping!";
@@ -330,7 +534,8 @@ namespace LOMSAPI.Repositories.Orders
                                     SanPham = sanpham,
                                     TongGia = formatted,
                                     DiaChi = customer.Address,
-                                    SoDienThoai = customer.PhoneNumber
+                                    SoDienThoai = customer.PhoneNumber,
+                                    Stock = stock
                                 };
                                 try
                                 {
@@ -353,6 +558,16 @@ namespace LOMSAPI.Repositories.Orders
                 Console.WriteLine($"Error: {ex.Message}");
                 return 0;
             }
+        }
+
+        private long TotalPrice(int liveStreamCustomerID, int productId)
+        {
+            var order = _context.Orders
+                .Include(o => o.Product)
+                .Where(o => o.Comment.LiveStreamCustomerID == liveStreamCustomerID
+                && o.ProductID == productId).ToList();
+            var total = order.Sum(order => order.Product.Price * order.Quantity);
+            return (long)total;
         }
 
         private async Task<bool> SendMessage2Async(string customerId, string TokenFacbook, string messageSend)
@@ -385,73 +600,6 @@ namespace LOMSAPI.Repositories.Orders
 
         }
 
-        private async Task SendMessageAsync(string customerId, string TokenFacbook, int OrderId)
-        {
-            Order order = await _context.Orders.FirstOrDefaultAsync(s => s.OrderID == OrderId);
-            var Customer = await _context.Customers.FirstOrDefaultAsync(s => s.CustomerID == customerId);
-            bool IsNewCustomer = Customer.Address == null || Customer.PhoneNumber == null;
-            var url = $"https://graph.facebook.com/v22.0/me/messages?access_token={TokenFacbook}";
-
-            if (!IsNewCustomer)
-            {
-                var payload = new
-                {
-                    recipient = new { id = customerId },
-                    message = new
-                    {
-                        text = "Your order has been successfully created\n" +
-                                       $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
-                                       $"Order creation time : {order.OrderDate}\n" +
-                                       $"Customer : {Customer.FacebookName}\n" +
-                                       $"Address : {Customer.Address}\n" +
-                                       $"Phone number : {Customer.PhoneNumber}"
-                    },
-                };
-                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(url, content);
-
-                var result = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error send message: {result}");
-                }
-                else
-                {
-                    Console.WriteLine("Sent message successfully");
-                }
-            }
-            else
-            {
-                var payload = new
-                {
-                    recipient = new { id = Customer.CustomerID },
-                    message = new
-                    {
-                        text = "Your order has been successfully created\n" +
-                                      $"Product : {_context.Products.FirstOrDefault(s => s.ProductID == order.ProductID).Name}\n" +
-                                      $"Order creation time : {order.OrderDate}\n" +
-                                      $"Customer : {Customer.FacebookName}\n" +
-                                      "Please provide your address and phone number for shipping!"
-                    },
-                };
-                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(url, content);
-
-                var result = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Error send message: {result}");
-                }
-                else
-                {
-                    Console.WriteLine("Sent message successfully");
-                }
-            }
-        }
 
         public Task<bool> PrinTest()
         {

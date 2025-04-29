@@ -1,7 +1,9 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Views;
 using Android.Widget;
+using LOMSAPI.Models;
 using LOMSUI.Activities;
 using LOMSUI.Models;
 using LOMSUI.Services;
@@ -14,7 +16,7 @@ namespace LOMSUI
     {
         private TextView _txtTitle, _txtStatus, _txtStartTime;
         private Button _btnViewComments, _btnViewCustomers,
-                       _btnViewOrders, _btnSetupListProduct;
+                       _btnViewOrders, _btnSetupListProduct, _tvRevenusLive;
         private ToggleButton _toggleAutoCreateOrder;
         private bool _isAutoCreating = false;
         private CancellationTokenSource _cancellationTokenSource;
@@ -36,6 +38,7 @@ namespace LOMSUI
             _txtTitle = FindViewById<TextView>(Resource.Id.txtLiveTitle);
             _txtStatus = FindViewById<TextView>(Resource.Id.txtLiveStatus);
             _txtStartTime = FindViewById<TextView>(Resource.Id.txtLiveStartTime);
+            _tvRevenusLive = FindViewById<Button>(Resource.Id.tvRevenueLive);
             _btnSetupListProduct = FindViewById<Button>(Resource.Id.btnSetupListProduct);
             _toggleAutoCreateOrder = FindViewById<ToggleButton>(Resource.Id.toggleAutoOrder);
             _spinnerListProduct = FindViewById<Spinner>(Resource.Id.spinnerListProduct);
@@ -56,6 +59,7 @@ namespace LOMSUI
             _txtStatus.Text = $"Status: {_status}";
             _txtStartTime.Text = $"Start: {_startTime}";
 
+            await CheckLiveStreamStatusAndUpdateUIAsync();
             await LoadListProducts();
 
             _btnSetupListProduct.Click += async (s, e) => await SetupListProduct();
@@ -86,8 +90,14 @@ namespace LOMSUI
                 }
             };
 
-
-            _btnViewComments.Click += (s, e) =>
+            _tvRevenusLive.Click += (s, e) =>
+            {
+                var intent = new Intent(this, typeof(LiveStreamRevenueActivity));
+                intent.PutExtra("LiveStreamID", _liveStreamId);
+                StartActivity(intent);
+            };
+            
+            _btnViewComments.Click += (s, e) => 
             {
                 var intent = new Intent(this, typeof(CommentsActivity));
                 intent.PutExtra("LivestreamID", _liveStreamId);
@@ -168,6 +178,21 @@ namespace LOMSUI
             {
                 while (!token.IsCancellationRequested)
                 {
+
+                    bool isLive = await _apiService.IsLiveStreamStillLiveAsync(_liveStreamId);
+
+                    if (!isLive)
+                    {
+                        RunOnUiThread(() =>
+                        {
+                            _isAutoCreating = false;
+                            _cancellationTokenSource?.Cancel();
+                            _toggleAutoCreateOrder.Checked = false;
+                            _toggleAutoCreateOrder.Visibility = ViewStates.Gone;
+                        });
+                        break;
+                    }
+
                     var (isSuccess, message) = await _apiService.CreateOrdersFromCommentsAsync(_liveStreamId);
 
                     if (isSuccess)
@@ -178,12 +203,12 @@ namespace LOMSUI
                         });
                     }
 
-                    await Task.Delay(4000, token); 
+                    await Task.Delay(5000, token); 
                 }
             }
             catch (TaskCanceledException)
             {
-                Console.WriteLine("Auto creation stopped.");
+                Console.WriteLine("Auto creation stopped."); 
             }
             catch (Exception ex)
             {
@@ -194,6 +219,29 @@ namespace LOMSUI
             }
         }
 
+        private async Task CheckLiveStreamStatusAndUpdateUIAsync()
+        {
+            bool isLive = await _apiService.IsLiveStreamStillLiveAsync(_liveStreamId);
+
+            RunOnUiThread(() =>
+            {
+                if (isLive)
+                {
+                    _toggleAutoCreateOrder.Visibility = ViewStates.Visible;
+                    _toggleAutoCreateOrder.Enabled = true;
+                }
+                else
+                {
+                    if (_isAutoCreating)
+                    {
+                        _isAutoCreating = false;
+                        _cancellationTokenSource?.Cancel();
+                        _toggleAutoCreateOrder.Checked = false;
+                    }
+                    _toggleAutoCreateOrder.Visibility = ViewStates.Gone;
+                }
+            });
+        }
 
     }
 }
