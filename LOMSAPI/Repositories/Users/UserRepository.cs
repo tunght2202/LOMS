@@ -21,9 +21,10 @@ namespace LOMSAPI.Repositories.Users
         private readonly IConfiguration _config;
         private readonly CloudinaryService _cloudinaryService;
         private readonly LOMSDbContext _lomsDbContext;
+        private readonly IEmailService _emailService;
 
         public UserRepository(UserManager<User> userManager, SignInManager<User> signInManager
-            , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService, LOMSDbContext lomsDbContext)
+            , IConfiguration config, IDistributedCache cache, CloudinaryService cloudinaryService, LOMSDbContext lomsDbContext, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,6 +32,7 @@ namespace LOMSAPI.Repositories.Users
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _cloudinaryService = cloudinaryService;
             _lomsDbContext = lomsDbContext;
+            _emailService = emailService;
         }
         public async Task<string> Authencate(LoginRequest loginRequest)
         {
@@ -101,7 +103,7 @@ namespace LOMSAPI.Repositories.Users
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
 
-            await SendEmailAsync(user.Email, "Verify account", $"Your OTP code is: {otpCode}");
+            await _emailService.SendEmailAsync(user.Email, "Verify account", $"Your OTP code is: {otpCode}");
 
             return (true, "Please check email for otp code!");
         }
@@ -153,7 +155,7 @@ namespace LOMSAPI.Repositories.Users
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
-            await SendEmailAsync(user.Email, "OTP code reset password", $"OTP code: {otpCode}");
+            await _emailService.SendEmailAsync(user.Email, "OTP code reset password", $"OTP code: {otpCode}");
 
             return true;
         }
@@ -190,26 +192,6 @@ namespace LOMSAPI.Repositories.Users
 
         }
 
-        private async Task SendEmailAsync(string toEmail, string subject, string body)
-        {
-            var smtpClient = new SmtpClient(_config["EmailSettings:SmtpServer"])
-            {
-                Port = int.Parse(_config["EmailSettings:SmtpPort"]),
-                Credentials = new NetworkCredential(_config["EmailSettings:SmtpUser"], _config["EmailSettings:SmtpPass"]),
-                EnableSsl = true
-            };
-
-            var mailMessage = new MailMessage
-            {
-                From = new MailAddress(_config["EmailSettings:SenderEmail"], _config["EmailSettings:SenderName"]),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = true
-            };
-
-            mailMessage.To.Add(toEmail);
-            await smtpClient.SendMailAsync(mailMessage);
-        }
 
         public async Task<User> GetUserProfile(string UserId)
         {
@@ -267,7 +249,7 @@ namespace LOMSAPI.Repositories.Users
                     var passwordHasher = new PasswordHasher<User>();
                     userInfo.PasswordHash = passwordHasher.HashPassword(userInfo, model.Password);
                     var otpCode = new Random().Next(100000, 999999).ToString();
-                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _emailService.SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
                     await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
@@ -285,7 +267,7 @@ namespace LOMSAPI.Repositories.Users
                 {
                     userInfo.Email = model.Email;
                     var otpCode = new Random().Next(100000, 999999).ToString();
-                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _emailService.SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
                     await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
@@ -304,7 +286,7 @@ namespace LOMSAPI.Repositories.Users
                     var passwordHasher = new PasswordHasher<User>();
                     userInfo.PasswordHash = passwordHasher.HashPassword(userInfo, model.Password);
                     var otpCode = new Random().Next(100000, 999999).ToString();
-                    await SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
+                    await _emailService.SendEmailAsync(oldEmail, "OTP EDIT PROFILE", $"Mã OTP: {otpCode}");
                     await _cache.SetStringAsync($"OTP_UPDATE_{oldEmail}", otpCode, new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
