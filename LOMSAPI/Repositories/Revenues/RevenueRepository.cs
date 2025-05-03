@@ -40,15 +40,12 @@ namespace LOMSAPI.Repositories.Revenues
                     throw new ArgumentException("Start date must be before end date");
 
                 return await _context.Orders
-                    .Where(o => o.Status == OrderStatus.Delivered
+                             .Where(o => o.Status == OrderStatus.Delivered
                              && o.OrderDate >= startDate
-                             && o.OrderDate <= endDate)
-                    .Join(_context.Products,
-                        order => order.ProductID,
-                        product => product.ProductID,
-                        (order, product) => new { order, product })
-                       .Where(op => op.product.UserID == userid)
-                    .SumAsync(op => op.product.Price * op.order.Quantity);
+                             && o.OrderDate <= endDate
+                             && o.Product.UserID == userid)
+                            .Select(o => (o.CurrentPrice ?? 0) * o.Quantity) // Projection chỉ lấy CurrentPrice và Quantity
+                            .SumAsync();
             }
             catch (Exception ex)
             {
