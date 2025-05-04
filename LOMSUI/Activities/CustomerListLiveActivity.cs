@@ -61,7 +61,6 @@ namespace LOMSUI.Activities
         {
             try
             {
-                //var apiService = new ApiService();
                 _customers = await _apiService.GetCustomersByLiveStreamIdAsync(_liveStreamID);
 
                 RunOnUiThread(() =>
