@@ -313,6 +313,7 @@ namespace LOMSAPI.Repositories.Orders
                         .Include(o => o.Comment)
                         .Include(o => o.Comment.LiveStreamCustomer)
                         .Include(o => o.Comment.LiveStreamCustomer.LiveStream)
+                        .Include(o => o.Comment.LiveStreamCustomer.Customer)
                 .FirstOrDefaultAsync( o => o.OrderID == orderId);
 
             if (order == null) return 0;
@@ -333,6 +334,11 @@ namespace LOMSAPI.Repositories.Orders
             if((newStatus.Equals(OrderStatus.Shipped)) && (string.IsNullOrEmpty(order.TrackingNumber)))
             {
                 throw new Exception("Can't change status, you must input tracking number !");
+                return 0;
+            }
+            if ((string.IsNullOrEmpty(order.Comment.LiveStreamCustomer.Customer.Address)) || (string.IsNullOrEmpty(order.Comment.LiveStreamCustomer.Customer.PhoneNumber)))
+            {
+                throw new Exception("Can't change status, you must input address and phone number !");
                 return 0;
             }
             var getProduct = await _context.Products
