@@ -105,5 +105,22 @@ namespace LOMSAPI.Controllers
                 return StatusCode(500, $"Error: {ex.Message}");
             }
         }
+        [HttpGet("MaxPrice/{liveStreamId}")]
+        public async Task<IActionResult> GetMaxPriceLiveStream(string liveStreamId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("UserID not found in token.");
+            try
+            {
+                var maxPrice = await _liveStreamRepositories.GetMaxPriceLiveStream(userId, liveStreamId);
+                return Ok(maxPrice);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
+
+        }
     }
 }
