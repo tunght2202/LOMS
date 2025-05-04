@@ -4,18 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+	<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <LinearLayout
+		<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#00a880"
             android:layout_marginBottom="30dp"
             android:gravity="center">
 
-            <ImageView
+			<ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
@@ -23,9 +23,9 @@
                 android:layout_marginBottom="10dp"
                 android:src="@drawable/logo_loms" />
 
-        </LinearLayout>
+		</LinearLayout>
 
-        <Button
+		<Button
             android:id="@+id/tvRevenueLive"
             android:layout_width="wrap_content"
             android:textSize="16sp"
@@ -36,12 +36,12 @@
             android:textColor="#185901"
             android:layout_height="wrap_content"/>
 
-        <LinearLayout
+		<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
-            <TextView
+			<TextView
                 android:id="@+id/txtLiveTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,16 +52,16 @@
                 android:layout_marginBottom="8dp" />
 
 			<TextView
-			  android:id="@+id/txtLiveStatus"
-			  android:layout_width="wrap_content"
-			  android:layout_height="wrap_content"
-			  android:text="Status: Live"
-			  android:padding="4dp"
-			  android:textStyle="bold"
-			  android:textSize="16sp"
-			  android:layout_marginBottom="8dp" />
+                android:id="@+id/txtLiveStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status: Live"
+                android:padding="4dp"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp" />
 
-            <TextView
+			<TextView
                 android:id="@+id/txtLiveStartTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,12 +70,12 @@
                 android:textSize="16sp"
                 android:layout_marginBottom="24dp" />
 
-            <LinearLayout
-				android:layout_width="match_parent"
+			<LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-				android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
+				<TextView
                     android:id="@+id/txtStreamTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -85,22 +85,34 @@
                     android:layout_marginBottom="10dp"
                     android:textStyle="bold" />
 
-                <Spinner
+				<Spinner
                     android:id="@+id/spinnerListProduct"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"/>
 
+			</LinearLayout>
+			<LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+				<EditText
+					android:id="@+id/edtMaxPrice"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Price max"/>
+
 				<Button
-				   android:id="@+id/btnSetupListProduct"
-				   android:layout_width="wrap_content"
-				   android:layout_height="wrap_content"
-				   android:backgroundTint="#009688"
-				   android:text="Setup" />
+                    android:id="@+id/btnSetupListProduct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#009688"
+                    android:text="Setup" />
 
-            </LinearLayout>
+			</LinearLayout>
 
-            <ToggleButton
+			<ToggleButton
                 android:id="@+id/toggleAutoOrder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -110,15 +122,15 @@
                 android:backgroundTint="#00BCD4"
                 android:textColor="@android:color/white"/>
 
-        </LinearLayout>
+		</LinearLayout>
 
 
-        <LinearLayout
+		<LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center">
-            <Button
+			<Button
                 android:id="@+id/btnViewComments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -127,7 +139,7 @@
                 android:backgroundTint="@android:color/holo_blue_dark"
                 android:textColor="@android:color/white"/>
 
-            <Button
+			<Button
                 android:id="@+id/btnViewCustomers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -135,7 +147,7 @@
                 android:backgroundTint="@android:color/holo_green_dark"
                 android:textColor="@android:color/white" />
 
-            <Button
+			<Button
                 android:id="@+id/btnViewOrders"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -144,7 +156,7 @@
                 android:backgroundTint="#009688"
                 android:textColor="@android:color/white" />
 
-        </LinearLayout>
-    </LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
 
 </LinearLayout>

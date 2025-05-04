@@ -36,9 +36,10 @@ namespace LOMSAPITEST
                 new ListProductModel { ListProductId = 1, ListProductName = "List 1" },
                 new ListProductModel { ListProductId = 2, ListProductName = "List 2" }
             };
-
+            // Replace the problematic line with the following:
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.GetAllListProduct())
+                .Setup(repo => repo.GetAllListProduct(userId))
                 .ReturnsAsync(listProducts);
 
             // Act
@@ -60,8 +61,9 @@ namespace LOMSAPITEST
         public async Task GetAllListProduct_NoListProducts_ReturnsNotFoundResult()
         {
             // Arrange
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.GetAllListProduct())
+                .Setup(repo => repo.GetAllListProduct(userId))
                 .ReturnsAsync((List<ListProductModel>)null);
 
             // Act
@@ -232,9 +234,9 @@ namespace LOMSAPITEST
         {
             // Arrange
             var listProductName = "New List";
-
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.AddNewListProduct(listProductName))
+                .Setup(repo => repo.AddNewListProduct(listProductName,userId))
                 .ReturnsAsync(1);
 
             // Act
@@ -250,9 +252,9 @@ namespace LOMSAPITEST
         {
             // Arrange
             var listProductName = "New List";
-
+            var userId = _controller.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             _mockListProductRepository
-                .Setup(repo => repo.AddNewListProduct(listProductName))
+                .Setup(repo => repo.AddNewListProduct(listProductName,userId))
                 .ReturnsAsync(0);
 
             // Act
@@ -307,13 +309,13 @@ namespace LOMSAPITEST
             // Arrange
             var listProductId = 1;
             var liveStreamID = "stream123";
-
+            var maxPrice = 99.99m; // thêm maxPrice
             _mockListProductRepository
-                .Setup(repo => repo.AddListProductInToLiveStream(listProductId, liveStreamID))
+                .Setup(repo => repo.AddListProductInToLiveStream(liveStreamID, listProductId, maxPrice))
                 .ReturnsAsync(1);
 
             // Act
-            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID);
+            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID,maxPrice);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -326,13 +328,13 @@ namespace LOMSAPITEST
             // Arrange
             var listProductId = 1;
             var liveStreamID = "stream123";
-
+            var maxPrice = 99.99m; // thêm maxPrice
             _mockListProductRepository
-                .Setup(repo => repo.AddListProductInToLiveStream(listProductId, liveStreamID))
+                .Setup(repo => repo.AddListProductInToLiveStream(liveStreamID, listProductId, maxPrice))
                 .ReturnsAsync(0);
 
             // Act
-            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID);
+            var result = await _controller.AddListProductInToLiveStream(listProductId, liveStreamID, maxPrice);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
