@@ -55,10 +55,10 @@ namespace LOMSUI.Helpers
                     _deliveredLayout.PerformClick();
                     break;
                 case "Canceled":
-                    _deliveredLayout.PerformClick();
+                    _cancelLayout.PerformClick();
                     break;
                 case "Returned":
-                    _deliveredLayout.PerformClick();
+                    _returnLayout.PerformClick();
                     break;
             }
         }

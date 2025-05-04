@@ -106,9 +106,38 @@ namespace LOMSAPI.Controllers
         [HttpPut("status/{id}")]
         public async Task<IActionResult> UpdateStatus(int id, [FromForm] OrderStatus status)
         {
-            var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
-            return result > 0 ? Ok() : NotFound("Can't update status of this order");
+            try
+            {
+                var result = await _orderRepo.UpdateStatusOrderAsync(id, status);
+                return result > 0 ? Ok() : NotFound("Can't update status of this order");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
+        [HttpPut("status-check/{id}")]
+        public async Task<IActionResult> UpdateStatusCheck(int id, [FromForm] bool newStatusCheck)
+        {
+            var result = await _orderRepo.UpdateStatusCheckOrderAsync(id, newStatusCheck);
+            if (result >= 0)
+                return Ok(new { message = "Status check updated successfully" });
+            return NotFound(new { message = "Order not found or update failed" });
+        }
+
+        [HttpPut("update-tracking-note/{id}")]
+        public async Task<IActionResult> UpdateTrackingAndNote(int id, [FromBody] OrderModelRequest model)
+        {
+            model.OrderID = id;
+
+            var result = await _orderRepo.UpdateOrderAsync2(model);
+            return result > 0
+                ? Ok(new { message = "Updated successfully" })
+                : NotFound(new { message = "Order not found" });
+        }
+
+
         [HttpPut("TestPrint")]
         public async Task<IActionResult> TestPrint()
         {

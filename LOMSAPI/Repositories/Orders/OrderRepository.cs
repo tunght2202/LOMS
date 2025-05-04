@@ -3,6 +3,7 @@ using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
 using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -47,7 +48,18 @@ namespace LOMSAPI.Repositories.Orders
                 Address = o.Comment.LiveStreamCustomer.Customer.Address,
                 Email = o.Comment.LiveStreamCustomer.Customer.Email,
                 FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
-                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
             }).ToList();
             return orderModels;
         }
@@ -75,7 +87,18 @@ namespace LOMSAPI.Repositories.Orders
                 Address = o.Comment.LiveStreamCustomer.Customer.Address,
                 Email = o.Comment.LiveStreamCustomer.Customer.Email,
                 FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
-                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
             }).ToList();
             return orderModels;
         }
@@ -103,7 +126,18 @@ namespace LOMSAPI.Repositories.Orders
                 Address = o.Comment.LiveStreamCustomer.Customer.Address,
                 Email = o.Comment.LiveStreamCustomer.Customer.Email,
                 FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
-                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
             }).ToList();
             return orderModels;
         }
@@ -131,13 +165,25 @@ namespace LOMSAPI.Repositories.Orders
                 Address = o.Comment.LiveStreamCustomer.Customer.Address,
                 Email = o.Comment.LiveStreamCustomer.Customer.Email,
                 FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
-                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
             }).ToList();
             return orderModels;
         }
         public async Task<OrderCustomerModel?> GetOrderByIdAsync(int orderId)
         {
             var order = await _context.Orders
+                        .Include(o => o.Product)
                         .Include(o => o.Comment)
                         .Include(o => o.Comment.LiveStreamCustomer)
                         .Include(o => o.Comment.LiveStreamCustomer.Customer)
@@ -156,7 +202,18 @@ namespace LOMSAPI.Repositories.Orders
                 Address = order.Comment.LiveStreamCustomer.Customer.Address,
                 Email = order.Comment.LiveStreamCustomer.Customer.Email,
                 FacebookName = order.Comment.LiveStreamCustomer.Customer.FacebookName,
-                PhoneNumber = order.Comment.LiveStreamCustomer.Customer.PhoneNumber
+                PhoneNumber = order.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = order.CommentID,
+                ProductID = order.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = order.Product.ProductID,
+                    Name = order.Product.Name,
+                    Price = order.Product.Price,
+                    Stock = order.Product.Stock,
+                    Description = order.Product.Description,
+                    ImageURL = order.Product.ImageURL
+                }
             };
 
             return orderCustomer;
@@ -209,7 +266,7 @@ namespace LOMSAPI.Repositories.Orders
                     DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
                     SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
                 };
-//                _print.PrintCustomerLabel("COM5", inforprint);
+                _print.PrintCustomerLabel("COM5", inforprint);
                 return true;
             }
             catch (Exception ex)
@@ -238,6 +295,17 @@ namespace LOMSAPI.Repositories.Orders
             return await _context.SaveChangesAsync();
         }
 
+
+        public async Task<int> UpdateOrderAsync2(OrderModelRequest orderModel)
+        {
+            var existing = await _context.Orders.FindAsync(orderModel.OrderID);
+            if (existing == null) return 0;
+            existing.TrackingNumber = orderModel.TrackingNumber;
+            existing.Note = orderModel.Note;
+
+            return await _context.SaveChangesAsync();
+        }
+
         public async Task<int> UpdateStatusOrderAsync(int orderId, OrderStatus newStatus)
         {
             var order = await _context.Orders
@@ -260,6 +328,11 @@ namespace LOMSAPI.Repositories.Orders
             }
             if( ((order.StatusCheck == false) && (order.Comment.LiveStreamCustomer.LiveStream.PriceMax <= (order.CurrentPrice * order.Quantity))) ) {
                 throw new Exception("Can't change status, you must call for customer !");
+                return 0;
+            }
+            if((newStatus.Equals(OrderStatus.Shipped)) && (string.IsNullOrEmpty(order.TrackingNumber)))
+            {
+                throw new Exception("Can't change status, you must input tracking number !");
                 return 0;
             }
             var getProduct = await _context.Products
@@ -308,7 +381,18 @@ namespace LOMSAPI.Repositories.Orders
                 Address = o.Comment.LiveStreamCustomer.Customer.Address,
                 Email = o.Comment.LiveStreamCustomer.Customer.Email,
                 FacebookName = o.Comment.LiveStreamCustomer.Customer.FacebookName,
-                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber
+                PhoneNumber = o.Comment.LiveStreamCustomer.Customer.PhoneNumber,
+                CommentID = o.CommentID,
+                ProductID = o.ProductID,
+                Product = new ProductModel
+                {
+                    ProductID = o.Product.ProductID,
+                    Name = o.Product.Name,
+                    Price = o.Product.Price,
+                    Stock = o.Product.Stock,
+                    Description = o.Product.Description,
+                    ImageURL = o.Product.ImageURL
+                }
 
             }).ToList();
             return orderModels;
@@ -396,10 +480,24 @@ namespace LOMSAPI.Repositories.Orders
                                 var customer = await _context.Customers
                                     .FirstOrDefaultAsync(c => c.CustomerID.Equals(comment.LiveStreamCustomer.CustomerID));
 
+                                var oldOrder = _context.Orders
+                                        .Include(o => o.Product)
+                                        .Where(o => o.Comment.LiveStreamCustomerID == comment.LiveStreamCustomerID
+                                        && o.ProductID == productId).ToList();
+                                decimal total = 0;
+                                if(oldOrder != null)
+                                {
+                                    total = oldOrder.Sum(order => order.Product.Price * order.Quantity);
+
+                                }
+                                if (total == null)
+                                {
+                                    total = 0;
+                                }
                                 var text = string.Empty;
                                 if (customer.Address != null || customer.PhoneNumber != null)
                                 {
-                                    if(tonggia >= priceMax)
+                                    if((tonggia + total) >= priceMax)
                                     {
                                         newOrder.Status = OrderStatus.Pending;
                                     }
@@ -472,6 +570,16 @@ namespace LOMSAPI.Repositories.Orders
                 Console.WriteLine($"Error: {ex.Message}");
                 return 0;
             }
+        }
+
+        private long TotalPrice(int liveStreamCustomerID, int productId)
+        {
+            var order = _context.Orders
+                .Include(o => o.Product)
+                .Where(o => o.Comment.LiveStreamCustomerID == liveStreamCustomerID
+                && o.ProductID == productId).ToList();
+            var total = order.Sum(order => order.Product.Price * order.Quantity);
+            return (long)total;
         }
 
         private async Task<bool> SendMessage2Async(string customerId, string TokenFacbook, string messageSend)

@@ -17,6 +17,7 @@ namespace LOMSUI
         private TextView _txtTitle, _txtStatus, _txtStartTime;
         private Button _btnViewComments, _btnViewCustomers,
                        _btnViewOrders, _btnSetupListProduct, _tvRevenusLive;
+        private EditText _edtMaxPrice;
         private ToggleButton _toggleAutoCreateOrder;
         private bool _isAutoCreating = false;
         private CancellationTokenSource _cancellationTokenSource;
@@ -39,6 +40,7 @@ namespace LOMSUI
             _txtStatus = FindViewById<TextView>(Resource.Id.txtLiveStatus);
             _txtStartTime = FindViewById<TextView>(Resource.Id.txtLiveStartTime);
             _tvRevenusLive = FindViewById<Button>(Resource.Id.tvRevenueLive);
+            _edtMaxPrice = FindViewById<EditText>(Resource.Id.edtMaxPrice);
             _btnSetupListProduct = FindViewById<Button>(Resource.Id.btnSetupListProduct);
             _toggleAutoCreateOrder = FindViewById<ToggleButton>(Resource.Id.toggleAutoOrder);
             _spinnerListProduct = FindViewById<Spinner>(Resource.Id.spinnerListProduct);
@@ -151,6 +153,7 @@ namespace LOMSUI
                 return;
             }
 
+        
             try
             {
                 int listProductId = 0;
@@ -161,7 +164,16 @@ namespace LOMSUI
                     listProductId = listProducts[selectedIndex - 1].ListProductId;
                 }
 
-                var success = await _apiService.SetupListProductAsync(_liveStreamId, listProductId);
+                decimal maxPrice = 0;
+                if (!string.IsNullOrWhiteSpace(_edtMaxPrice.Text))
+                {
+                    if (!decimal.TryParse(_edtMaxPrice.Text, out maxPrice) || maxPrice <= 0)
+                    {
+                        Toast.MakeText(this, "Please enter a valid Max Price > 0.", ToastLength.Short).Show();
+                        return;
+                    }
+                }
+                var success = await _apiService.SetupListProductAsync(_liveStreamId, listProductId, maxPrice);
 
                 Toast.MakeText(this, success ? "ListProduct setup successfully!" : "Failed to setup ListProduct.", ToastLength.Short).Show();
             }

@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using Android.Views;
 using AndroidX.RecyclerView.Widget;
+using Bumptech.Glide;
 using LOMSUI.Models;
 using System;
 using System.Collections.Generic;
@@ -28,11 +29,15 @@ namespace LOMSUI.Adapter
         {
             var viewHolder = holder as OrderViewHolder;
             var order = _orders[position];
+            Glide.With(viewHolder.ItemView.Context)
+                    .Load(order.Product.ImageURL)
+                    .Placeholder(Resource.Drawable.logos)
+                    .Into(viewHolder.imgNameProduct);
 
-            viewHolder.TxtOrderCode.Text = $"Order code: ORD{order.OrderID}";
-            viewHolder.TxtOrderDate.Text = $"Order date: {order.OrderDate:dd/MM/yyyy}";
+            viewHolder.txtCustomerName.Text = $"Customer :{order.FacebookName}";
+            viewHolder.txtProductName.Text = $"{order.Product.Name}";
             viewHolder.txtOrderQuantity.Text = $"Quantity: {order.Quantity}";
-            viewHolder.TxtTotalPrice.Text = $"Price: {order.Quantity * order.Product.Price:n0}đ"; 
+            viewHolder.TxtTotalPrice.Text = $"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ"; 
             viewHolder.TxtOrderStatus.Text = $"Status: {order.Status}";
 
             viewHolder.BtnViewDetail.Tag = new OrderModelWrapper(order);
@@ -58,13 +63,15 @@ namespace LOMSUI.Adapter
 
         public class OrderViewHolder : RecyclerView.ViewHolder
         {
-            public TextView TxtOrderCode, TxtOrderDate, TxtTotalPrice, TxtOrderStatus, txtOrderQuantity;
+            public TextView txtCustomerName, txtProductName, TxtTotalPrice, TxtOrderStatus, txtOrderQuantity;
+            public ImageView imgNameProduct;
             public Button BtnViewDetail;
 
             public OrderViewHolder(View itemView) : base(itemView)
             {
-                TxtOrderCode = itemView.FindViewById<TextView>(Resource.Id.txtOrderCode);
-                TxtOrderDate = itemView.FindViewById<TextView>(Resource.Id.txtOrderDate);
+                imgNameProduct = itemView.FindViewById<ImageView>(Resource.Id.imgNameProduct);
+                txtCustomerName = itemView.FindViewById<TextView>(Resource.Id.txtCustomerName);
+                txtProductName = itemView.FindViewById<TextView>(Resource.Id.txtProductName);
                 TxtTotalPrice = itemView.FindViewById<TextView>(Resource.Id.txtTotalPrice);
                 txtOrderQuantity = itemView.FindViewById<TextView>(Resource.Id.txtOrderQuantity);
                 TxtOrderStatus = itemView.FindViewById<TextView>(Resource.Id.txtOrderStatus);
