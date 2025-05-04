@@ -262,7 +262,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="#17B857"
-                android:text="Shipped"
+                android:text="Shipping"
                 android:textColor="@android:color/white"
                 android:textSize="15sp" />
         </LinearLayout>

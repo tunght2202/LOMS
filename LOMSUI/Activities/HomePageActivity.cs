@@ -25,6 +25,21 @@ namespace LOMSUI.Activities
             SetContentView(Resource.Layout.homepage);
             BottomNavHelper.SetupFooterNavigation(this, "statistics");
 
+            InitViews();
+
+            _apiService = ApiServiceProvider.Instance;
+
+            Task.Run(async () =>
+            {
+                await LoadRevenueData();
+                await LoadProductData();
+            });
+
+
+        }
+
+        private void InitViews()
+        {
             _txtTotalRevenue = FindViewById<TextView>(Resource.Id.txtTotalRevenue);
             _txtTotalOrders = FindViewById<TextView>(Resource.Id.txtTotalOrders);
             _txtOrderDelive = FindViewById<TextView>(Resource.Id.txtOrderDelivered);
@@ -36,50 +51,47 @@ namespace LOMSUI.Activities
             _txtStartDate.Text = _startDate.ToString("d/M/yyyy");
             _txtEndDate.Text = _endDate.ToString("d/M/yyyy");
 
-
-            _apiService = ApiServiceProvider.Instance;
-
             FindViewById<LinearLayout>(Resource.Id.startDateLayout).Click += (s, e) => ShowDatePicker(true);
             FindViewById<LinearLayout>(Resource.Id.endDateLayout).Click += (s, e) => ShowDatePicker(false);
-
-            LoadRevenueData();
-            LoadProductData();
-
-         
         }
+
         private async Task LoadRevenueData()
         {
-            var revenueData = await _apiService.GetRevenueByDateRangeAsync(_startDate, _endDate);
-            var totalOrders = await _apiService.GetTotalOrdersAsync(_startDate, _endDate);
-            var totalOrderCancel = await _apiService.GetTotalOrdersCancelledAsync(_startDate, _endDate);
-            var totalOrderReturn = await _apiService.GetTotalOrdersReturnedAsync(_startDate, _endDate);
-            var totalOrderDelive = await _apiService.GetTotalOrdersDeliveredAsync(_startDate, _endDate);
-
-            if (revenueData != null)
+            try
             {
-                _txtTotalRevenue.Text = string.Format(CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", revenueData.TotalRevenue);
+                var revenueTask = _apiService.GetRevenueByDateRangeAsync(_startDate, _endDate);
+                var totalOrdersTask = _apiService.GetTotalOrdersAsync(_startDate, _endDate);
+                var cancelTask = _apiService.GetTotalOrdersCancelledAsync(_startDate, _endDate);
+                var returnTask = _apiService.GetTotalOrdersReturnedAsync(_startDate, _endDate);
+                var deliveredTask = _apiService.GetTotalOrdersDeliveredAsync(_startDate, _endDate);
+
+                await Task.WhenAll(revenueTask, totalOrdersTask, cancelTask, returnTask, deliveredTask);
+
+                var revenueData = revenueTask.Result;
+                var totalOrders = totalOrdersTask.Result;
+                var totalOrderCancel = cancelTask.Result;
+                var totalOrderReturn = returnTask.Result;
+                var totalOrderDelive = deliveredTask.Result;
+
+                RunOnUiThread(() =>
+                {
+                    if (revenueData != null)
+                    {
+                        _txtTotalRevenue.Text = string.Format(CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", revenueData.TotalRevenue);
+                    }
+
+                    _txtTotalOrders.Text = $"{totalOrders:N0}";
+                    _txtOrderDelive.Text = $"{totalOrderDelive:N0}";
+                    _txtOrderCancel.Text = $"{totalOrderCancel:N0}";
+                    _txtOrderReturn.Text = $"{totalOrderReturn:N0}";
+                });
             }
-
-            if (totalOrders >= 0)
+            catch (Exception ex)
             {
-                _txtTotalOrders.Text = $"{totalOrders:N0}";
-            }
-
-            if (totalOrderDelive >= 0)
-            {
-                _txtOrderDelive.Text = $"{totalOrderDelive:N0}";
-            }
-
-            if (totalOrderCancel >= 0)
-            {
-                _txtOrderCancel.Text = $"{totalOrderCancel:N0}";
-            }
-
-            if (totalOrderReturn >= 0)
-            {
-                _txtOrderReturn.Text = $"{totalOrderReturn:N0}";
+                Console.WriteLine("Error loading revenue data: " + ex.Message);
             }
         }
+
 
         private void ShowDatePicker(bool isStart)
         {
@@ -118,18 +130,16 @@ namespace LOMSUI.Activities
             try
             {
                 var products = await _apiService.GetAllProductsByUserAsync();
-                TableLayout productTable = FindViewById<TableLayout>(Resource.Id.productListLayout);
+                TableLayout productDataTable = FindViewById<TableLayout>(Resource.Id.productDataTable);
                 if (products == null || products.Count == 0) return;
 
                 RunOnUiThread(() =>
                 {
-                    productTable.RemoveAllViews(); 
-
-                    productTable.AddView(CreateTableRow(new[] { "STT", "Name", "Quantity", "Price" }, true));
+                    productDataTable.RemoveAllViews(); 
 
                     for (int i = 0; i < products.Count; i++)
                     {
-                        productTable.AddView(CreateTableRow(new[]
+                        productDataTable.AddView(CreateTableRow(new[]
                         {
                     $"{i + 1}",
                     products[i].Name,

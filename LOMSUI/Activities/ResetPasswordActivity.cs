@@ -58,7 +58,6 @@ namespace LOMSUI
             if (string.IsNullOrEmpty(input))
             {
                 ShowToast(errorMessage);
-                Finish();
                 return false;
             }
             return true;
