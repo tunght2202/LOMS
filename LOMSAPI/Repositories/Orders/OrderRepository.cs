@@ -3,7 +3,6 @@ using LOMSAPI.Models;
 using LOMSAPI.Repositories.ListProducts;
 using LOMSAPI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -319,21 +318,25 @@ namespace LOMSAPI.Repositories.Orders
             if (order == null) return 0;
             if (newStatus < order.Status)
             {
-                throw new Exception("Can't change status");
-                return 0;
+                throw new Exception("Can't change status");        
             }
+            if ((order.Status == OrderStatus.Pending) && order.Comment?.LiveStreamCustomer?.Customer == null)
+                    throw new Exception("Can't confirm order without customer information!");
+
             if (order.Status == OrderStatus.Canceled)
             {
                 throw new Exception("Can't change status");
-                return 0;
             }
             if( ((order.StatusCheck == false) && (order.Comment.LiveStreamCustomer.LiveStream.PriceMax <= (order.CurrentPrice * order.Quantity))) ) {
                 throw new Exception("Can't change status, you must call for customer !");
-                return 0;
             }
             if((newStatus.Equals(OrderStatus.Shipped)) && (string.IsNullOrEmpty(order.TrackingNumber)))
             {
                 throw new Exception("Can't change status, you must input tracking number !");
+            }
+            if ((string.IsNullOrEmpty(order.Comment.LiveStreamCustomer.Customer.Address)) || (string.IsNullOrEmpty(order.Comment.LiveStreamCustomer.Customer.PhoneNumber)))
+            {
+                throw new Exception("Can't change status, you must input address and phone number !");
                 return 0;
             }
 
