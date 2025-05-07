@@ -105,7 +105,9 @@ namespace LOMSUI.Activities
                     _etCode.Text = _product.ProductCode;
                     _etDescription.Text = _product.Description;
                     _etStock.Text = _product.Stock;
-                    _etPrice.Text = _product.Price;
+                    string input = _product.Price;
+                    string result = input.Split('.')[0];
+                    _etPrice.Text = result;
 
                     Glide.With(this).Load(_product.ImageURL).Into(_imgProduct);
                 });
@@ -149,6 +151,12 @@ namespace LOMSUI.Activities
             await _imageStream.CopyToAsync(clonedStream);
             clonedStream.Seek(0, SeekOrigin.Begin);
 
+            if (!(int.TryParse(_product.Price, out var Priceint)))
+            {
+                Toast.MakeText(this, "Price must integer", ToastLength.Short).Show();
+                return;
+            }
+
             var errorResponse = await _apiService.UpdateProductAsync(_productId, _product, clonedStream, "product.jpg");
                 if (errorResponse == null)
                 {
@@ -166,6 +174,10 @@ namespace LOMSUI.Activities
 
                     if (errorResponse.Errors.TryGetValue("Name", out var nameErrs))
                         _etName.Error = string.Join("\n", nameErrs);
+
+                    if (errorResponse.Errors.TryGetValue("ProductCode", out var codeErrs))
+                        _etCode.Error = string.Join("\n", codeErrs);
+
 
                     if (errorResponse.Errors.TryGetValue("Price", out var priceErrs))
                         _etPrice.Error = string.Join("\n", priceErrs);

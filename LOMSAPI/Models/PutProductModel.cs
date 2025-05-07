@@ -16,11 +16,11 @@ namespace LOMSAPI.Models
         public string Description { get; set; }
 
         [Required(ErrorMessage = "Price is required.")]
-        [Range(0.01, 1000000, ErrorMessage = "Price must be between 0.01 and 1,000,000.")]
+        [Range(0, 1000000000000, ErrorMessage = "Price must be greater or equal 0.")]
         public decimal Price { get; set; }
 
         [Required(ErrorMessage = "Stock is required.")]
-        [Range(0, 100000, ErrorMessage = "Stock must be between 0 and 100,000.")]
+        [Range(0, 1000000, ErrorMessage = "Stock must be between 0 and 1,000,000.")]
         public int Stock { get; set; }
     }
 }

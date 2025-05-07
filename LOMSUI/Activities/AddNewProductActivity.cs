@@ -96,7 +96,11 @@ namespace LOMSUI.Activities
                 Price = _edtPrice.Text,
                 Stock = _edtStock.Text,
             };
-
+            if( !(int.TryParse(product.Price, out var Priceint) ))
+            {
+                Toast.MakeText(this, "Price must integer", ToastLength.Short).Show();
+                return;
+            }
             var error = await _apiService.AddProductAsync(product, _imageStream, "product.jpg");
 
             if (error == null)
@@ -111,8 +115,11 @@ namespace LOMSUI.Activities
                 _edtStock.Error = null;
                 _edtDescription.Error = null;
 
+                
                 if (error.Errors.TryGetValue("Name", out var nameErrs))
                     _edtName.Error = string.Join("\n", nameErrs);
+                if (error.Errors.TryGetValue("ProductCode", out var codeErrs))
+                    _edtCode.Error = string.Join("\n", codeErrs);
 
                 if (error.Errors.TryGetValue("Price", out var priceErrs))
                     _edtPrice.Error = string.Join("\n", priceErrs);
