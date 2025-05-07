@@ -6,26 +6,26 @@
     android:layout_marginBottom="10dp"
     android:elevation="4dp">
 
-    <LinearLayout
+	<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <LinearLayout
+		<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <LinearLayout
+			<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
 
-                <TextView
+				<TextView
                     android:id="@+id/txtLiveStreamName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
                     android:textSize="16sp"
                     android:textColor="@android:color/black" />
 
-                <TextView
+				<TextView
                     android:id="@+id/txtOrderStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -43,25 +43,25 @@
                     android:textSize="14sp"
                     android:textColor="#4CAF50"
                     android:gravity="end" />
-            </LinearLayout>
+			</LinearLayout>
 
-            <LinearLayout
+			<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                <ImageView
+				<ImageView
                     android:id="@+id/imgNameCustomer"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:src="@drawable/logos"
                     android:layout_gravity="center"
                     android:layout_marginRight="8dp"/>
-                <LinearLayout
+				<LinearLayout
                     android:layout_width="0px"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
-                    <TextView
+					<TextView
                         android:id="@+id/txtCustomerName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -69,22 +69,22 @@
                         android:textStyle="bold"
                         android:textSize="14sp" />
 
-                    <TextView
+					<TextView
                         android:id="@+id/txtOrderTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TotalOrder: 4" />
 
 
-                    <TextView
+					<TextView
                         android:id="@+id/txtTotalPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TotalPrice: 500.000đ"
                         android:textSize="14sp" />
-                </LinearLayout>
+				</LinearLayout>
 
-                <Button
+				<Button
                     android:id="@+id/btnViewOrderDetails"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,9 +94,9 @@
                     android:textColor="@android:color/white"
                     android:textSize="12sp" />
 
-            </LinearLayout>
+			</LinearLayout>
 
-        </LinearLayout>
+		</LinearLayout>
 
-    </LinearLayout>
+	</LinearLayout>
 </androidx.cardview.widget.CardView>

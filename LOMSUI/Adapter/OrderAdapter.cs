@@ -13,11 +13,11 @@ namespace LOMSUI.Adapter
 {
     public class OrderAdapter : RecyclerView.Adapter
     {
-        private List<OrderModel> _orders;
+        private List<OrderByLiveStreamCustoemrModel> _orders;
         private readonly Context _context;
         public event Action<OrderModel> OnViewDetailClick;
 
-        public OrderAdapter(Context context, List<OrderModel> orders)
+        public OrderAdapter(Context context, List<OrderByLiveStreamCustoemrModel> orders)
         {
             _context = context;
             _orders = orders;
@@ -29,13 +29,13 @@ namespace LOMSUI.Adapter
         {
             var viewHolder = holder as OrderViewHolder;
             var order = _orders[position];
-            Glide.With(viewHolder.ItemView.Context)
+          /*  Glide.With(viewHolder.ItemView.Context)
                     .Load(order.Product.ImageURL)
                     .Placeholder(Resource.Drawable.logos)
-                    .Into(viewHolder.imgNameProduct);
+                    .Into(viewHolder.imgNameProduct);*/
 
-            viewHolder.txtCustomerName.Text = $"Customer :{order.FacebookName}";
-            viewHolder.txtLiveStreamName.Text = $"{order.Product.}";
+            viewHolder.txtCustomerName.Text = $"Customer :{order.CustoemrName}";
+            viewHolder.txtLiveStreamName.Text = $"{order.LiveStreamTital}";
             viewHolder.txtOrderQuantity.Text = $"Quantity: {order.Quantity}";
             viewHolder.TxtTotalPrice.Text = $"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ"; 
             viewHolder.TxtOrderStatus.Text = $"Status: {order.Status}";
@@ -78,7 +78,7 @@ namespace LOMSUI.Adapter
             }
         }
 
-        public void UpdateData(List<OrderModel> newOrders)
+        public void UpdateData(List<OrderByLiveStreamCustoemrModel> newOrders)
         {
             _orders = newOrders;
             NotifyDataSetChanged();
