@@ -509,6 +509,7 @@ namespace LOMSAPI.Repositories.Orders
                                 {
                                     if((tonggia + total) >= priceMax)
                                     {
+
                                         ChangePendingStatus(comment.LiveStreamCustomerID);
                                         newOrder.Status = OrderStatus.Pending;
                                     }
