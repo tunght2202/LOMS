@@ -79,9 +79,18 @@ namespace LOMSAPI.Controllers
         [HttpGet("LivestreamCustomer/{livestreamCustomerID}")]
         public async Task<IActionResult> GetOrderByLiveStreamCustoemrModel(int livestreamCustomerID)
         {
-            var orderByLiveStreamCustmer = await _orderRepo.GetOrdersByLiveStreamCustomerIdAsync(livestreamCustomerID);
+            var orderByLiveStreamCustmer = await _orderRepo.GetOrderByLiveStreamCustoemrModel(livestreamCustomerID);
             if (orderByLiveStreamCustmer == null) return NotFound();
             return Ok(orderByLiveStreamCustmer);
+        }
+
+        [HttpGet("GetListOrderByLiveStreamCustoemrModel")]
+        public async Task<IActionResult> GetListOrderByLiveStreamCustoemrModel()
+        {
+            string userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var ListOrderByLiveStreamCustmer = await _orderRepo.GetListOrderByLiveStreamCustoemrModel(userID);
+            if (ListOrderByLiveStreamCustmer == null) return NotFound();
+            return Ok(ListOrderByLiveStreamCustmer);
         }
 
         [HttpPost]
