@@ -9,5 +9,7 @@ namespace LOMSAPI.Repositories.LiveStreams
         Task<int> DeleteLiveStream(string liveStreamId);
         Task<bool> IsLiveStreamStillLive(string liveStreamId, string userId);
 
+        Task<int> GetMaxPriceLiveStream(string userId, string liveStreamId);    
+
     }
 }
