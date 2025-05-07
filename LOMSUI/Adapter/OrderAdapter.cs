@@ -57,7 +57,7 @@ namespace LOMSUI.Adapter
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
             var itemView = LayoutInflater.From(parent.Context)
-                .Inflate(Resource.Layout.item_order_history, parent, false);
+                .Inflate(Resource.Layout.item_order, parent, false);
             return new OrderViewHolder(itemView);
         }
 
