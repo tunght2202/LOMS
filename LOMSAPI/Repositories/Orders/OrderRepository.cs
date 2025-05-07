@@ -660,18 +660,35 @@ namespace LOMSAPI.Repositories.Orders
         {
             var totalOrder = await _context.Orders
                 .Include(o => o.Product)
-                .Where(o => o.Comment.LiveStreamCustomerID == LiveStreamCustomerID
-                && o.ProductID == productID).ToListAsync();
+                .Where(o => o.Comment.LiveStreamCustomerID == LiveStreamCustomerID && o.ProductID == productID)
+                .ToListAsync();
+
+            if (!totalOrder.Any())
+            {
+                // Trả về một mô hình rỗng hoặc mặc định để tránh tham chiếu null
+                return new OrderByProductCodeModel
+                {
+                    Status = "None",
+                    Quantity = 0,
+                    TotalPrice = 0,
+                    StatusCheck = false,
+                    TrackingNumber = null,
+                    Note = null,
+                    ProductID = productID,
+                    LiveStreamCustomerID = LiveStreamCustomerID
+                };
+            }
+
             var totalPrice = totalOrder.Sum(order => order.Product.Price * order.Quantity);
 
             var orderByProductCodeModel = new OrderByProductCodeModel
             {
-                Status = totalOrder.FirstOrDefault().Status.ToString(),
+                Status = totalOrder.First().Status.ToString(),
                 Quantity = totalOrder.Sum(order => order.Quantity),
-                TotalPrice = totalOrder.Sum(order => order.Product.Price * order.Quantity),
-                StatusCheck = totalOrder.FirstOrDefault().StatusCheck,
-                TrackingNumber = totalOrder.FirstOrDefault().TrackingNumber,
-                Note = totalOrder.FirstOrDefault().Note,
+                TotalPrice = totalOrder.Sum(order => order.CurrentPrice * order.Quantity),
+                StatusCheck = totalOrder.First().StatusCheck,
+                TrackingNumber = totalOrder.First().TrackingNumber,
+                Note = totalOrder.First().Note,
                 ProductID = productID,
                 LiveStreamCustomerID = LiveStreamCustomerID
             };
@@ -698,6 +715,7 @@ namespace LOMSAPI.Repositories.Orders
             orderByLiveStreamCustoemrModel.PhoneNumber = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.PhoneNumber;
             orderByLiveStreamCustoemrModel.Email = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.Email;
             orderByLiveStreamCustoemrModel.FacebookName = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.FacebookName;
+            orderByLiveStreamCustoemrModel.TotalPrice = order.Sum(order => (long)order.CurrentPrice * order.Quantity);
 
             var listProductID = order.Select(o => o.ProductID).Distinct().ToList();
             var listOrderByProductCodeModel = new List<OrderByProductCodeModel>();
@@ -742,12 +760,13 @@ namespace LOMSAPI.Repositories.Orders
                 orderByLiveStreamCustoemrModel.PhoneNumber = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.PhoneNumber;
                 orderByLiveStreamCustoemrModel.Email = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.Email;
                 orderByLiveStreamCustoemrModel.FacebookName = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.FacebookName;
+                orderByLiveStreamCustoemrModel.TotalPrice = order.Sum(order => (long)order.CurrentPrice * order.Quantity);
+
                 var listProductID = order.Select(o => o.ProductID).Distinct().ToList();
                 var listOrderByProductCodeModel = new List<OrderByProductCodeModel>();
                 foreach (var productID in listProductID)
                 {
-                    var orderByProductCodeModel = new OrderByProductCodeModel();
-                    orderByProductCodeModel = OrderByProductCodeModel(LiveStreamCustomerID, productID).Result;
+                    var orderByProductCodeModel = await OrderByProductCodeModel(LiveStreamCustomerID, productID);
                     listOrderByProductCodeModel.Add(orderByProductCodeModel);
                 }
 
