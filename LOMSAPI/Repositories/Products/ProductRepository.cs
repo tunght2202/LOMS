@@ -103,14 +103,18 @@ namespace LOMSAPI.Repositories.Products
                 throw new Exception($"Can't find a product with id = {productId}");
             }
             string imageUrl = await _cloudinaryService.UploadImageAsync(image);
-            var productCodeExist = await _context.Products
-
-            .AnyAsync(p => p.ProductCode.ToLower() == product.ProductCode.ToLower()
-                   && p.ProductID != productId);
-            if (productCodeExist)
+            if (!(string.IsNullOrEmpty(product.ProductCode)))
             {
-                throw new Exception($"Product code {product.ProductCode} exist");
+                var productCodeExist = await _context.Products
+
+                .AnyAsync(p => p.ProductCode.ToLower() == product.ProductCode.ToLower()
+                       && p.ProductID != productId);
+                if (productCodeExist)
+                {
+                    throw new Exception($"Product code {product.ProductCode} exist");
+                }
             }
+
 
 
             productById.Name = product.Name;

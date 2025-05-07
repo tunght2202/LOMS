@@ -15,7 +15,7 @@ namespace LOMSAPI.Models
         public string Description { get; set; }
 
         [Required(ErrorMessage = "Price is required.")]
-        [Range(0, 1000000000000, ErrorMessage = "Price must be greater than 0.")]
+        [Range(0, 1000000000000, ErrorMessage = "Price must be greater or equal 0.")]
         public decimal Price { get; set; }
 
         [Required(ErrorMessage = "Stock is required.")]
