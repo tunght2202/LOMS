@@ -240,5 +240,19 @@ namespace LOMSAPI.Repositories.LiveStreams
 
 
         }
+
+        public Task<int> GetMaxPriceLiveStream(string userId, string liveStreamId)
+        {
+            try
+            {
+                return _context.LiveStreams.Where(ls => ls.UserID == userId && ls.LivestreamID == liveStreamId)
+                    .Select(ls => (int)(ls.PriceMax ?? 0)).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Error calculating max price by livestream", ex);
+
+            }
+        }
     }
 }
