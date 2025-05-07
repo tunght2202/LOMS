@@ -21,6 +21,7 @@ namespace LOMSAPI.Repositories.Orders
         Task<IEnumerable<OrderCustomerModel>> GetAllOrdersByLiveStreamIdAsync(string liveStreamId);
         Task<IEnumerable<OrderCustomerModel>> GetAllOrdersAsync();
         Task<int> UpdateStatusCheckOrderAsync(int orderId, bool newStatusCheck);
+        Task<int> UpdateStatusOrderByLiveStreamCustoemrAsync(int livestreamCustomerID, OrderStatus newStatus);
         Task<IEnumerable<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustoemrModel(string userID);
     }
 }
