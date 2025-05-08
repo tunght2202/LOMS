@@ -1,0 +1,79 @@
+﻿@page
+@model Information.Pages.Customers.UpdateModel
+@{
+}
+<form method="post">
+    <input type="hidden" asp-for="Customer.CustomerId" />
+    <div class="form-group">
+        <label>Tỉnh/Thành phố</label>
+        <select id="ProvinceId" asp-for="Customer.ProvinceId" class="form-control" required>
+            <option value="">-- Chọn Tỉnh/Thành phố --</option>
+            @foreach (var province in Model.Provinces)
+            {
+                <option value="@province.Code">@province.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Quận/Huyện</label>
+        <select id="DistrictId" asp-for="Customer.DistrictId" class="form-control" required>
+            <option value="">-- Chọn Quận/Huyện --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Phường/Xã</label>
+        <select id="WardId" asp-for="Customer.WardId" class="form-control" required>
+            <option value="">-- Chọn Phường/Xã --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Địa chỉ cụ thể (số nhà, đường...)</label>
+        <input asp-for="Customer.DetailAddress" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Số điện thoại</label>
+        <input asp-for="Customer.PhoneNumber" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success mt-3">
+            @Model.SuccessMessage
+        </div>
+    }
+</form>
+@section Scripts {
+    <script>
+        document.getElementById("ProvinceId").addEventListener("change", async function () {
+            const provinceId = this.value;
+            const res = await fetch(`/api/districts?provinceId=${provinceId}`);
+            const data = await res.json();
+
+            const districtSelect = document.getElementById("DistrictId");
+            districtSelect.innerHTML = `<option value="">-- Chọn Quận/Huyện --</option>`;
+            data.forEach(d => {
+                districtSelect.innerHTML += `<option value="${d.code}">${d.name}</option>`;
+            });
+
+            document.getElementById("WardId").innerHTML = `<option value="">-- Chọn Phường/Xã --</option>`;
+        });
+
+        document.getElementById("DistrictId").addEventListener("change", async function () {
+            const districtId = this.value;
+            const res = await fetch(`/api/wards?districtId=${districtId}`);
+            const data = await res.json();
+
+            const wardSelect = document.getElementById("WardId");
+            wardSelect.innerHTML = `<option value="">-- Chọn Phường/Xã --</option>`;
+            data.forEach(w => {
+                wardSelect.innerHTML += `<option value="${w.code}">${w.name}</option>`;
+            });
+        });
+    </script>
+}

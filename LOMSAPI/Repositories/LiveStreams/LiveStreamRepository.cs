@@ -241,11 +241,12 @@ namespace LOMSAPI.Repositories.LiveStreams
 
         }
 
-        public Task<int> GetMaxPriceLiveStream(string userId, string liveStreamId)
+        public async Task<int> GetMaxPriceLiveStream(string userId, string liveStreamId)
         {
             try
             {
-                return _context.LiveStreams.Where(ls => ls.UserID == userId && ls.LivestreamID == liveStreamId)
+                return await _context.LiveStreams
+                    .Where(ls => ls.UserID == userId && ls.LivestreamID == liveStreamId)
                     .Select(ls => (int)(ls.PriceMax ?? 0)).FirstOrDefaultAsync();
             }
             catch (Exception ex)
