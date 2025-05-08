@@ -51,13 +51,13 @@ namespace LOMSUI.Activities
                 case "ByCustomer":
                     _customerId = Intent.GetStringExtra("customerId");
                     if (!string.IsNullOrEmpty(_customerId))
-                        await LoadOrdersAsync(() => _apiService.GetOrdersByCustomerIdAsync(_customerId));
+                        await LoadOrdersAsync(() => _apiService.GetListOrderByLiveStreamCustomerByCustomerModelAsync(_customerId));
                     break;
 
                 case "ByLive":
                     _liveStreamId = Intent.GetStringExtra("LiveStreamID");
                     if (!string.IsNullOrEmpty(_liveStreamId))
-                        await LoadOrdersAsync(() => _apiService.GetOrdersByLiveStreamIdAsync(_liveStreamId));
+                        await LoadOrdersAsync(() => _apiService.GetListOrderByLiveStreamCustomerByLiveStremModelAsync(_liveStreamId));
                     break;
 
                 case "ByUser":
@@ -81,9 +81,7 @@ namespace LOMSUI.Activities
             _adapter.OnViewDetailClick += order =>
             {
                 var intent = new Intent(this, typeof(OrderDetailActivity));
-                //intent.PutExtra("OrderId", order.OrderID);
                 intent.PutExtra("liveStreamCustoemrID", order.LiveStreamCustoemrID);
-
                 StartActivityForResult(intent, 100);
             };
             _recyclerView.SetAdapter(_adapter);
@@ -113,11 +111,11 @@ namespace LOMSUI.Activities
             {
                 if (!string.IsNullOrEmpty(_customerId))
                 {
-                    _ = LoadOrdersAsync(() => _apiService.GetOrdersByCustomerIdAsync(_customerId));
+                    _ = LoadOrdersAsync(() => _apiService.GetListOrderByLiveStreamCustomerByCustomerModelAsync(_customerId));
                 }
                 else if (!string.IsNullOrEmpty(_liveStreamId))
                 {
-                    _ = LoadOrdersAsync(() => _apiService.GetOrdersByLiveStreamIdAsync(_liveStreamId));
+                    _ = LoadOrdersAsync(() => _apiService.GetListOrderByLiveStreamCustomerByLiveStremModelAsync(_liveStreamId));
                 }
                 else
                 {

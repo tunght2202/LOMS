@@ -297,17 +297,6 @@ namespace LOMSAPI.Repositories.Orders
             return await _context.SaveChangesAsync();
         }
 
-
-        public async Task<int> UpdateOrderAsync2(OrderModelRequest orderModel)
-        {
-            var existing = await _context.Orders.FindAsync(orderModel.OrderID);
-            if (existing == null) return 0;
-            existing.TrackingNumber = orderModel.TrackingNumber;
-            existing.Note = orderModel.Note;
-
-            return await _context.SaveChangesAsync();
-        }
-
         public async Task<int> UpdateStatusOrderAsync(int orderId, OrderStatus newStatus)
         {
             var order = await _context.Orders
@@ -913,7 +902,7 @@ namespace LOMSAPI.Repositories.Orders
             if (orderByLiveStreamCustomer == null) return 0;
             foreach (var order in orderByLiveStreamCustomer)
             {
-                order.StatusCheck = true;
+                order.StatusCheck = statusCheck;
             }
             _context.UpdateRange(orderByLiveStreamCustomer);
             return await _context.SaveChangesAsync();

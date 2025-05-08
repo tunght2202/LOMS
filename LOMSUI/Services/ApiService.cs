@@ -721,7 +721,7 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<List<OrderByLiveStreamCustoemrModel>> GetOrdersByUserIdAsync()
+       /* public async Task<List<OrderByLiveStreamCustoemrModel>> GetOrdersByUserIdAsync()
         {
             try
             {
@@ -742,9 +742,9 @@ namespace LOMSUI.Services
                 Console.WriteLine($"Error when calling API to get orders: {ex.Message}");
                 return new List<OrderByLiveStreamCustoemrModel>();
             }
-        }
+        }*/
 
-        public async Task<List<OrderByLiveStreamCustoemrModel>> GetOrdersByCustomerIdAsync(string customerId)
+      /*  public async Task<List<OrderByLiveStreamCustoemrModel>> GetOrdersByCustomerIdAsync(string customerId)
         {
             try
             {
@@ -777,7 +777,7 @@ namespace LOMSUI.Services
 
             var json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<OrderByLiveStreamCustoemrModel>>(json);
-        }
+        }*/
 
         public async Task<OrderModel> GetOrderByIdAsync(int id)
         {
@@ -824,6 +824,43 @@ namespace LOMSUI.Services
             }
         }
 
+        public async Task<List<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustomerByLiveStremModelAsync(string liveStreamId)
+        {
+
+
+            var url = $"{BASE_URLL}/Orders/GetListOrderByLiveStreamCustomerByLiveStremModel/LiveStream/{liveStreamId}";
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<List<OrderByLiveStreamCustoemrModel>>(json);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustomerByCustomerModelAsync(string customerId)
+        {
+
+
+            var url = $"{BASE_URLL}/Orders/GetListOrderByLiveStreamCustomerByCustomerModel/Customer/{customerId}";
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<List<OrderByLiveStreamCustoemrModel>>(json);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
         public async Task<OrderByLiveStreamCustoemrModel> GetOrderByLiveStreamCustomerModelAsync(int livestreamCustomerId)
         {
             var url = $"{BASE_URLL}/Orders/LivestreamCustomer/{livestreamCustomerId}";
@@ -868,56 +905,47 @@ namespace LOMSUI.Services
                 return (false, $"{error}");
             }
         }
-        public async Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status)
+        public async Task<bool> UpdateOrderStatusAsync(int livestreamCustomerID, OrderStatus status)
         {
-          
-                
-                var url = $"{BASE_URLL}/Orders/status/{orderId}";
+           
+                var url = $"{BASE_URLL}/Orders/UpdateStatusOrderByLiveStreamCustoemrAsync/LivestreamCustomer/{livestreamCustomerID}/Status/{status}";
 
-                var content = new MultipartFormDataContent
-                  {
-                      { new StringContent(((int)status).ToString()), "status" }
-                  };
+                var response = await _httpClient.PutAsync(url, null);
 
-                var response = await _httpClient.PutAsync(url, content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                try
+                if (!response.IsSuccessStatusCode)
                 {
-                    var errorObj = JsonConvert.DeserializeObject<ApiErrorResponse>(responseContent);
-                    if (errorObj != null && !string.IsNullOrEmpty(errorObj.Message))
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    try
                     {
-                        throw new Exception(errorObj.Message);
+                        var errorObj = JsonConvert.DeserializeObject<ApiErrorResponse>(responseContent);
+                        if (errorObj != null && !string.IsNullOrEmpty(errorObj.Message))
+                            throw new Exception(errorObj.Message);
                     }
-                    else
-                    {
-                        throw new Exception("Unknown error (no message in JSON): " + responseContent);
-                    }
-                }
                 catch (JsonException)
                 {
-                    throw new Exception("Unknown error (not valid JSON): " + responseContent);
+                    var cleaned = responseContent;
+                    if (cleaned.StartsWith("System.Exception:"))
+                    {
+                        cleaned = cleaned.Replace("System.Exception:", "").Trim();
+                    }
+
+                    throw new Exception(cleaned);
                 }
+
             }
 
-
             return true;
+       
         }
 
-        public async Task<bool> UpdateStatusCheckOrderAsync(int orderId, bool newStatusCheck)
+
+        public async Task<bool> UpdateStatusCheckOrderAsync(int livestreamCustomerId, bool statusCheck)
         {
             try
             {
-                var content = new MultipartFormDataContent
-                 {
-                     { new StringContent(newStatusCheck.ToString()), "newStatusCheck" }
-                 };
-
-                var url = $"{BASE_URLL}/Orders/status-check/{orderId}";
-                var response = await _httpClient.PutAsync(url, content);
+                var url = $"{BASE_URLL}/Orders/UpdateStatusCalldAsync/LivestreamCustomer/{livestreamCustomerId}/statusCheck/{statusCheck}";
+                var response = await _httpClient.PutAsync(url, null); 
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
@@ -927,32 +955,46 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<bool> UpdateOrderTrackingAndNoteAsync(int orderId, OrderModelRequest model)
+        public async Task<OrderByLiveStreamCustoemrModel> GetOrderByLiveStreamCustomerAsync(int livestreamCustomerID)
         {
-            var url = $"{BASE_URLL}/Orders/update-tracking-note/{orderId}";
-            var json = JsonConvert.SerializeObject(model);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PutAsync(url, content);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                try
+                var url = $"{BASE_URLL}/Orders/LivestreamCustomer/{livestreamCustomerID}";
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
                 {
-                    var errorObj = JsonConvert.DeserializeObject<ApiErrorResponse>(responseContent);
-                    if (errorObj != null && !string.IsNullOrEmpty(errorObj.Message))
-                        throw new Exception(errorObj.Message);
+                    var json = await response.Content.ReadAsStringAsync();
+                    var order = JsonConvert.DeserializeObject<OrderByLiveStreamCustoemrModel>(json);
+                    return order;
                 }
-                catch
-                {
-                    throw new Exception("Unknown error while updating order info.");
-                }
+                return null;
             }
-
-            return true;
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error getting order by livestreamCustomerID: " + ex.Message);
+                return null;
+            }
         }
 
+        public async Task<bool> UpdateOrderTrackingAndNoteAsync(int livestreamCustomerID, string trackingNumber, string note)
+        {
+            try
+            {
+                var encodedTracking = Uri.EscapeDataString(trackingNumber ?? "");
+                var encodedNote = Uri.EscapeDataString(note ?? "");
+
+                var url = $"{BASE_URLL}/Orders/UpdateStatusTrackingNumberdAsync/LivestreamCustomer/{livestreamCustomerID}/trackingNumber/{encodedTracking}/Note/{encodedNote}";
+
+                var response = await _httpClient.PutAsync(url, null);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error updating tracking info: " + ex.Message);
+                return false;
+            }
+        }
 
 
         public async Task<bool> CheckListProductExistsAsync(string liveStreamId)

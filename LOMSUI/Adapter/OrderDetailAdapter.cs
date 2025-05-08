@@ -25,21 +25,21 @@ namespace LOMSUI.Adapter
             {
                 var orders = _orders[position];
 
-                //viewHolder.TxtProductName.Text = orders.;
+                viewHolder.TxtProductName.Text = orders.Name;
                 viewHolder.TxtOrderQuantity.Text = $"Quantity: {orders.Quantity}";
-               // viewHolder.TxtPrice.Text = $"Price: {orders.:#,##0}đ";
+                viewHolder.TxtPrice.Text = $"Price: {orders.CurrentPrice:#,##0}đ";
                 viewHolder.TxtTotalPrice.Text = $"Total: {orders.TotalPrice:#,##0}đ";
 
-             /*   if (!string.IsNullOrEmpty(orders.ImageUrl))
+                if (!string.IsNullOrEmpty(orders.ImageURL))
                 {
                     Glide.With(_context)
-                         .Load(orders.ImageUrl)
+                         .Load(orders.ImageURL)
                          .Into(viewHolder.ImgProduct);
                 }
                 else
                 {
                     viewHolder.ImgProduct.SetImageResource(Resource.Drawable.logos);
-                }*/
+                }
             }
         }
 

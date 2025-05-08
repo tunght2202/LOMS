@@ -74,6 +74,20 @@
                 android:layout_weight="1"
                 android:scrollbars="vertical"/>
         </LinearLayout>
+		<LinearLayout
+		   android:layout_width="match_parent"
+		   android:layout_height="wrap_content"
+		   android:orientation="vertical"
+		   android:padding="16sp">
+			<TextView
+                android:id="@+id/txtTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TotalPrice : 150.000vnđ"
+                android:textStyle="bold"
+				android:textColor="#258C1E"
+                android:textSize="16sp" />
+		</LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"

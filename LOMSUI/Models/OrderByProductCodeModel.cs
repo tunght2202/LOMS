@@ -19,6 +19,10 @@ namespace LOMSUI.Models
         public string? TrackingNumber { get; set; }
         public string? Note { get; set; }
         public int ProductID { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal? CurrentPrice { get; set; }
+        public string? ImageURL { get; set; }
         public int LiveStreamCustomerID { get; set; }
     }
 }

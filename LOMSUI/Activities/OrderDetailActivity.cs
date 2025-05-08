@@ -3,16 +3,16 @@ using AndroidX.RecyclerView.Widget;
 using LOMSUI.Adapter;
 using LOMSUI.Models;
 using LOMSUI.Services;
+using static AndroidX.RecyclerView.Widget.RecyclerView;
 
 namespace LOMSUI.Activities
 {
     [Activity(Label = "OrderDetail")]
     public class OrderDetailActivity : BaseActivity
     {
-        private TextView _txtOrderCode, _txtOrderDate, 
+        private TextView _txtOrderDate,
                          _txtTotalPrice, _txtOrderStatus,
-                         _txtProductName, _txtProductPrice,
-                         _txtOrderQuantity, _txtCustomerName,
+                         _txtCustomerName,
                           _txtAddress, _txtPhoneNumber;
         private RecyclerView _recyclerView;
         private CheckBox _cbCheck;
@@ -22,10 +22,9 @@ namespace LOMSUI.Activities
                    _btnSetStatusCheck, _btnUpdateOrder;
         private LinearLayout _layoutPending, _layoutConfirm, _layoutShipped,
                               _layoutTracking, _layoutNote;
-        private OrderModel _currentOrder;
         private ApiService _apiService;
         private int _orderId;
-        private int _liveStreamCustoemrID;
+        private int _liveStreamCustomerID;
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -33,24 +32,23 @@ namespace LOMSUI.Activities
 
             _apiService = ApiServiceProvider.Instance;
 
-            //_orderId = Intent.GetIntExtra("OrderId", -1);
-            _liveStreamCustoemrID = Intent.GetIntExtra("liveStreamCustoemrID", 0);
+            _liveStreamCustomerID = Intent.GetIntExtra("liveStreamCustoemrID", -1);
 
-           /* if (_orderId == -1)
-            {
-                Toast.MakeText(this, "Invalid Order ID", ToastLength.Long).Show();
-                Finish();
-                return;
-            }*/
             InitViews();
             InitButtonEvents();
             await LoadOrderDetails();
+
+            var orderInfo = await _apiService.GetOrderByLiveStreamCustomerAsync(_liveStreamCustomerID);
+            if (orderInfo != null)
+            {
+                _cbCheck.Checked = orderInfo.StatusCheck;
+            }
 
             _btnSetStatusCheck.Click += async (s, e) =>
             {
                 bool newStatusCheck = _cbCheck.Checked;
 
-                var success = await _apiService.UpdateStatusCheckOrderAsync(_currentOrder.OrderID, newStatusCheck);
+                var success = await _apiService.UpdateStatusCheckOrderAsync(_liveStreamCustomerID, newStatusCheck);
                 if (success)
                 {
                     Toast.MakeText(this, "Updated check status successfully", ToastLength.Short).Show();
@@ -76,13 +74,9 @@ namespace LOMSUI.Activities
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
 
-            // _txtOrderCode = FindViewById<TextView>(Resource.Id.txtOrderCode);
             //_txtOrderDate = FindViewById<TextView>(Resource.Id.txtOrderDate);
-            _txtOrderQuantity = FindViewById<TextView>(Resource.Id.txtOrderQuantity);
             _txtTotalPrice = FindViewById<TextView>(Resource.Id.txtTotalPrice);
             _txtOrderStatus = FindViewById<TextView>(Resource.Id.txtOrderStatus);
-            _txtProductName = FindViewById<TextView>(Resource.Id.txtProductName);
-            //_txtProductPrice = FindViewById<TextView>(Resource.Id.txtProductPrice);
 
             _edtTrackingNumber = FindViewById<EditText>(Resource.Id.edtTrackingNumber);
             _edtNote = FindViewById<EditText>(Resource.Id.edtNote);
@@ -118,7 +112,7 @@ namespace LOMSUI.Activities
 
         private async Task LoadOrderDetails()
         {
-            var order = await _apiService.GetOrderByLiveStreamCustomerModelAsync(_liveStreamCustoemrID);
+            var order = await _apiService.GetOrderByLiveStreamCustomerModelAsync(_liveStreamCustomerID);
             if (order == null)
             {
                 Toast.MakeText(this, "Failed to fetch order details", ToastLength.Long).Show();
@@ -128,7 +122,7 @@ namespace LOMSUI.Activities
             _txtCustomerName.Text = order.FacebookName;
             _txtAddress.Text = "Address: " + order.Address;
             _txtPhoneNumber.Text = "Phone: " + order.PhoneNumber;
-           // _currentOrder = order;
+            _txtTotalPrice.Text =  $"TotalPrice: {order.TotalPrice:n0}đ";
 
             var adapter = new OrderDetailAdapter(this, order.orderByProductCodeModels);
             _recyclerView.SetAdapter(adapter);
@@ -169,7 +163,7 @@ namespace LOMSUI.Activities
         {
             try
             {
-                var success = await _apiService.UpdateOrderStatusAsync(_orderId, newStatus);
+                var success = await _apiService.UpdateOrderStatusAsync(_liveStreamCustomerID, newStatus);
                 if (success)
                 {
                     Toast.MakeText(this, "Order status updated", ToastLength.Short).Show();
@@ -180,27 +174,26 @@ namespace LOMSUI.Activities
             catch (Exception ex)
             {
                 Toast.MakeText(this, ex.Message, ToastLength.Long).Show();
+
             }
         }
 
+
         private async Task UpdateOrderTrackingAndNote()
         {
-            var tracking = _edtTrackingNumber.Text?.Trim();
-            var note = _edtNote.Text?.Trim();
-
-            var model = new OrderModelRequest
-            {
-                OrderID = _orderId,
-                TrackingNumber = tracking,
-                Note = note
-            };
+            var tracking = _edtTrackingNumber.Text?.Trim() ?? "";
+            var note = _edtNote.Text?.Trim() ?? "";
 
             try
             {
-                var success = await _apiService.UpdateOrderTrackingAndNoteAsync(_orderId,model);
+                var success = await _apiService.UpdateOrderTrackingAndNoteAsync(_liveStreamCustomerID, tracking, note);
                 if (success)
                 {
-                    Toast.MakeText(this, "Order infomation updated", ToastLength.Short).Show();
+                    Toast.MakeText(this, "Order information updated", ToastLength.Short).Show();
+                }
+                else
+                {
+                    Toast.MakeText(this, "Update failed", ToastLength.Short).Show();
                 }
             }
             catch (Exception ex)
@@ -208,6 +201,7 @@ namespace LOMSUI.Activities
                 Toast.MakeText(this, ex.Message, ToastLength.Long).Show();
             }
         }
+
 
     }
 }

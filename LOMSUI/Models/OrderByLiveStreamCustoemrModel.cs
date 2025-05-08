@@ -13,6 +13,7 @@ namespace LOMSUI.Models
         public string CustoemrName { get; set; }
         public int TotalOrder { get; set; }
         public long TotalPrice { get; set; }
+        public bool StatusCheck { get; set; } = false;
         public int LiveStreamCustoemrID { get; set; }
         public string? TrackingNumber { get; set; }
         public string? Note { get; set; }
