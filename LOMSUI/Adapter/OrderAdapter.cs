@@ -35,7 +35,7 @@ namespace LOMSUI.Adapter
                     .Into(viewHolder.imgNameProduct);
 
             viewHolder.txtCustomerName.Text = $"Customer :{order.FacebookName}";
-            viewHolder.txtProductName.Text = $"{order.Product.Name}";
+            viewHolder.txtLiveStreamName.Text = $"{order.Product.}";
             viewHolder.txtOrderQuantity.Text = $"Quantity: {order.Quantity}";
             viewHolder.TxtTotalPrice.Text = $"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ"; 
             viewHolder.TxtOrderStatus.Text = $"Status: {order.Status}";
@@ -56,25 +56,24 @@ namespace LOMSUI.Adapter
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            var itemView = LayoutInflater.From(parent.Context)
-                .Inflate(Resource.Layout.item_order_history, parent, false);
+            var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.item_total_order, parent, false);
             return new OrderViewHolder(itemView);
         }
 
         public class OrderViewHolder : RecyclerView.ViewHolder
         {
-            public TextView txtCustomerName, txtProductName, TxtTotalPrice, TxtOrderStatus, txtOrderQuantity;
-            public ImageView imgNameProduct;
+            public TextView txtCustomerName, txtLiveStreamName, TxtTotalPrice, TxtOrderStatus, txtTotalOrder;
+            public ImageView imgNameCustomer;
             public Button BtnViewDetail;
 
             public OrderViewHolder(View itemView) : base(itemView)
             {
-                imgNameProduct = itemView.FindViewById<ImageView>(Resource.Id.imgNameProduct);
+                imgNameCustomer = itemView.FindViewById<ImageView>(Resource.Id.imgNameCustomer);
                 txtCustomerName = itemView.FindViewById<TextView>(Resource.Id.txtCustomerName);
-                txtProductName = itemView.FindViewById<TextView>(Resource.Id.txtProductName);
                 TxtTotalPrice = itemView.FindViewById<TextView>(Resource.Id.txtTotalPrice);
-                txtOrderQuantity = itemView.FindViewById<TextView>(Resource.Id.txtOrderQuantity);
+                txtTotalOrder = itemView.FindViewById<TextView>(Resource.Id.txtOrderTotal);
                 TxtOrderStatus = itemView.FindViewById<TextView>(Resource.Id.txtOrderStatus);
+                txtLiveStreamName = itemView.FindViewById<TextView>(Resource.Id.txtLiveStreamName);
                 BtnViewDetail = itemView.FindViewById<Button>(Resource.Id.btnViewOrderDetails);
             }
         }

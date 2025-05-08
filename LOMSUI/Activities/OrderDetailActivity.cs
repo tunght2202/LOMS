@@ -130,7 +130,7 @@ namespace LOMSUI.Activities
             _txtTotalPrice.Text =$"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ";
             _txtOrderStatus.Text = "Status: " + order.Status;
             _txtProductName.Text = "Product Name: " + order.Product.Name;
-            _txtProductPrice.Text =$"Price: {order.Quantity * order.CurrentPrice:n0}đ";
+            _txtProductPrice.Text =$"Price: {order.CurrentPrice:n0}đ";
 
             UpdateStatusLayout(order.Status); 
 

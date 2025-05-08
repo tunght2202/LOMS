@@ -29,7 +29,7 @@ namespace LOMSUI.Activities
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_order);
+            SetContentView(Resource.Layout.activity_order); 
 
             _apiService = ApiServiceProvider.Instance;
 
