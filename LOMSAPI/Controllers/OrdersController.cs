@@ -93,6 +93,22 @@ namespace LOMSAPI.Controllers
             return Ok(ListOrderByLiveStreamCustmer);
         }
 
+        [HttpGet("GetListOrderByLiveStreamCustomerByLiveStremModel/LiveStream/{liveStreamId}")]
+        public async Task<IActionResult> GetListOrderByLiveStreamCustomerByLiveStremModel(string liveStreamId)
+        {
+            var ListOrderByLiveStreamCustmer = await _orderRepo.GetListOrderByLiveStreamCustoemrLiveStremModel(liveStreamId);
+            if (ListOrderByLiveStreamCustmer == null) return NotFound();
+            return Ok(ListOrderByLiveStreamCustmer);
+        }
+
+        [HttpGet("GetListOrderByLiveStreamCustomerByCustomerModel/Customer/{customerId}")]
+        public async Task<IActionResult> GetListOrderByLiveStreamCustomerByCustomerModel(string customerId)
+        {
+            var ListOrderByLiveStreamCustmer = await _orderRepo.GetListOrderByLiveStreamCustoemrByCustoemrModel(customerId);
+            if (ListOrderByLiveStreamCustmer == null) return NotFound();
+            return Ok(ListOrderByLiveStreamCustmer);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(string commentId)
         {
@@ -167,6 +183,48 @@ namespace LOMSAPI.Controllers
         {
             await _orderRepo.PrinTest();
             return Ok("Test print success");
+        }
+
+        [HttpPut("UpdateStatusOrderByLiveStreamCustoemrAsync/LivestreamCustomer/{livestreamCustomerID}/Status/{newStatus}")]
+        public async Task<IActionResult> UpdateStatusOrderByLiveStreamCustoemrAsync(int livestreamCustomerID, OrderStatus newStatus)
+        {
+            var updateStatus = await _orderRepo.UpdateStatusOrderByLiveStreamCustoemrAsync(livestreamCustomerID, newStatus);
+            if (updateStatus > 0)
+            {
+                return Ok(new { message = "Status updated successfully" });
+            }
+            else
+            {
+                return NotFound(new { message = "Order not found or update failed" });
+            }
+        }
+
+        [HttpPut("UpdateStatusCalldAsync/LivestreamCustomer/{livestreamCustomerID}/statusCheck/{statusCheck}")]
+        public async Task<IActionResult> UpdateStatusCalldAsync(int livestreamCustomerID, bool statusCheck)
+        {
+            var updateStatus = await _orderRepo.UpdateStatusCalldAsync(livestreamCustomerID, statusCheck);
+            if (updateStatus > 0)
+            {
+                return Ok(new { message = "Status updated successfully" });
+            }
+            else
+            {
+                return NotFound(new { message = "Order not found or update failed" });
+            }
+        }
+
+        [HttpPut("UpdateStatusTrackingNumberdAsync/LivestreamCustomer/{livestreamCustomerID}/trackingNumber/{trackingNumber}/Note/{note}")]
+        public async Task<IActionResult> UpdateStatusTrackingNumberdAsync(int livestreamCustomerID, string trackingNumber, string note)
+        {
+            var updateStatusTrackingNumberdAsync = await _orderRepo.UpdateStatusTrackingNumberdAsync(livestreamCustomerID, trackingNumber, note);
+            if (updateStatusTrackingNumberdAsync > 0)
+            {
+                return Ok(new { message = "Updated successfully" });
+            }
+            else
+            {
+                return NotFound(new { message = "Order not found or update failed" });
+            }
         }
     }
 }

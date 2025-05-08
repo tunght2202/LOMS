@@ -23,5 +23,9 @@ namespace LOMSAPI.Repositories.Orders
         Task<int> UpdateStatusCheckOrderAsync(int orderId, bool newStatusCheck);
         Task<int> UpdateStatusOrderByLiveStreamCustoemrAsync(int livestreamCustomerID, OrderStatus newStatus);
         Task<IEnumerable<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustoemrModel(string userID);
+        Task<int> UpdateStatusCalldAsync(int livestreamCustomerID, bool statusCheck);
+        Task<int> UpdateStatusTrackingNumberdAsync(int livestreamCustomerID, string trackingNumber, string note);
+        Task<IEnumerable<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustoemrByCustoemrModel(string customerId);
+        Task<IEnumerable<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustoemrLiveStremModel(string liveStreamId);
     }
 }
