@@ -8,7 +8,6 @@ namespace LOMSUI.Models
 {
     public class OrderByLiveStreamCustoemrModel
     {
-        public int OrderID { get; set; }
         public string LiveStreamTital { get; set; }
         public decimal? PriceMax { get; set; }
         public string CustoemrName { get; set; }

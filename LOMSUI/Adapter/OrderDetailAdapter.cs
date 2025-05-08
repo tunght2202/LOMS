@@ -27,7 +27,8 @@ namespace LOMSUI.Adapter
 
                 //viewHolder.TxtProductName.Text = orders.;
                 viewHolder.TxtOrderQuantity.Text = $"Quantity: {orders.Quantity}";
-                viewHolder.TxtTotalPrice.Text = $"Price: {orders.TotalPrice:#,##0}đ";
+               // viewHolder.TxtPrice.Text = $"Price: {orders.:#,##0}đ";
+                viewHolder.TxtTotalPrice.Text = $"Total: {orders.TotalPrice:#,##0}đ";
 
              /*   if (!string.IsNullOrEmpty(orders.ImageUrl))
                 {
@@ -53,6 +54,8 @@ namespace LOMSUI.Adapter
         {
             public TextView TxtProductName { get; }
             public TextView TxtOrderQuantity { get; }
+            public TextView TxtPrice { get; }
+
             public TextView TxtTotalPrice { get; }
             public ImageView ImgProduct { get; }
 
@@ -60,6 +63,7 @@ namespace LOMSUI.Adapter
             {
                 TxtProductName = itemView.FindViewById<TextView>(Resource.Id.txtProductName);
                 TxtOrderQuantity = itemView.FindViewById<TextView>(Resource.Id.txtOrderQuantity);
+                TxtPrice = itemView.FindViewById<TextView>(Resource.Id.txtPrice);
                 TxtTotalPrice = itemView.FindViewById<TextView>(Resource.Id.txtTotalPrice);
                 ImgProduct = itemView.FindViewById<ImageView>(Resource.Id.imgNameProduct);
             }

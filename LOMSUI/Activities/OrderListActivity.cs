@@ -81,7 +81,7 @@ namespace LOMSUI.Activities
             _adapter.OnViewDetailClick += order =>
             {
                 var intent = new Intent(this, typeof(OrderDetailActivity));
-                intent.PutExtra("OrderId", order.OrderID);
+                //intent.PutExtra("OrderId", order.OrderID);
                 intent.PutExtra("liveStreamCustoemrID", order.LiveStreamCustoemrID);
 
                 StartActivityForResult(intent, 100);

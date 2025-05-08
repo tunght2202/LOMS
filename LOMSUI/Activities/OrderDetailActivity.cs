@@ -33,15 +33,15 @@ namespace LOMSUI.Activities
 
             _apiService = ApiServiceProvider.Instance;
 
-            _orderId = Intent.GetIntExtra("OrderId", -1);
+            //_orderId = Intent.GetIntExtra("OrderId", -1);
             _liveStreamCustoemrID = Intent.GetIntExtra("liveStreamCustoemrID", 0);
 
-            if (_orderId == -1)
+           /* if (_orderId == -1)
             {
                 Toast.MakeText(this, "Invalid Order ID", ToastLength.Long).Show();
                 Finish();
                 return;
-            }
+            }*/
             InitViews();
             InitButtonEvents();
             await LoadOrderDetails();

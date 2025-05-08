@@ -50,12 +50,17 @@
                         android:layout_height="wrap_content"
                         android:text="Quantity: 2" />
 
-
-                    <TextView
+					<TextView
+                        android:id="@+id/txtPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Price: 250.000đ"
+                        android:textSize="14sp" />
+					<TextView
                         android:id="@+id/txtTotalPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Price: 500.000đ"
+                        android:text="Total: 500.000đ"
                         android:textSize="14sp" />
                 </LinearLayout>
 
