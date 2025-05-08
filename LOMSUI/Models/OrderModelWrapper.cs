@@ -8,9 +8,9 @@ namespace LOMSUI.Models
 {
     public class OrderModelWrapper : Java.Lang.Object
     {
-        public OrderModel Order { get; set; }
+        public OrderByLiveStreamCustoemrModel Order { get; set; }
 
-        public OrderModelWrapper(OrderModel order)
+        public OrderModelWrapper(OrderByLiveStreamCustoemrModel order)
         {
             Order = order;
         }

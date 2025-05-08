@@ -742,6 +742,7 @@ namespace LOMSAPI.Repositories.Orders
             foreach (var LiveStreamCustomerID in listLiveStreamCustomerID)
             {
                 var orderByLiveStreamCustoemrModel = new OrderByLiveStreamCustoemrModel();
+                orderByLiveStreamCustoemrModel.OrderID = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).OrderID;
                 orderByLiveStreamCustoemrModel.LiveStreamTital = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.LiveStream.StreamTitle;
                 orderByLiveStreamCustoemrModel.CustoemrName = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.FacebookName;
                 orderByLiveStreamCustoemrModel.ImageUrl = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.ImageURL;

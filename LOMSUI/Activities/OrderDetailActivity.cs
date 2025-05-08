@@ -1,4 +1,6 @@
 ﻿using Android.Views;
+using AndroidX.RecyclerView.Widget;
+using LOMSUI.Adapter;
 using LOMSUI.Models;
 using LOMSUI.Services;
 
@@ -11,7 +13,8 @@ namespace LOMSUI.Activities
                          _txtTotalPrice, _txtOrderStatus,
                          _txtProductName, _txtProductPrice,
                          _txtOrderQuantity, _txtCustomerName,
-                          _txtAddress, _txPhoneNumber;
+                          _txtAddress, _txtPhoneNumber;
+        private RecyclerView _recyclerView;
         private CheckBox _cbCheck;
         private EditText _edtTrackingNumber, _edtNote;
         private Button _btnStatusCancel, _btnStatusConfirmed, _btnStatusCancell,
@@ -22,6 +25,7 @@ namespace LOMSUI.Activities
         private OrderModel _currentOrder;
         private ApiService _apiService;
         private int _orderId;
+        private int _liveStreamCustoemrID;
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -30,6 +34,8 @@ namespace LOMSUI.Activities
             _apiService = ApiServiceProvider.Instance;
 
             _orderId = Intent.GetIntExtra("OrderId", -1);
+            _liveStreamCustoemrID = Intent.GetIntExtra("liveStreamCustoemrID", 0);
+
             if (_orderId == -1)
             {
                 Toast.MakeText(this, "Invalid Order ID", ToastLength.Long).Show();
@@ -65,15 +71,18 @@ namespace LOMSUI.Activities
         {
             _txtCustomerName = FindViewById<TextView>(Resource.Id.txtCustomerName);
             _txtAddress = FindViewById<TextView>(Resource.Id.txtAddress);
-            _txPhoneNumber = FindViewById<TextView>(Resource.Id.txPhoneNumber);
+            _txtPhoneNumber = FindViewById<TextView>(Resource.Id.txPhoneNumber);
+            _recyclerView = FindViewById<RecyclerView>(Resource.Id.listOrderRecyclerView);
+            _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
-            _txtOrderCode = FindViewById<TextView>(Resource.Id.txtOrderCode);
-            _txtOrderDate = FindViewById<TextView>(Resource.Id.txtOrderDate);
+
+            // _txtOrderCode = FindViewById<TextView>(Resource.Id.txtOrderCode);
+            //_txtOrderDate = FindViewById<TextView>(Resource.Id.txtOrderDate);
             _txtOrderQuantity = FindViewById<TextView>(Resource.Id.txtOrderQuantity);
             _txtTotalPrice = FindViewById<TextView>(Resource.Id.txtTotalPrice);
             _txtOrderStatus = FindViewById<TextView>(Resource.Id.txtOrderStatus);
             _txtProductName = FindViewById<TextView>(Resource.Id.txtProductName);
-            _txtProductPrice = FindViewById<TextView>(Resource.Id.txtProductPrice);
+            //_txtProductPrice = FindViewById<TextView>(Resource.Id.txtProductPrice);
 
             _edtTrackingNumber = FindViewById<EditText>(Resource.Id.edtTrackingNumber);
             _edtNote = FindViewById<EditText>(Resource.Id.edtNote);
@@ -109,30 +118,21 @@ namespace LOMSUI.Activities
 
         private async Task LoadOrderDetails()
         {
-            var order = await _apiService.GetOrderByIdAsync(_orderId);
+            var order = await _apiService.GetOrderByLiveStreamCustomerModelAsync(_liveStreamCustoemrID);
             if (order == null)
             {
                 Toast.MakeText(this, "Failed to fetch order details", ToastLength.Long).Show();
                 return;
             }
 
-            _currentOrder = order;
+            _txtCustomerName.Text = order.FacebookName;
+            _txtAddress.Text = "Address: " + order.Address;
+            _txtPhoneNumber.Text = "Phone: " + order.PhoneNumber;
+           // _currentOrder = order;
 
-            _txtCustomerName.Text = "Customer : " + order.FacebookName;
-            _txtAddress.Text = "Address : " + order.Address;
-            _txPhoneNumber.Text = "Phone : " + order.PhoneNumber;
-            _cbCheck.Checked = order.StatusCheck;
-            _edtTrackingNumber.Text = order.TrackingNumber;
-            _edtNote.Text = order.Note;
-            _txtOrderCode.Text = "Order code: " + order.OrderID;
-            _txtOrderDate.Text = "Order date: " + order.OrderDate;
-            _txtOrderQuantity.Text =  "Quantity: " + order.Quantity;
-            _txtTotalPrice.Text =$"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ";
-            _txtOrderStatus.Text = "Status: " + order.Status;
-            _txtProductName.Text = "Product Name: " + order.Product.Name;
-            _txtProductPrice.Text =$"Price: {order.CurrentPrice:n0}đ";
-
-            UpdateStatusLayout(order.Status); 
+            var adapter = new OrderDetailAdapter(this, order.orderByProductCodeModels);
+            _recyclerView.SetAdapter(adapter);
+            UpdateStatusLayout(order.OrderStatus); 
 
         }
 

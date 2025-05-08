@@ -15,8 +15,7 @@ namespace LOMSUI.Activities
     [Activity(Label = "Orders")]
     public class OrderListActivity : BaseActivity
     {
-
-        private List<OrderModel> _allOrders = new List<OrderModel>();
+        private List<OrderByLiveStreamCustoemrModel> _allOrders = new List<OrderByLiveStreamCustoemrModel>();
         private OrderStatusFilterHelper _statusFilterHelper;
         private LinearLayout _currentSelectedLayout;
         private RecyclerView _recyclerView;
@@ -26,70 +25,51 @@ namespace LOMSUI.Activities
 
         private string _liveStreamId;
         private string _customerId;
+
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_order); 
+            SetContentView(Resource.Layout.activity_order);
 
             _apiService = ApiServiceProvider.Instance;
 
             _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerViewOrders);
             _txtNoOrders = FindViewById<TextView>(Resource.Id.txtNoOrders);
-
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
             _statusFilterHelper = new OrderStatusFilterHelper(this, FilterOrdersByStatus);
 
-            await LoadOrdersByType();
-
+            await LoadOrdersByTypeAsync();
         }
 
-        private async Task LoadOrdersByType()
+        private async Task LoadOrdersByTypeAsync()
         {
-            var type = Intent.GetStringExtra("Type");
+            string type = Intent.GetStringExtra("Type");
 
             switch (type)
             {
                 case "ByCustomer":
                     _customerId = Intent.GetStringExtra("customerId");
                     if (!string.IsNullOrEmpty(_customerId))
-                        await LoadOrdersByCustomerId(_customerId);
+                        await LoadOrdersAsync(() => _apiService.GetOrdersByCustomerIdAsync(_customerId));
                     break;
 
                 case "ByLive":
                     _liveStreamId = Intent.GetStringExtra("LiveStreamID");
                     if (!string.IsNullOrEmpty(_liveStreamId))
-                        await LoadOrdersByLiveStreamId(_liveStreamId);
+                        await LoadOrdersAsync(() => _apiService.GetOrdersByLiveStreamIdAsync(_liveStreamId));
                     break;
 
                 case "ByUser":
-                    await LoadOrdersByUserId();
+                    await LoadOrdersAsync(() => _apiService.GetListOrderByLiveStreamCustomerModelAsync());
                     break;
             }
         }
 
-        private async Task LoadOrdersByUserId()
+        private async Task LoadOrdersAsync(Func<Task<List<OrderByLiveStreamCustoemrModel>>> fetchOrdersFunc)
         {
-            var orders = await _apiService.GetOrdersByUserIdAsync();
-            _allOrders = orders ?? new List<OrderModel>();
-
-            SetupOrderAdapter();
-            _statusFilterHelper.SelectDefaultStatus("Pending");
-        }
-
-        private async Task LoadOrdersByLiveStreamId(string livestreamId)
-        {
-            var orders = await _apiService.GetOrdersByLiveStreamIdAsync(livestreamId);
-            _allOrders = orders ?? new List<OrderModel>();
-
-            SetupOrderAdapter();
-            _statusFilterHelper.SelectDefaultStatus("Pending");
-        }
-
-        private async Task LoadOrdersByCustomerId(string customerId)
-        {
-            var orders = await _apiService.GetOrdersByCustomerIdAsync(customerId);
-            _allOrders = orders ?? new List<OrderModel>();
+            var orders = await fetchOrdersFunc.Invoke();
+            _allOrders = orders ?? new List<OrderByLiveStreamCustoemrModel>();
 
             SetupOrderAdapter();
             _statusFilterHelper.SelectDefaultStatus("Pending");
@@ -97,11 +77,13 @@ namespace LOMSUI.Activities
 
         private void SetupOrderAdapter()
         {
-            _adapter = new OrderAdapter(this, new List<OrderModel>());
+            _adapter = new OrderAdapter(this, _allOrders);
             _adapter.OnViewDetailClick += order =>
             {
                 var intent = new Intent(this, typeof(OrderDetailActivity));
                 intent.PutExtra("OrderId", order.OrderID);
+                intent.PutExtra("liveStreamCustoemrID", order.LiveStreamCustoemrID);
+
                 StartActivityForResult(intent, 100);
             };
             _recyclerView.SetAdapter(_adapter);
@@ -109,9 +91,9 @@ namespace LOMSUI.Activities
 
         private void FilterOrdersByStatus(string status, LinearLayout selectedLayout)
         {
-            var filteredOrders = (_allOrders ?? new List<OrderModel>())
-                                 .Where(o => o.Status == status)
-                                 .ToList();
+            var filteredOrders = _allOrders
+                .Where(o => o.OrderStatus == status)
+                .ToList();
 
             _adapter?.UpdateData(filteredOrders);
             _txtNoOrders.Visibility = filteredOrders.Any() ? ViewStates.Gone : ViewStates.Visible;
@@ -131,18 +113,18 @@ namespace LOMSUI.Activities
             {
                 if (!string.IsNullOrEmpty(_customerId))
                 {
-                    _ = LoadOrdersByCustomerId(_customerId);
+                    _ = LoadOrdersAsync(() => _apiService.GetOrdersByCustomerIdAsync(_customerId));
                 }
                 else if (!string.IsNullOrEmpty(_liveStreamId))
                 {
-                    _ = LoadOrdersByLiveStreamId(_liveStreamId);
+                    _ = LoadOrdersAsync(() => _apiService.GetOrdersByLiveStreamIdAsync(_liveStreamId));
                 }
                 else
                 {
-                    _ = LoadOrdersByUserId(); 
+                    _ = LoadOrdersAsync(() => _apiService.GetListOrderByLiveStreamCustomerModelAsync());
                 }
             }
         }
-
     }
+
 }

@@ -15,7 +15,7 @@ namespace LOMSUI.Adapter
     {
         private List<OrderByLiveStreamCustoemrModel> _orders;
         private readonly Context _context;
-        public event Action<OrderModel> OnViewDetailClick;
+        public event Action<OrderByLiveStreamCustoemrModel> OnViewDetailClick;
 
         public OrderAdapter(Context context, List<OrderByLiveStreamCustoemrModel> orders)
         {
@@ -29,16 +29,17 @@ namespace LOMSUI.Adapter
         {
             var viewHolder = holder as OrderViewHolder;
             var order = _orders[position];
-          /*  Glide.With(viewHolder.ItemView.Context)
-                    .Load(order.Product.ImageURL)
-                    .Placeholder(Resource.Drawable.logos)
-                    .Into(viewHolder.imgNameProduct);*/
 
-            viewHolder.txtCustomerName.Text = $"Customer :{order.CustoemrName}";
-            viewHolder.txtLiveStreamName.Text = $"{order.LiveStreamTital}";
-            viewHolder.txtOrderQuantity.Text = $"Quantity: {order.Quantity}";
-            viewHolder.TxtTotalPrice.Text = $"TotalPrice: {order.Quantity * order.CurrentPrice:n0}đ"; 
-            viewHolder.TxtOrderStatus.Text = $"Status: {order.Status}";
+            Glide.With(viewHolder.ItemView.Context)
+          .Load(order.ImageUrl) 
+          .Placeholder(Resource.Drawable.logos)
+          .Into(viewHolder.imgCustomer);
+
+            viewHolder.txtCustomerName.Text = order.CustoemrName;
+            viewHolder.txtLiveStreamName.Text = order.LiveStreamTital;
+            viewHolder.txtTotalOrder.Text = $"TotalOrder: {order.TotalOrder}";
+            viewHolder.TxtTotalPrice.Text = $"TotalPrice: {order.TotalPrice:n0}đ";
+            viewHolder.TxtOrderStatus.Text = $"Status: {order.OrderStatus}";
 
             viewHolder.BtnViewDetail.Tag = new OrderModelWrapper(order);
             viewHolder.BtnViewDetail.Click -= BtnViewDetail_Click;
@@ -56,19 +57,19 @@ namespace LOMSUI.Adapter
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.item_total_order, parent, false);
+            var itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.item_order, parent, false);
             return new OrderViewHolder(itemView);
         }
 
         public class OrderViewHolder : RecyclerView.ViewHolder
         {
             public TextView txtCustomerName, txtLiveStreamName, TxtTotalPrice, TxtOrderStatus, txtTotalOrder;
-            public ImageView imgNameCustomer;
+            public ImageView imgCustomer;
             public Button BtnViewDetail;
 
             public OrderViewHolder(View itemView) : base(itemView)
             {
-                imgNameCustomer = itemView.FindViewById<ImageView>(Resource.Id.imgNameCustomer);
+                imgCustomer = itemView.FindViewById<ImageView>(Resource.Id.imgCustomer);
                 txtCustomerName = itemView.FindViewById<TextView>(Resource.Id.txtCustomerName);
                 TxtTotalPrice = itemView.FindViewById<TextView>(Resource.Id.txtTotalPrice);
                 txtTotalOrder = itemView.FindViewById<TextView>(Resource.Id.txtOrderTotal);

@@ -721,7 +721,7 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<List<OrderModel>> GetOrdersByUserIdAsync()
+        public async Task<List<OrderByLiveStreamCustoemrModel>> GetOrdersByUserIdAsync()
         {
             try
             {
@@ -729,22 +729,22 @@ namespace LOMSUI.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var orders = JsonConvert.DeserializeObject<List<OrderModel>>(json);
-                    return orders ?? new List<OrderModel>();
+                    var orders = JsonConvert.DeserializeObject<List<OrderByLiveStreamCustoemrModel>>(json);
+                    return orders ?? new List<OrderByLiveStreamCustoemrModel>();
                 }
                 else
                 {
-                    return new List<OrderModel>();
+                    return new List<OrderByLiveStreamCustoemrModel>();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error when calling API to get orders: {ex.Message}");
-                return new List<OrderModel>();
+                return new List<OrderByLiveStreamCustoemrModel>();
             }
         }
 
-        public async Task<List<OrderModel>> GetOrdersByCustomerIdAsync(string customerId)
+        public async Task<List<OrderByLiveStreamCustoemrModel>> GetOrdersByCustomerIdAsync(string customerId)
         {
             try
             {
@@ -752,22 +752,22 @@ namespace LOMSUI.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var orders = JsonConvert.DeserializeObject<List<OrderModel>>(json);
-                    return orders ?? new List<OrderModel>();
+                    var orders = JsonConvert.DeserializeObject<List<OrderByLiveStreamCustoemrModel>>(json);
+                    return orders ?? new List<OrderByLiveStreamCustoemrModel>();
                 }
                 else
                 {
-                    return new List<OrderModel>();
+                    return new List<OrderByLiveStreamCustoemrModel>();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error when calling API to get orders: {ex.Message}");
-                return new List<OrderModel>();
+                return new List<OrderByLiveStreamCustoemrModel>();
             }
         }
 
-        public async Task<List<OrderModel>> GetOrdersByLiveStreamIdAsync(string liveStreamId)
+        public async Task<List<OrderByLiveStreamCustoemrModel>> GetOrdersByLiveStreamIdAsync(string liveStreamId)
         {
             var url = $"{BASE_URLL}/Orders/livestream/{liveStreamId}";
             var response = await _httpClient.GetAsync(url);
@@ -776,7 +776,7 @@ namespace LOMSUI.Services
                 return null;
 
             var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<List<OrderModel>>(json);
+            return JsonConvert.DeserializeObject<List<OrderByLiveStreamCustoemrModel>>(json);
         }
 
         public async Task<OrderModel> GetOrderByIdAsync(int id)
@@ -805,6 +805,42 @@ namespace LOMSUI.Services
                 return null;
             }
         }
+        public async Task<List<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustomerModelAsync()
+        {
+     
+
+            var url = $"{BASE_URLL}/Orders/GetListOrderByLiveStreamCustoemrModel";
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<List<OrderByLiveStreamCustoemrModel>>(json);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public async Task<OrderByLiveStreamCustoemrModel> GetOrderByLiveStreamCustomerModelAsync(int livestreamCustomerId)
+        {
+            var url = $"{BASE_URLL}/Orders/LivestreamCustomer/{livestreamCustomerId}";
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<OrderByLiveStreamCustoemrModel>(json);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
 
         public async Task<bool> CreateOrderFromCommentAsync(string commentId)
         {
