@@ -1,4 +1,7 @@
-﻿namespace Information.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Information.Models;
 
 public partial class Customer
 {
@@ -25,9 +28,14 @@ public partial class Customer
     public DateTime UpdatedAt { get; set; }
 
     public bool Status { get; set; }
-    public string? ProvinceId { get; set; }
-    public string? DistrictId { get; set; }
-    public string? WardId { get; set; }
+
     public string? DetailAddress { get; set; }
+
+    public string? DistrictId { get; set; }
+
+    public string? ProvinceId { get; set; }
+
+    public string? WardId { get; set; }
+
     public virtual ICollection<LiveStreamCustomer> LiveStreamCustomers { get; set; } = new List<LiveStreamCustomer>();
 }

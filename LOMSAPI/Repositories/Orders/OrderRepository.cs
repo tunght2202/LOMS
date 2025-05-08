@@ -244,7 +244,9 @@ namespace LOMSAPI.Repositories.Orders
                     text = "Your order from\n" +
                                        $"Comment : {commentorder.Content}\n" +
                                        "has been successfully created.\n" +
-                                       "Please provide your address and phone number for shipping!";
+                                       "Please provide your address and phone number for shipping! \n"+
+                                       "Click to link :  "  + 
+                                       $"https://4e00-118-70-211-238.ngrok-free.app/Customers/Update?id={commentorder.LiveStreamCustomer.CustomerID}";
                 }
                 else
                 {
@@ -266,7 +268,7 @@ namespace LOMSAPI.Repositories.Orders
                     DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
                     SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
                 };
-                _print.PrintCustomerLabel("COM5", inforprint);
+                //_print.PrintCustomerLabel("COM5", inforprint);
                 return true;
             }
             catch (Exception ex)
