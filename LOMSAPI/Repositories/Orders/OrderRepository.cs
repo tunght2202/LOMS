@@ -668,7 +668,6 @@ namespace LOMSAPI.Repositories.Orders
 
             if (!totalOrder.Any())
             {
-                // Trả về một mô hình rỗng hoặc mặc định để tránh tham chiếu null
                 return null;
             }
 
@@ -683,6 +682,11 @@ namespace LOMSAPI.Repositories.Orders
                 TrackingNumber = totalOrder.First().TrackingNumber,
                 Note = totalOrder.First().Note,
                 ProductID = productID,
+                CurrentPrice = totalOrder.First().CurrentPrice,
+                Description = totalOrder.First().Product.Description,
+                Name = totalOrder.First().Product.Name,
+                ImageURL = totalOrder.First().Product.ImageURL,
+
                 LiveStreamCustomerID = LiveStreamCustomerID
             };
 
@@ -710,7 +714,7 @@ namespace LOMSAPI.Repositories.Orders
             orderByLiveStreamCustoemrModel.FacebookName = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.FacebookName;
             orderByLiveStreamCustoemrModel.TotalPrice = order.Sum(order => (long)order.CurrentPrice * order.Quantity);
             orderByLiveStreamCustoemrModel.ImageUrl = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.ImageURL;
-
+            orderByLiveStreamCustoemrModel.StatusCheck = order.FirstOrDefault().StatusCheck;
             var listProductID = order.Select(o => o.ProductID).Distinct().ToList();
             var listOrderByProductCodeModel = new List<OrderByProductCodeModel>();
             foreach (var productID in listProductID)
@@ -756,6 +760,98 @@ namespace LOMSAPI.Repositories.Orders
                 orderByLiveStreamCustoemrModel.PhoneNumber = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.PhoneNumber;
                 orderByLiveStreamCustoemrModel.Email = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.Email;
                 orderByLiveStreamCustoemrModel.FacebookName = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.FacebookName;
+                orderByLiveStreamCustoemrModel.StatusCheck = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).StatusCheck;
+                orderByLiveStreamCustoemrModel.TotalPrice = order.Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Sum(order => (long)order.CurrentPrice * order.Quantity);
+
+                var listProductID = order.Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Select(o => o.ProductID).Distinct().ToList();
+                var listOrderByProductCodeModel = new List<OrderByProductCodeModel>();
+                foreach (var productID in listProductID)
+                {
+                    var orderByProductCodeModel = await OrderByProductCodeModel(LiveStreamCustomerID, productID);
+                    if (orderByProductCodeModel == null) continue;
+                    listOrderByProductCodeModel.Add(orderByProductCodeModel);
+                }
+
+                orderByLiveStreamCustoemrModel.orderByProductCodeModels = listOrderByProductCodeModel;
+                orderByLiveStreamCustoemrModel.TotalOrder = listProductID.Count();
+                listOrderByLiveStreamCustoemrModel.Add(orderByLiveStreamCustoemrModel);
+            }
+
+
+            return listOrderByLiveStreamCustoemrModel;
+
+        }
+        public async Task<IEnumerable<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustoemrLiveStremModel(string liveStreamId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.Comment)
+                .Include(o => o.Comment.LiveStreamCustomer.LiveStream)
+                .Include(o => o.Comment.LiveStreamCustomer.Customer)
+                .Where(o => o.Comment.LiveStreamCustomer.LivestreamID == liveStreamId).ToListAsync();
+            var listLiveStreamCustomerID = order.Select(o => o.Comment.LiveStreamCustomerID).Distinct().ToList();
+            var listOrderByLiveStreamCustoemrModel = new List<OrderByLiveStreamCustoemrModel>();
+            foreach (var LiveStreamCustomerID in listLiveStreamCustomerID)
+            {
+                var orderByLiveStreamCustoemrModel = new OrderByLiveStreamCustoemrModel();
+                orderByLiveStreamCustoemrModel.LiveStreamTital = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.LiveStream.StreamTitle;
+                orderByLiveStreamCustoemrModel.CustoemrName = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.FacebookName;
+                orderByLiveStreamCustoemrModel.ImageUrl = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.ImageURL;
+                orderByLiveStreamCustoemrModel.LiveStreamCustoemrID = LiveStreamCustomerID;
+                orderByLiveStreamCustoemrModel.OrderStatus = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Status.ToString();
+                orderByLiveStreamCustoemrModel.PriceMax = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.LiveStream.PriceMax;
+                orderByLiveStreamCustoemrModel.TrackingNumber = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).TrackingNumber;
+                orderByLiveStreamCustoemrModel.Note = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Note;
+                orderByLiveStreamCustoemrModel.Address = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.Address;
+                orderByLiveStreamCustoemrModel.PhoneNumber = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.PhoneNumber;
+                orderByLiveStreamCustoemrModel.Email = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.Email;
+                orderByLiveStreamCustoemrModel.FacebookName = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.FacebookName;
+                orderByLiveStreamCustoemrModel.StatusCheck = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).StatusCheck;
+                orderByLiveStreamCustoemrModel.TotalPrice = order.Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Sum(order => (long)order.CurrentPrice * order.Quantity);
+
+                var listProductID = order.Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Select(o => o.ProductID).Distinct().ToList();
+                var listOrderByProductCodeModel = new List<OrderByProductCodeModel>();
+                foreach (var productID in listProductID)
+                {
+                    var orderByProductCodeModel = await OrderByProductCodeModel(LiveStreamCustomerID, productID);
+                    if (orderByProductCodeModel == null) continue;
+                    listOrderByProductCodeModel.Add(orderByProductCodeModel);
+                }
+
+                orderByLiveStreamCustoemrModel.orderByProductCodeModels = listOrderByProductCodeModel;
+                orderByLiveStreamCustoemrModel.TotalOrder = listProductID.Count();
+                listOrderByLiveStreamCustoemrModel.Add(orderByLiveStreamCustoemrModel);
+            }
+
+
+            return listOrderByLiveStreamCustoemrModel;
+
+        }
+        
+        public async Task<IEnumerable<OrderByLiveStreamCustoemrModel>> GetListOrderByLiveStreamCustoemrByCustoemrModel(string customerId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.Comment)
+                .Include(o => o.Comment.LiveStreamCustomer.LiveStream)
+                .Include(o => o.Comment.LiveStreamCustomer.Customer)
+                .Where(o => o.Comment.LiveStreamCustomer.CustomerID == customerId).ToListAsync();
+            var listLiveStreamCustomerID = order.Select(o => o.Comment.LiveStreamCustomerID).Distinct().ToList();
+            var listOrderByLiveStreamCustoemrModel = new List<OrderByLiveStreamCustoemrModel>();
+            foreach (var LiveStreamCustomerID in listLiveStreamCustomerID)
+            {
+                var orderByLiveStreamCustoemrModel = new OrderByLiveStreamCustoemrModel();
+                orderByLiveStreamCustoemrModel.LiveStreamTital = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.LiveStream.StreamTitle;
+                orderByLiveStreamCustoemrModel.CustoemrName = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.FacebookName;
+                orderByLiveStreamCustoemrModel.ImageUrl = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.ImageURL;
+                orderByLiveStreamCustoemrModel.LiveStreamCustoemrID = LiveStreamCustomerID;
+                orderByLiveStreamCustoemrModel.OrderStatus = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Status.ToString();
+                orderByLiveStreamCustoemrModel.PriceMax = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.LiveStream.PriceMax;
+                orderByLiveStreamCustoemrModel.TrackingNumber = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).TrackingNumber;
+                orderByLiveStreamCustoemrModel.Note = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Note;
+                orderByLiveStreamCustoemrModel.Address = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.Address;
+                orderByLiveStreamCustoemrModel.PhoneNumber = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.PhoneNumber;
+                orderByLiveStreamCustoemrModel.Email = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.Email;
+                orderByLiveStreamCustoemrModel.FacebookName = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Comment.LiveStreamCustomer.Customer.FacebookName;
+                orderByLiveStreamCustoemrModel.StatusCheck = order.FirstOrDefault(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).StatusCheck;
                 orderByLiveStreamCustoemrModel.TotalPrice = order.Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Sum(order => (long)order.CurrentPrice * order.Quantity);
 
                 var listProductID = order.Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == LiveStreamCustomerID).Select(o => o.ProductID).Distinct().ToList();
@@ -792,7 +888,7 @@ namespace LOMSAPI.Repositories.Orders
             {
                 throw new Exception("Can't change status");
             }
-            if (((orderByLiveStreamCustomer.PriceMax <= orderByLiveStreamCustomer.TotalPrice)))
+            if (((orderByLiveStreamCustomer.PriceMax <= orderByLiveStreamCustomer.TotalPrice) && (orderByLiveStreamCustomer.StatusCheck == false)))
             {
                 throw new Exception("Can't change status, you must call for customer !");
             }
@@ -805,15 +901,40 @@ namespace LOMSAPI.Repositories.Orders
                 throw new Exception("Can't change status, you must input address and phone number !");
             }
 
-            if (newStatus == OrderStatus.Canceled || newStatus == OrderStatus.Returned)
-            {
-               return await ReturnStock(livestreamCustomerID, newStatus);
-            }
+               return await UpdateStatus(livestreamCustomerID, newStatus);
 
+        }
+
+        public async Task<int> UpdateStatusCalldAsync(int livestreamCustomerID, bool statusCheck)
+        {
+            var orderByLiveStreamCustomer = await _context.Orders
+                .Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == livestreamCustomerID)
+                .ToListAsync();
+            if (orderByLiveStreamCustomer == null) return 0;
+            foreach (var order in orderByLiveStreamCustomer)
+            {
+                order.StatusCheck = true;
+            }
+            _context.UpdateRange(orderByLiveStreamCustomer);
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> ReturnStock(int liveStreamCustomerId, OrderStatus newStatus)
+        public async Task<int> UpdateStatusTrackingNumberdAsync(int livestreamCustomerID, string trackingNumber, string note)
+        {
+        var orderByLiveStreamCustomer = await _context.Orders
+                .Where(o => o.Comment.LiveStreamCustomer.LiveStreamCustomerId == livestreamCustomerID)
+                .ToListAsync();
+            if (orderByLiveStreamCustomer == null) return 0;
+            foreach (var order in orderByLiveStreamCustomer)
+            {
+                order.TrackingNumber = trackingNumber;
+                order.Note = note;
+            }
+            _context.UpdateRange(orderByLiveStreamCustomer);
+            return await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> UpdateStatus(int liveStreamCustomerId, OrderStatus newStatus)
         {
             var orders = await _context.Orders
                 .Include(o => o.Product)
@@ -822,7 +943,7 @@ namespace LOMSAPI.Repositories.Orders
             foreach (var order in orders)
             {
                 var product = _context.Products.Find(order.ProductID);
-                if (product != null)
+                if (product != null && ((newStatus == OrderStatus.Canceled) || (newStatus == OrderStatus.Returned)))
                 {
                     product.Stock += order.Quantity;
                 }
