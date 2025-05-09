@@ -9,7 +9,6 @@ namespace LOMSAPI.Repositories.Orders
         Task<bool> OrderExistsAsync(int orderId);
         Task<bool> AddOrderAsync(string commentId, string TokenFacbook);
         Task<int> UpdateOrderAsync(OrderModel order);
-        Task<int> UpdateOrderAsync2(OrderModelRequest order);
         Task<int> UpdateStatusOrderAsync(int orderID, OrderStatus newStatus);
         Task<bool> PrinTest();
         Task<OrderByProductCodeModel> OrderByProductCodeModel (int LiveStreamCustomerID, int productID);

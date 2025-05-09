@@ -137,8 +137,16 @@ builder.Services.AddAuthentication(opt =>
     });
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
 {
-    opt.TokenLifespan = TimeSpan.FromMinutes(1); // Giới hạn token reset chỉ sống 10 phút
+    opt.TokenLifespan = TimeSpan.FromMinutes(1); 
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -151,6 +159,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 

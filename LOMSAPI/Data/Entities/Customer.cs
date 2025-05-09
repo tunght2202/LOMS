@@ -28,6 +28,10 @@ namespace LOMSAPI.Data.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         public bool Status { get; set; }
+        public string? ProvinceId { get; set; }
+        public string? DistrictId { get; set; }
+        public string? WardId { get; set; }
+        public string? DetailAddress { get; set; }
         public ICollection<LiveStreamCustomer> LiveStreamCustomers {  get; set; }
     }
 
