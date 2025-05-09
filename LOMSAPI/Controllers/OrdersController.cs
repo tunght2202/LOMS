@@ -166,16 +166,6 @@ namespace LOMSAPI.Controllers
             return NotFound(new { message = "Order not found or update failed" });
         }
 
-        [HttpPut("update-tracking-note/{id}")]
-        public async Task<IActionResult> UpdateTrackingAndNote(int id, [FromBody] OrderModelRequest model)
-        {
-            model.OrderID = id;
-
-            var result = await _orderRepo.UpdateOrderAsync2(model);
-            return result > 0
-                ? Ok(new { message = "Updated successfully" })
-                : NotFound(new { message = "Order not found" });
-        }
 
 
         [HttpPut("TestPrint")]

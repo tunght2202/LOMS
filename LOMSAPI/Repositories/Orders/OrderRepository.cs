@@ -244,7 +244,9 @@ namespace LOMSAPI.Repositories.Orders
                     text = "Your order from\n" +
                                        $"Comment : {commentorder.Content}\n" +
                                        "has been successfully created.\n" +
-                                       "Please provide your address and phone number for shipping!";
+                                       "Please provide your address and phone number for shipping! \n"+
+                                       "Click to link :  "  + 
+                                       $"https://localhost:7286/Customers/Update?id={commentorder.LiveStreamCustomer.CustomerID}";
                 }
                 else
                 {
@@ -266,7 +268,7 @@ namespace LOMSAPI.Repositories.Orders
                     DiaChi = commentorder.LiveStreamCustomer.Customer.Address,
                     SoDienThoai = commentorder.LiveStreamCustomer.Customer.PhoneNumber
                 };
-                _print.PrintCustomerLabel("COM5", inforprint);
+                //_print.PrintCustomerLabel("COM5", inforprint);
                 return true;
             }
             catch (Exception ex)
@@ -291,17 +293,6 @@ namespace LOMSAPI.Repositories.Orders
             existing.CurrentPrice = orderModel.CurrentPrice;
             existing.ProductID = orderModel.ProductID;
             existing.CommentID = orderModel.CommentID;
-
-            return await _context.SaveChangesAsync();
-        }
-
-
-        public async Task<int> UpdateOrderAsync2(OrderModelRequest orderModel)
-        {
-            var existing = await _context.Orders.FindAsync(orderModel.OrderID);
-            if (existing == null) return 0;
-            existing.TrackingNumber = orderModel.TrackingNumber;
-            existing.Note = orderModel.Note;
 
             return await _context.SaveChangesAsync();
         }
@@ -536,7 +527,9 @@ namespace LOMSAPI.Repositories.Orders
                                        $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}\n" +
-                                       "Please provide your address and phone number for shipping!";
+                                       "Please provide your address and phone number for shipping! \n" +
+                                        "Click to link :  "  +
+                                       $"https://localhost:7286/Customers/Update?id={customer.CustomerID}"; ;
                                 }
 
                                 var resultSendMessage = await SendMessage2Async(customer.CustomerID, TokenFacbook, text);
@@ -703,6 +696,7 @@ namespace LOMSAPI.Repositories.Orders
             orderByLiveStreamCustoemrModel.CustoemrName = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.FacebookName;
             orderByLiveStreamCustoemrModel.LiveStreamCustoemrID = LiveStreamCustomerID;
             orderByLiveStreamCustoemrModel.OrderStatus = order.FirstOrDefault().Status.ToString();
+            orderByLiveStreamCustoemrModel.OrderDate = order.FirstOrDefault().OrderDate.ToString("dd/MM/yyyy");
             orderByLiveStreamCustoemrModel.PriceMax = order.FirstOrDefault().Comment.LiveStreamCustomer.LiveStream.PriceMax;
             orderByLiveStreamCustoemrModel.TrackingNumber = order.FirstOrDefault().TrackingNumber;
             orderByLiveStreamCustoemrModel.Note = order.FirstOrDefault().Note;
@@ -911,7 +905,7 @@ namespace LOMSAPI.Repositories.Orders
             if (orderByLiveStreamCustomer == null) return 0;
             foreach (var order in orderByLiveStreamCustomer)
             {
-                order.StatusCheck = true;
+                order.StatusCheck = statusCheck;
             }
             _context.UpdateRange(orderByLiveStreamCustomer);
             return await _context.SaveChangesAsync();

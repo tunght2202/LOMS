@@ -22,6 +22,238 @@ namespace LOMSAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Information.Models.AdministrativeRegion", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CodeName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("code_name");
+
+                    b.Property<string>("CodeNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("code_name_en");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name_en");
+
+                    b.HasKey("Id")
+                        .HasName("administrative_regions_pkey");
+
+                    b.ToTable("administrative_regions", (string)null);
+                });
+
+            modelBuilder.Entity("Information.Models.AdministrativeUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CodeName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("code_name");
+
+                    b.Property<string>("CodeNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("code_name_en");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("FullNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name_en");
+
+                    b.Property<string>("ShortName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("short_name");
+
+                    b.Property<string>("ShortNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("short_name_en");
+
+                    b.HasKey("Id")
+                        .HasName("administrative_units_pkey");
+
+                    b.ToTable("administrative_units", (string)null);
+                });
+
+            modelBuilder.Entity("Information.Models.District", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("code");
+
+                    b.Property<int?>("AdministrativeUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("administrative_unit_id");
+
+                    b.Property<string>("CodeName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("code_name");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("FullNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name_en");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name_en");
+
+                    b.Property<string>("ProvinceCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("province_code");
+
+                    b.HasKey("Code")
+                        .HasName("districts_pkey");
+
+                    b.HasIndex(new[] { "ProvinceCode" }, "idx_districts_province");
+
+                    b.HasIndex(new[] { "AdministrativeUnitId" }, "idx_districts_unit");
+
+                    b.ToTable("districts", (string)null);
+                });
+
+            modelBuilder.Entity("Information.Models.Province", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("code");
+
+                    b.Property<int?>("AdministrativeRegionId")
+                        .HasColumnType("int")
+                        .HasColumnName("administrative_region_id");
+
+                    b.Property<int?>("AdministrativeUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("administrative_unit_id");
+
+                    b.Property<string>("CodeName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("code_name");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("FullNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name_en");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name_en");
+
+                    b.HasKey("Code")
+                        .HasName("provinces_pkey");
+
+                    b.HasIndex(new[] { "AdministrativeRegionId" }, "idx_provinces_region");
+
+                    b.HasIndex(new[] { "AdministrativeUnitId" }, "idx_provinces_unit");
+
+                    b.ToTable("provinces", (string)null);
+                });
+
+            modelBuilder.Entity("Information.Models.Ward", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("code");
+
+                    b.Property<int?>("AdministrativeUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("administrative_unit_id");
+
+                    b.Property<string>("CodeName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("code_name");
+
+                    b.Property<string>("DistrictCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("district_code");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("FullNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("full_name_en");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("name_en");
+
+                    b.HasKey("Code")
+                        .HasName("wards_pkey");
+
+                    b.HasIndex(new[] { "DistrictCode" }, "idx_wards_district");
+
+                    b.HasIndex(new[] { "AdministrativeUnitId" }, "idx_wards_unit");
+
+                    b.ToTable("wards", (string)null);
+                });
+
             modelBuilder.Entity("LOMSAPI.Data.Entities.Comment", b =>
                 {
                     b.Property<string>("CommentID")
@@ -55,6 +287,12 @@ namespace LOMSAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DetailAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DistrictId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -77,6 +315,9 @@ namespace LOMSAPI.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("ProvinceId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
@@ -85,6 +326,9 @@ namespace LOMSAPI.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("WardId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CustomerID");
 
@@ -511,6 +755,57 @@ namespace LOMSAPI.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Information.Models.District", b =>
+                {
+                    b.HasOne("Information.Models.AdministrativeUnit", "AdministrativeUnit")
+                        .WithMany("Districts")
+                        .HasForeignKey("AdministrativeUnitId")
+                        .HasConstraintName("districts_administrative_unit_id_fkey");
+
+                    b.HasOne("Information.Models.Province", "ProvinceCodeNavigation")
+                        .WithMany("Districts")
+                        .HasForeignKey("ProvinceCode")
+                        .HasConstraintName("districts_province_code_fkey");
+
+                    b.Navigation("AdministrativeUnit");
+
+                    b.Navigation("ProvinceCodeNavigation");
+                });
+
+            modelBuilder.Entity("Information.Models.Province", b =>
+                {
+                    b.HasOne("Information.Models.AdministrativeRegion", "AdministrativeRegion")
+                        .WithMany("Provinces")
+                        .HasForeignKey("AdministrativeRegionId")
+                        .HasConstraintName("provinces_administrative_region_id_fkey");
+
+                    b.HasOne("Information.Models.AdministrativeUnit", "AdministrativeUnit")
+                        .WithMany("Provinces")
+                        .HasForeignKey("AdministrativeUnitId")
+                        .HasConstraintName("provinces_administrative_unit_id_fkey");
+
+                    b.Navigation("AdministrativeRegion");
+
+                    b.Navigation("AdministrativeUnit");
+                });
+
+            modelBuilder.Entity("Information.Models.Ward", b =>
+                {
+                    b.HasOne("Information.Models.AdministrativeUnit", "AdministrativeUnit")
+                        .WithMany("Wards")
+                        .HasForeignKey("AdministrativeUnitId")
+                        .HasConstraintName("wards_administrative_unit_id_fkey");
+
+                    b.HasOne("Information.Models.District", "DistrictCodeNavigation")
+                        .WithMany("Wards")
+                        .HasForeignKey("DistrictCode")
+                        .HasConstraintName("wards_district_code_fkey");
+
+                    b.Navigation("AdministrativeUnit");
+
+                    b.Navigation("DistrictCodeNavigation");
+                });
+
             modelBuilder.Entity("LOMSAPI.Data.Entities.Comment", b =>
                 {
                     b.HasOne("LOMSAPI.Data.Entities.LiveStreamCustomer", "LiveStreamCustomer")
@@ -667,6 +962,30 @@ namespace LOMSAPI.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Information.Models.AdministrativeRegion", b =>
+                {
+                    b.Navigation("Provinces");
+                });
+
+            modelBuilder.Entity("Information.Models.AdministrativeUnit", b =>
+                {
+                    b.Navigation("Districts");
+
+                    b.Navigation("Provinces");
+
+                    b.Navigation("Wards");
+                });
+
+            modelBuilder.Entity("Information.Models.District", b =>
+                {
+                    b.Navigation("Wards");
+                });
+
+            modelBuilder.Entity("Information.Models.Province", b =>
+                {
+                    b.Navigation("Districts");
                 });
 
             modelBuilder.Entity("LOMSAPI.Data.Entities.Comment", b =>
