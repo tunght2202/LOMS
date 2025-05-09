@@ -246,7 +246,7 @@ namespace LOMSAPI.Repositories.Orders
                                        "has been successfully created.\n" +
                                        "Please provide your address and phone number for shipping! \n"+
                                        "Click to link :  "  + 
-                                       $"https://4e00-118-70-211-238.ngrok-free.app/Customers/Update?id={commentorder.LiveStreamCustomer.CustomerID}";
+                                       $"https://localhost:7286/Customers/Update?id={commentorder.LiveStreamCustomer.CustomerID}";
                 }
                 else
                 {
@@ -527,7 +527,9 @@ namespace LOMSAPI.Repositories.Orders
                                        $"Total price : {formatted} \n" +
                                        $"Order creation time : {comment.CommentTime}\n" +
                                        $"Customer : {customer.FacebookName}\n" +
-                                       "Please provide your address and phone number for shipping!";
+                                       "Please provide your address and phone number for shipping! \n" +
+                                        "Click to link :  "  +
+                                       $"https://localhost:7286/Customers/Update?id={customer.CustomerID}"; ;
                                 }
 
                                 var resultSendMessage = await SendMessage2Async(customer.CustomerID, TokenFacbook, text);
@@ -694,6 +696,7 @@ namespace LOMSAPI.Repositories.Orders
             orderByLiveStreamCustoemrModel.CustoemrName = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.FacebookName;
             orderByLiveStreamCustoemrModel.LiveStreamCustoemrID = LiveStreamCustomerID;
             orderByLiveStreamCustoemrModel.OrderStatus = order.FirstOrDefault().Status.ToString();
+            orderByLiveStreamCustoemrModel.OrderDate = order.FirstOrDefault().OrderDate.ToString("dd/MM/yyyy");
             orderByLiveStreamCustoemrModel.PriceMax = order.FirstOrDefault().Comment.LiveStreamCustomer.LiveStream.PriceMax;
             orderByLiveStreamCustoemrModel.TrackingNumber = order.FirstOrDefault().TrackingNumber;
             orderByLiveStreamCustoemrModel.Note = order.FirstOrDefault().Note;

@@ -65,6 +65,13 @@
                     android:layout_height="wrap_content"
                     android:text="Phone : 376245217"
                     android:textSize="16sp" />
+
+				<TextView
+				   android:id="@+id/txtOrderDate"
+				   android:layout_width="match_parent"
+				   android:layout_height="wrap_content"
+				   android:text="OrderDate : "
+				   android:textSize="16sp" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -121,6 +128,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tracking number : "
+				android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 />
@@ -129,6 +137,7 @@
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:enabled="false"
+                android:textColor="#B4000000"
                 android:layout_weight="1"
                 android:hint="Tracking Number" />
 
@@ -145,6 +154,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:text="Note : "
+				android:textColor="@android:color/black"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:layout_height="wrap_content"/>
@@ -153,6 +163,7 @@
                 android:id="@+id/edtNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+				android:textColor="#B4000000"
                 android:enabled="false"
                 android:hint="Note" />
         </LinearLayout>

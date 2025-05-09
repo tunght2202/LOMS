@@ -23,7 +23,6 @@ namespace LOMSUI.Activities
         private LinearLayout _layoutPending, _layoutConfirm, _layoutShipped,
                               _layoutTracking, _layoutNote;
         private ApiService _apiService;
-        private int _orderId;
         private int _liveStreamCustomerID;
         protected override async void OnCreate(Bundle? savedInstanceState)
         {
@@ -38,11 +37,6 @@ namespace LOMSUI.Activities
             InitButtonEvents();
             await LoadOrderDetails();
 
-            var orderInfo = await _apiService.GetOrderByLiveStreamCustomerAsync(_liveStreamCustomerID);
-            if (orderInfo != null)
-            {
-                _cbCheck.Checked = orderInfo.StatusCheck;
-            }
 
             _btnSetStatusCheck.Click += async (s, e) =>
             {
@@ -74,7 +68,7 @@ namespace LOMSUI.Activities
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
 
-            //_txtOrderDate = FindViewById<TextView>(Resource.Id.txtOrderDate);
+            _txtOrderDate = FindViewById<TextView>(Resource.Id.txtOrderDate);
             _txtTotalPrice = FindViewById<TextView>(Resource.Id.txtTotalPrice);
             _txtOrderStatus = FindViewById<TextView>(Resource.Id.txtOrderStatus);
 
@@ -123,6 +117,10 @@ namespace LOMSUI.Activities
             _txtAddress.Text = "Address: " + order.Address;
             _txtPhoneNumber.Text = "Phone: " + order.PhoneNumber;
             _txtTotalPrice.Text =  $"TotalPrice: {order.TotalPrice:n0}đ";
+            _txtOrderDate.Text = $"OrderDate : " + order.OrderDate;
+            _cbCheck.Checked = order.StatusCheck;
+            _edtTrackingNumber.Text = order.TrackingNumber;
+            _edtNote.Text = order.Note;
 
             var adapter = new OrderDetailAdapter(this, order.orderByProductCodeModels);
             _recyclerView.SetAdapter(adapter);

@@ -955,26 +955,6 @@ namespace LOMSUI.Services
             }
         }
 
-        public async Task<OrderByLiveStreamCustoemrModel> GetOrderByLiveStreamCustomerAsync(int livestreamCustomerID)
-        {
-            try
-            {
-                var url = $"{BASE_URLL}/Orders/LivestreamCustomer/{livestreamCustomerID}";
-                var response = await _httpClient.GetAsync(url);
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var order = JsonConvert.DeserializeObject<OrderByLiveStreamCustoemrModel>(json);
-                    return order;
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error getting order by livestreamCustomerID: " + ex.Message);
-                return null;
-            }
-        }
 
         public async Task<bool> UpdateOrderTrackingAndNoteAsync(int livestreamCustomerID, string trackingNumber, string note)
         {
