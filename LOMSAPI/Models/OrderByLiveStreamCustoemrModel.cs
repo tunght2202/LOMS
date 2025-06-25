@@ -18,7 +18,7 @@ namespace LOMSAPI.Models
         public string? Email { get; set; }
         public string? Address { get; set; }
         public string OrderStatus { get; set; }
-        public string OrderDate { get; set; }
+        public DateTime OrderDate { get; set; }
         public string ImageUrl { get; set; }
         public List<OrderByProductCodeModel> orderByProductCodeModels { get; set; }
     }

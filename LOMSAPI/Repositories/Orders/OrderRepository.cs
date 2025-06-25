@@ -696,7 +696,7 @@ namespace LOMSAPI.Repositories.Orders
             orderByLiveStreamCustoemrModel.CustoemrName = order.FirstOrDefault().Comment.LiveStreamCustomer.Customer.FacebookName;
             orderByLiveStreamCustoemrModel.LiveStreamCustoemrID = LiveStreamCustomerID;
             orderByLiveStreamCustoemrModel.OrderStatus = order.FirstOrDefault().Status.ToString();
-            orderByLiveStreamCustoemrModel.OrderDate = order.FirstOrDefault().OrderDate.ToString("dd/MM/yyyy");
+            orderByLiveStreamCustoemrModel.OrderDate = order.FirstOrDefault().OrderDate;
             orderByLiveStreamCustoemrModel.PriceMax = order.FirstOrDefault().Comment.LiveStreamCustomer.LiveStream.PriceMax;
             orderByLiveStreamCustoemrModel.TrackingNumber = order.FirstOrDefault().TrackingNumber;
             orderByLiveStreamCustoemrModel.Note = order.FirstOrDefault().Note;
